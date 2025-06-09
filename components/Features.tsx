@@ -1,38 +1,40 @@
-import { GraduationCap, Home, Smartphone } from "lucide-react"
+import { ShieldCheck, PlusCircle, Smartphone } from "lucide-react"
 
 export default function Features() {
   const features = [
     {
-      icon: <GraduationCap className="w-12 h-12 text-sky-600" />,
+      icon: <ShieldCheck className="w-6 h-6 text-green-600" />,
       title: "Verified .edu Users",
       description: "All listings are verified by students with valid .edu email addresses, ensuring a safe and trustworthy community."
     },
     {
-      icon: <Home className="w-12 h-12 text-mint-600" />,
+      icon: <PlusCircle className="w-6 h-6 text-orange-600" />,
       title: "Easy Listing Creation",
       description: "Create and manage your property listings in minutes with our intuitive interface and smart templates."
     },
     {
-      icon: <Smartphone className="w-12 h-12 text-sky-600" />,
+      icon: <Smartphone className="w-6 h-6 text-green-600" />,
       title: "Mobile-First Design",
       description: "Browse and manage listings on any device with our responsive, mobile-optimized platform."
     }
   ]
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section id="how-it-works" className="py-24 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="max-w-2xl mx-auto space-y-12">
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">
+              <div className="feature-icon-bg w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">
                 {feature.title}
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 leading-relaxed">
                 {feature.description}
               </p>
             </div>

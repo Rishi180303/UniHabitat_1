@@ -1,0 +1,67 @@
+import { useState } from "react"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Step } from "./Step"
+import { RenterStep1, ListerStep1 } from "./StepContent"
+
+export default function HowItWorks() {
+  const [activeTab, setActiveTab] = useState("renters")
+
+  return (
+    <section className="py-24 bg-white">
+      <div className="container mx-auto px-4">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+            How UniHabitat Makes Student Housing Simple
+          </h2>
+          
+          <Tabs 
+            defaultValue="renters" 
+            className="w-full max-w-md mx-auto"
+            onValueChange={setActiveTab}
+          >
+            <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-full">
+              <TabsTrigger 
+                value="renters"
+                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-full"
+              >
+                Renters
+              </TabsTrigger>
+              <TabsTrigger 
+                value="listers"
+                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-full"
+              >
+                Listers
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {/* Steps Timeline */}
+        <div className="relative max-w-4xl mx-auto">
+          {/* Vertical Line */}
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-gray-200" />
+          
+          {/* Steps */}
+          <div className="space-y-24">
+            {activeTab === "renters" ? (
+              <>
+                <Step number={1} title="Find the perfect campus housing">
+                  <RenterStep1 />
+                </Step>
+                {/* Add more steps here */}
+              </>
+            ) : (
+              <>
+                <Step number={1} title="List your place">
+                  <ListerStep1 />
+                </Step>
+                {/* Add more steps here */}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+} 
