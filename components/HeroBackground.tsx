@@ -13,11 +13,8 @@ export default function HeroBackground() {
         }}
       />
       
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/60" />
-      
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/80" />
+      {/* Light beige gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FDF6ED] via-[#FDF6ED]/95 to-[#FDF6ED]/90" />
     </div>
   )
 } 

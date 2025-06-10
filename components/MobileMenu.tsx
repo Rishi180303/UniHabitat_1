@@ -26,7 +26,7 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
         className={`transition-colors ${
           isScrolled 
             ? 'text-gray-600 hover:bg-gray-100' 
-            : 'text-white hover:bg-white/10'
+            : 'text-[#2C3E50] hover:bg-gray-100'
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -35,15 +35,15 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
 
       {isOpen && (
         <div className={`absolute top-20 left-0 right-0 ${
-          isScrolled ? 'bg-white shadow-lg' : 'glass-effect'
+          isScrolled ? 'bg-white shadow-lg' : 'bg-white shadow-lg'
         }`}>
           <div className="container mx-auto px-4 py-4 space-y-4">
             <button 
               onClick={() => scrollToSection('how-it-works')}
               className={`block w-full text-left transition-colors py-2 ${
                 isScrolled 
-                  ? 'text-gray-600 hover:text-green-600' 
-                  : 'text-white/80 hover:text-white'
+                  ? 'text-gray-600 hover:text-[#2C3E50]' 
+                  : 'text-[#2C3E50] hover:text-[#34495E]'
               }`}
             >
               How It Works
@@ -52,8 +52,8 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
               onClick={() => scrollToSection('contact')}
               className={`block w-full text-left transition-colors py-2 ${
                 isScrolled 
-                  ? 'text-gray-600 hover:text-green-600' 
-                  : 'text-white/80 hover:text-white'
+                  ? 'text-gray-600 hover:text-[#2C3E50]' 
+                  : 'text-[#2C3E50] hover:text-[#34495E]'
               }`}
             >
               Contact
@@ -61,8 +61,8 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
             <Button 
               className={`w-full transition-all duration-300 ${
                 isScrolled 
-                  ? 'gradient-bg text-white hover:opacity-90' 
-                  : 'glass-effect text-white hover:bg-white/20'
+                  ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
+                  : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
               }`}
             >
               Sign In

@@ -22,8 +22,8 @@ export default function Navigation({ isScrolled }: NavigationProps) {
         onClick={() => scrollToSection('how-it-works')}
         className={`transition-colors ${
           isScrolled 
-            ? 'text-gray-600 hover:text-green-600' 
-            : 'text-white/80 hover:text-white'
+            ? 'text-gray-600 hover:text-[#2C3E50]' 
+            : 'text-[#2C3E50] hover:text-[#34495E]'
         }`}
       >
         How It Works
@@ -32,8 +32,8 @@ export default function Navigation({ isScrolled }: NavigationProps) {
         onClick={() => scrollToSection('contact')}
         className={`transition-colors ${
           isScrolled 
-            ? 'text-gray-600 hover:text-green-600' 
-            : 'text-white/80 hover:text-white'
+            ? 'text-gray-600 hover:text-[#2C3E50]' 
+            : 'text-[#2C3E50] hover:text-[#34495E]'
         }`}
       >
         Contact
@@ -41,8 +41,8 @@ export default function Navigation({ isScrolled }: NavigationProps) {
       <Button 
         className={`transition-all duration-300 ${
           isScrolled 
-            ? 'gradient-bg text-white hover:opacity-90' 
-            : 'glass-effect text-white hover:bg-white/20'
+            ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
+            : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
         }`}
       >
         Sign In

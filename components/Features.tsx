@@ -3,24 +3,24 @@ import { ShieldCheck, PlusCircle, Smartphone } from "lucide-react"
 export default function Features() {
   const features = [
     {
-      icon: <ShieldCheck className="w-6 h-6 text-green-600" />,
+      icon: <ShieldCheck className="w-6 h-6 text-[#2C3E50]" />,
       title: "Verified .edu Users",
       description: "All listings are verified by students with valid .edu email addresses, ensuring a safe and trustworthy community."
     },
     {
-      icon: <PlusCircle className="w-6 h-6 text-orange-600" />,
+      icon: <PlusCircle className="w-6 h-6 text-[#2C3E50]" />,
       title: "Easy Listing Creation",
       description: "Create and manage your property listings in minutes with our intuitive interface and smart templates."
     },
     {
-      icon: <Smartphone className="w-6 h-6 text-green-600" />,
+      icon: <Smartphone className="w-6 h-6 text-[#2C3E50]" />,
       title: "Mobile-First Design",
       description: "Browse and manage listings on any device with our responsive, mobile-optimized platform."
     }
   ]
 
   return (
-    <section id="how-it-works" className="py-24 bg-gray-50">
+    <section id="how-it-works" className="py-24 bg-[#FDF6ED]">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto space-y-12">
           {features.map((feature, index) => (
@@ -31,7 +31,7 @@ export default function Features() {
               <div className="feature-icon-bg w-16 h-16 rounded-full flex items-center justify-center mb-6">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">
+              <h3 className="text-xl font-semibold mb-4 text-[#2C3E50]">
                 {feature.title}
               </h3>
               <p className="text-gray-600 leading-relaxed">

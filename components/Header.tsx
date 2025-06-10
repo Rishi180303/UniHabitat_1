@@ -27,7 +27,7 @@ export default function Header() {
         <Link 
           href="/" 
           className={`text-2xl font-bold transition-colors duration-300 ${
-            isScrolled ? 'text-green-600 hover:text-green-700' : 'text-white hover:text-green-400'
+            isScrolled ? 'text-[#2C3E50] hover:text-[#34495E]' : 'text-[#2C3E50] hover:text-[#34495E]'
           }`}
         >
           UniHabitat

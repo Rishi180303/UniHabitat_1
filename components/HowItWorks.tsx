@@ -7,11 +7,11 @@ export default function HowItWorks() {
   const [activeTab, setActiveTab] = useState("renters")
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-[#FDF6ED]">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-8">
             How UniHabitat Makes Student Housing Simple
           </h2>
           
@@ -20,16 +20,16 @@ export default function HowItWorks() {
             className="w-full max-w-md mx-auto"
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-full">
+            <TabsList className="grid w-full grid-cols-2 bg-white/50 p-1 rounded-full">
               <TabsTrigger 
                 value="renters"
-                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-full"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#2C3E50] rounded-full"
               >
                 Renters
               </TabsTrigger>
               <TabsTrigger 
                 value="listers"
-                className="data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-full"
+                className="data-[state=active]:bg-white data-[state=active]:text-[#2C3E50] rounded-full"
               >
                 Listers
               </TabsTrigger>
@@ -40,7 +40,7 @@ export default function HowItWorks() {
         {/* Steps Timeline */}
         <div className="relative max-w-4xl mx-auto">
           {/* Vertical Line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gray-200" />
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-[#2C3E50]/10" />
           
           {/* Steps */}
           <div className="space-y-24">
