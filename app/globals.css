@@ -77,18 +77,22 @@
 
 @layer utilities {
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-green-400;
   }
   
   .gradient-bg {
-    @apply bg-gradient-to-r from-orange-500 to-pink-500;
+    @apply bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition-all duration-300;
   }
   
   .hero-gradient {
-    @apply bg-gradient-to-b from-blue-50 to-white;
+    @apply bg-gradient-to-b from-gray-50 to-white;
   }
   
   .feature-icon-bg {
-    @apply bg-gradient-to-br from-green-500/10 to-orange-500/10;
+    @apply bg-gradient-to-br from-green-500/10 to-green-400/10;
+  }
+
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
 } 

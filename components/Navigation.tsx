@@ -16,17 +16,17 @@ export default function Navigation() {
     <nav className="hidden md:flex items-center space-x-8">
       <button 
         onClick={() => scrollToSection('how-it-works')}
-        className="text-gray-600 hover:text-green-600 transition-colors"
+        className="text-white/80 hover:text-white transition-colors"
       >
         How It Works
       </button>
       <button 
         onClick={() => scrollToSection('contact')}
-        className="text-gray-600 hover:text-green-600 transition-colors"
+        className="text-white/80 hover:text-white transition-colors"
       >
         Contact
       </button>
-      <Button className="gradient-bg text-white hover:opacity-90 transition-opacity">
+      <Button className="glass-effect text-white hover:bg-white/20 transition-all duration-300">
         Sign In
       </Button>
     </nav>
