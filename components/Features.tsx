@@ -22,6 +22,16 @@ export default function Features() {
   return (
     <section id="how-it-works" className="py-24 bg-[#FDF6ED]">
       <div className="container mx-auto px-4">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-6">
+            Why Choose UniHabitat?
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            We're making student housing simple, safe, and stress-free with our unique features
+          </p>
+        </div>
+
         <div className="max-w-2xl mx-auto space-y-12">
           {features.map((feature, index) => (
             <div 
