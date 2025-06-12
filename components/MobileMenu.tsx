@@ -3,6 +3,10 @@
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
 import { useState } from 'react'
+import { useAuth } from "./auth-provider"
+import { supabase } from "@/lib/supabase"
+import { useRouter, usePathname } from "next/navigation"
+import AuthModal from "./AuthModal"
 
 interface MobileMenuProps {
   isScrolled: boolean
@@ -10,12 +14,32 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isScrolled }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { user } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+
+  const isLandingPage = pathname === '/'
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
       setIsOpen(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    setIsLoading(true)
+    try {
+      await supabase.auth.signOut()
+      router.push('/')
+      setIsOpen(false)
+    } catch (error) {
+      console.error('Error logging out:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -38,38 +62,65 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
           isScrolled ? 'bg-white shadow-lg' : 'bg-white shadow-lg'
         }`}>
           <div className="container mx-auto px-4 py-4 space-y-4">
-            <button 
-              onClick={() => scrollToSection('how-it-works')}
-              className={`block w-full text-left transition-colors py-2 ${
-                isScrolled 
-                  ? 'text-gray-600 hover:text-[#2C3E50]' 
-                  : 'text-[#2C3E50] hover:text-[#34495E]'
-              }`}
-            >
-              How It Works
-            </button>
-            <button 
-              onClick={() => scrollToSection('contact')}
-              className={`block w-full text-left transition-colors py-2 ${
-                isScrolled 
-                  ? 'text-gray-600 hover:text-[#2C3E50]' 
-                  : 'text-[#2C3E50] hover:text-[#34495E]'
-              }`}
-            >
-              Contact
-            </button>
-            <Button 
-              className={`w-full transition-all duration-300 ${
-                isScrolled 
-                  ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
-                  : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
-              }`}
-            >
-              Sign In
-            </Button>
+            {isLandingPage && (
+              <>
+                <button 
+                  onClick={() => scrollToSection('how-it-works')}
+                  className={`block w-full text-left transition-colors py-2 ${
+                    isScrolled 
+                      ? 'text-gray-600 hover:text-[#2C3E50]' 
+                      : 'text-[#2C3E50] hover:text-[#34495E]'
+                  }`}
+                >
+                  How It Works
+                </button>
+                <button 
+                  onClick={() => scrollToSection('contact')}
+                  className={`block w-full text-left transition-colors py-2 ${
+                    isScrolled 
+                      ? 'text-gray-600 hover:text-[#2C3E50]' 
+                      : 'text-[#2C3E50] hover:text-[#34495E]'
+                  }`}
+                >
+                  Contact
+                </button>
+              </>
+            )}
+            
+            {!isLandingPage && user && (
+              <>
+                <div className="py-2 text-gray-600 border-t border-gray-200">
+                  {user.email}
+                </div>
+                <Button 
+                  onClick={handleLogout}
+                  className="w-full bg-red-500 text-white hover:bg-red-600"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Logging out...' : 'Logout'}
+                </Button>
+              </>
+            )}
+
+            {isLandingPage && !user && (
+              <Button 
+                onClick={() => {
+                  setIsAuthModalOpen(true)
+                  setIsOpen(false)
+                }}
+                className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E]"
+              >
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       )}
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
     </div>
   )
 } 

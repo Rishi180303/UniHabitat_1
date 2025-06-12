@@ -122,10 +122,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       })
 
       if (error) {
-        setMessage(`⚠️ ${error.message}`)
+        if (error.message.includes('Invalid OTP')) {
+          setMessage('⚠️ Invalid verification code. Please check the code and try again.')
+        } else if (error.message.includes('expired')) {
+          setMessage('⚠️ Verification code has expired. Please request a new code.')
+        } else if (error.message.includes('rate limit')) {
+          setMessage('⚠️ Too many attempts. Please wait a few minutes before trying again.')
+        } else {
+          setMessage(`⚠️ ${error.message}`)
+        }
       } else {
-        router.push('/profile/setup')
-        onClose()
+        setMessage('✅ Email verified successfully! Redirecting to profile setup...')
+        setTimeout(() => {
+          router.push('/profile/setup')
+          onClose()
+        }, 1500)
       }
     } catch (error) {
       setMessage('⚠️ An error occurred. Please try again.')
@@ -300,12 +311,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <Input
                 id="otp"
                 type="text"
-                placeholder="Enter the code from your email"
+                placeholder="Enter the 6-digit code from your email"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 className="w-full"
                 required
+                maxLength={6}
+                pattern="[0-9]*"
+                inputMode="numeric"
               />
+              <p className="text-xs text-gray-500">
+                Enter the 6-digit code sent to your email address
+              </p>
             </div>
 
             {message && (
@@ -332,9 +349,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {isLoading ? 'Verifying...' : 'Verify Code'}
             </Button>
 
-            <p className="text-sm text-gray-500 text-center">
-              Didn't receive the code? Check your spam folder or try again.
-            </p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-500">
+                Didn't receive the code? Check your spam folder.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('signup')
+                  setMessage('')
+                }}
+                className="text-sm text-[#2C3E50] hover:underline"
+              >
+                Try a different email
+              </button>
+            </div>
           </form>
         )
     }
