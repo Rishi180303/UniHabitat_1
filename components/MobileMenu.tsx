@@ -19,6 +19,7 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
   const pathname = usePathname()
   const [isLoading, setIsLoading] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
 
   const isLandingPage = pathname === '/'
 
@@ -41,6 +42,12 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleOpenAuthModal = (mode: 'signin' | 'signup') => {
+    setAuthMode(mode)
+    setIsAuthModalOpen(true)
+    setIsOpen(false)
   }
 
   return (
@@ -103,15 +110,21 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
             )}
 
             {isLandingPage && !user && (
-              <Button 
-                onClick={() => {
-                  setIsAuthModalOpen(true)
-                  setIsOpen(false)
-                }}
-                className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E]"
-              >
-                Sign In
-              </Button>
+              <div className="space-y-3 pt-2 border-t border-gray-200">
+                <Button 
+                  onClick={() => handleOpenAuthModal('signin')}
+                  className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E]"
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  onClick={() => handleOpenAuthModal('signup')}
+                  variant="outline"
+                  className="w-full border-[#2C3E50] text-[#2C3E50] hover:bg-[#2C3E50] hover:text-white"
+                >
+                  Create Account
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -119,7 +132,8 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
 
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
       />
     </div>
   )

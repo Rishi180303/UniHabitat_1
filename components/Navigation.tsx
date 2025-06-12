@@ -19,6 +19,7 @@ export default function Navigation({ isScrolled }: NavigationProps) {
   const pathname = usePathname()
   const [isLoading, setIsLoading] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
 
   const isLandingPage = pathname === '/'
 
@@ -39,6 +40,11 @@ export default function Navigation({ isScrolled }: NavigationProps) {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleOpenAuthModal = (mode: 'signin' | 'signup') => {
+    setAuthMode(mode)
+    setIsAuthModalOpen(true)
   }
 
   return (
@@ -92,21 +98,35 @@ export default function Navigation({ isScrolled }: NavigationProps) {
       )}
 
       {isLandingPage && !user && (
-        <Button 
-          onClick={() => setIsAuthModalOpen(true)}
-          className={`transition-all duration-300 ${
-            isScrolled 
-              ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
-              : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
-          }`}
-        >
-          Sign In
-        </Button>
+        <div className="flex items-center space-x-4">
+          <Button 
+            onClick={() => handleOpenAuthModal('signin')}
+            className={`transition-all duration-300 ${
+              isScrolled 
+                ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
+                : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
+            }`}
+          >
+            Sign In
+          </Button>
+          <Button 
+            onClick={() => handleOpenAuthModal('signup')}
+            variant="outline"
+            className={`transition-all duration-300 ${
+              isScrolled 
+                ? 'border-[#2C3E50] text-[#2C3E50] hover:bg-[#2C3E50] hover:text-white' 
+                : 'border-[#2C3E50] text-[#2C3E50] hover:bg-[#2C3E50] hover:text-white'
+            }`}
+          >
+            Create Account
+          </Button>
+        </div>
       )}
 
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
       />
     </nav>
   )

@@ -11,17 +11,18 @@ import { useRouter } from "next/navigation"
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
+  initialMode?: 'signin' | 'signup'
 }
 
 type AuthMode = 'signup' | 'signin' | 'verify'
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModalProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
-  const [mode, setMode] = useState<AuthMode>('signup')
+  const [mode, setMode] = useState<AuthMode>(initialMode)
   const { user } = useAuth()
   const router = useRouter()
 
