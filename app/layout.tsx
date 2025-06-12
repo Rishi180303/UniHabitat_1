@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import AuthProvider from '@/components/auth-provider'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -9,8 +10,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'UniHabitat - Find Your Next Home on Campus',
-  description: 'The easiest way to discover and secure your perfect off-campus housing. Verified listings, trusted by students.',
+  title: 'UniHabitat - Student Housing Made Simple',
+  description: 'Find your perfect off-campus housing near your university',
 }
 
 export default function RootLayout({
@@ -20,7 +21,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans`}>{children}</body>
+      <body className={`${inter.variable} font-sans`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 } 
