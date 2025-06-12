@@ -44,13 +44,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     e.preventDefault()
     
     if (!email.endsWith('.edu')) {
-      setMessage('Please use your .edu email address')
+      setMessage('⚠️ Please use your .edu email address to verify your student status')
       return
     }
 
     const passwordError = validatePassword(password)
     if (passwordError) {
-      setMessage(passwordError)
+      setMessage(`⚠️ ${passwordError}`)
       return
     }
     
@@ -71,14 +71,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       })
       
       if (error) {
-        setMessage(error.message)
+        setMessage(`⚠️ ${error.message}`)
         console.error('Supabase error:', error)
       } else {
         setMode('verify')
-        setMessage('Please check your email for the verification code. If you don\'t see it, check your spam folder.')
+        setMessage('✅ Please check your email for the verification code. If you don\'t see it, check your spam folder.')
       }
     } catch (error) {
-      setMessage('An error occurred. Please try again.')
+      setMessage('⚠️ An error occurred. Please try again.')
       console.error('Network or unexpected error:', error)
     } finally {
       setIsLoading(false)
@@ -97,13 +97,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       })
 
       if (error) {
-        setMessage(error.message)
+        setMessage(`⚠️ ${error.message}`)
       } else {
         router.push('/profile/setup')
         onClose()
       }
     } catch (error) {
-      setMessage('An error occurred. Please try again.')
+      setMessage('⚠️ An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -122,13 +122,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       })
 
       if (error) {
-        setMessage(error.message)
+        setMessage(`⚠️ ${error.message}`)
       } else {
         router.push('/profile/setup')
         onClose()
       }
     } catch (error) {
-      setMessage('An error occurred. Please try again.')
+      setMessage('⚠️ An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -182,9 +182,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
 
             {message && (
-              <p className={`text-sm ${message.includes('error') ? 'text-red-500' : 'text-green-500'}`}>
-                {message}
-              </p>
+              <div className={`p-3 rounded-md ${
+                message.includes('⚠️') 
+                  ? 'bg-red-50 border border-red-200' 
+                  : 'bg-green-50 border border-green-200'
+              }`}>
+                <p className={`text-sm font-medium ${
+                  message.includes('⚠️') 
+                    ? 'text-red-800' 
+                    : 'text-green-800'
+                }`}>
+                  {message}
+                </p>
+              </div>
             )}
 
             <Button 
@@ -245,9 +255,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
 
             {message && (
-              <p className={`text-sm ${message.includes('error') ? 'text-red-500' : 'text-green-500'}`}>
-                {message}
-              </p>
+              <div className={`p-3 rounded-md ${
+                message.includes('⚠️') 
+                  ? 'bg-red-50 border border-red-200' 
+                  : 'bg-green-50 border border-green-200'
+              }`}>
+                <p className={`text-sm font-medium ${
+                  message.includes('⚠️') 
+                    ? 'text-red-800' 
+                    : 'text-green-800'
+                }`}>
+                  {message}
+                </p>
+              </div>
             )}
 
             <Button 
@@ -289,9 +309,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
 
             {message && (
-              <p className={`text-sm ${message.includes('error') ? 'text-red-500' : 'text-green-500'}`}>
-                {message}
-              </p>
+              <div className={`p-3 rounded-md ${
+                message.includes('⚠️') 
+                  ? 'bg-red-50 border border-red-200' 
+                  : 'bg-green-50 border border-green-200'
+              }`}>
+                <p className={`text-sm font-medium ${
+                  message.includes('⚠️') 
+                    ? 'text-red-800' 
+                    : 'text-green-800'
+                }`}>
+                  {message}
+                </p>
+              </div>
             )}
 
             <Button 
