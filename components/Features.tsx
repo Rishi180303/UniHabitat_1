@@ -1,4 +1,7 @@
+'use client'
+
 import { ShieldCheck, PlusCircle, Smartphone } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function Features() {
   const features = [
@@ -23,20 +26,29 @@ export default function Features() {
     <section id="how-it-works" className="py-24 bg-[#FDF6ED]">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-6">
             Why Choose UniHabitat?
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             We're making student housing simple, safe, and stress-free with our unique features
           </p>
-        </div>
+        </motion.div>
 
         <div className="max-w-2xl mx-auto space-y-12">
           {features.map((feature, index) => (
-            <div 
+            <motion.div 
               key={index}
-              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              whileHover={{ scale: 1.02 }}
+              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
             >
               <div className="feature-icon-bg w-16 h-16 rounded-full flex items-center justify-center mb-6">
                 {feature.icon}
@@ -47,7 +59,7 @@ export default function Features() {
               <p className="text-gray-600 leading-relaxed">
                 {feature.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

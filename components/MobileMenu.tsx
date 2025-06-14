@@ -7,6 +7,7 @@ import { useAuth } from "./auth-provider"
 import { supabase } from "@/lib/supabase"
 import { useRouter, usePathname } from "next/navigation"
 import AuthModal from "./AuthModal"
+import { motion } from "framer-motion"
 
 interface MobileMenuProps {
   isScrolled: boolean
@@ -52,22 +53,29 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
 
   return (
     <div className="md:hidden">
-      <Button 
-        variant="ghost" 
-        className={`transition-colors ${
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        onClick={() => setIsOpen(!isOpen)}
+        className={`p-2 text-[#2C3E50] hover:text-[#34495E] transition-colors ${
           isScrolled 
             ? 'text-gray-600 hover:bg-gray-100' 
             : 'text-[#2C3E50] hover:bg-gray-100'
         }`}
-        onClick={() => setIsOpen(!isOpen)}
       >
-        <Menu className="h-6 w-6" />
-      </Button>
+        <Menu className="w-6 h-6" />
+      </motion.button>
 
       {isOpen && (
-        <div className={`absolute top-20 left-0 right-0 ${
-          isScrolled ? 'bg-white shadow-lg' : 'bg-white shadow-lg'
-        }`}>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className={`absolute top-20 left-0 right-0 ${
+            isScrolled ? 'bg-white shadow-lg' : 'bg-white shadow-lg'
+          } p-4`}
+        >
           <div className="container mx-auto px-4 py-4 space-y-4">
             {isLandingPage && (
               <>
@@ -127,7 +135,7 @@ export default function MobileMenu({ isScrolled }: MobileMenuProps) {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
 
       <AuthModal 

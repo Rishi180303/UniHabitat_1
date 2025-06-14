@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter, usePathname } from "next/navigation"
 import { useState } from "react"
 import AuthModal from "./AuthModal"
+import { motion } from "framer-motion"
 
 interface NavigationProps {
   isScrolled: boolean
@@ -48,7 +49,12 @@ export default function Navigation({ isScrolled }: NavigationProps) {
   }
 
   return (
-    <nav className="hidden md:flex items-center space-x-8">
+    <motion.nav 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.4 }}
+      className="hidden md:flex items-center space-x-8"
+    >
       {isLandingPage && (
         <>
           <button 
@@ -128,6 +134,6 @@ export default function Navigation({ isScrolled }: NavigationProps) {
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authMode}
       />
-    </nav>
+    </motion.nav>
   )
 } 
