@@ -2,15 +2,40 @@
 
 import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
-import { useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Calendar } from 'lucide-react'
+
+interface ProfileFormData {
+  fullName: string
+  university: string
+  major: string
+  graduationYear: string
+  moveInDate: string
+  budget: string
+  preferredLocation: string
+  roommates: string
+  bio: string
+}
 
 export default function ProfileSetup() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState<ProfileFormData>({
+    fullName: '',
+    university: '',
+    major: '',
+    graduationYear: '',
+    moveInDate: '',
+    budget: '',
+    preferredLocation: '',
+    roommates: '',
+    bio: ''
+  })
 
   useEffect(() => {
     if (!loading && !user) {
@@ -27,6 +52,39 @@ export default function ProfileSetup() {
       console.error('Error logging out:', error)
     } finally {
       setIsLoggingOut(false)
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user?.id,
+          email: user?.email,
+          ...formData,
+          updated_at: new Date().toISOString()
+        })
+
+      if (error) throw error
+      
+      // Redirect to dashboard or home page after successful profile creation
+      router.push('/dashboard')
+    } catch (error) {
+      console.error('Error saving profile:', error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -66,15 +124,158 @@ export default function ProfileSetup() {
             Complete Your Profile
           </h2>
           <p className="text-gray-600 mb-8">
-            Welcome to UniHabitat! Let's get your profile set up.
+            Welcome to UniHabitat! Let's get your profile set up to help you find your perfect student housing.
           </p>
           
-          {/* Placeholder for profile setup form */}
-          <div className="space-y-4">
-            <p className="text-gray-500 italic">
-              Profile setup form will be implemented here...
-            </p>
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Personal Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-[#2C3E50]">Personal Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
+                    Full Name
+                  </label>
+                  <Input
+                    id="fullName"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="university" className="text-sm font-medium text-gray-700">
+                    University
+                  </label>
+                  <Input
+                    id="university"
+                    name="university"
+                    value={formData.university}
+                    onChange={handleInputChange}
+                    placeholder="Your University"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="major" className="text-sm font-medium text-gray-700">
+                    Major
+                  </label>
+                  <Input
+                    id="major"
+                    name="major"
+                    value={formData.major}
+                    onChange={handleInputChange}
+                    placeholder="Your Major"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="graduationYear" className="text-sm font-medium text-gray-700">
+                    Expected Graduation Year
+                  </label>
+                  <Input
+                    id="graduationYear"
+                    name="graduationYear"
+                    value={formData.graduationYear}
+                    onChange={handleInputChange}
+                    placeholder="2025"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Housing Preferences Section */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-[#2C3E50]">Housing Preferences</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="moveInDate" className="text-sm font-medium text-gray-700">
+                    Preferred Move-in Date
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Input
+                      id="moveInDate"
+                      name="moveInDate"
+                      type="date"
+                      value={formData.moveInDate}
+                      onChange={handleInputChange}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="budget" className="text-sm font-medium text-gray-700">
+                    Monthly Budget
+                  </label>
+                  <Input
+                    id="budget"
+                    name="budget"
+                    value={formData.budget}
+                    onChange={handleInputChange}
+                    placeholder="e.g., $1000"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="preferredLocation" className="text-sm font-medium text-gray-700">
+                    Preferred Location
+                  </label>
+                  <Input
+                    id="preferredLocation"
+                    name="preferredLocation"
+                    value={formData.preferredLocation}
+                    onChange={handleInputChange}
+                    placeholder="e.g., Near Campus, Downtown"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="roommates" className="text-sm font-medium text-gray-700">
+                    Roommate Preference
+                  </label>
+                  <Input
+                    id="roommates"
+                    name="roommates"
+                    value={formData.roommates}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 1-2 roommates"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Bio Section */}
+            <div className="space-y-2">
+              <label htmlFor="bio" className="text-sm font-medium text-gray-700">
+                About Me
+              </label>
+              <textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                onChange={handleInputChange}
+                placeholder="Tell us about yourself and your housing preferences..."
+                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2C3E50] focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div className="pt-4">
+              <Button
+                type="submit"
+                className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E]"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving Profile...' : 'Complete Profile Setup'}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
