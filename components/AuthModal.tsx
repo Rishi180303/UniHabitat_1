@@ -92,15 +92,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
     setMessage('')
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithOtp({
         email,
-        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          shouldCreateUser: false
+        }
       })
 
       if (error) {
         setMessage(`⚠️ ${error.message}`)
       } else {
-        router.push('/profile/setup')
+        setMessage('✅ Check your email for the magic link to sign in. If you don\'t see it, check your spam folder.')
         onClose()
       }
     } catch (error) {
@@ -133,10 +136,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
           setMessage(`⚠️ ${error.message}`)
         }
       } else {
-        setMessage('✅ Email verified successfully! Redirecting to profile setup...')
+        setMessage('✅ Email verified successfully! Redirecting...')
         setTimeout(() => {
-          router.push('/profile/setup')
-          onClose()
+          // Check if user has completed profile setup
+          const checkProfile = async () => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', user?.id)
+              .single()
+
+            if (profile) {
+              router.push('/dashboard')
+            } else {
+              router.push('/profile/setup')
+            }
+            onClose()
+          }
+          checkProfile()
         }, 1500)
       }
     } catch (error) {
@@ -249,21 +266,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
                 className="w-full"
                 required
               />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full"
-                required
-              />
+              <p className="text-xs text-gray-500">
+                We'll send you a magic link to sign in securely
+              </p>
             </div>
 
             {message && (
@@ -287,7 +292,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
               className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E]"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Sending magic link...' : 'Send Magic Link'}
             </Button>
 
             <div className="text-center">
