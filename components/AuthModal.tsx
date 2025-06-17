@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "./auth-provider"
@@ -11,19 +12,17 @@ import { useRouter } from "next/navigation"
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
-  initialMode?: 'signin' | 'signup'
+  initialMode?: 'signin' | 'signup' | 'verify'
 }
 
-type AuthMode = 'signup' | 'signin' | 'verify'
-
-export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModalProps) {
+  const [mode, setMode] = useState<'signin' | 'signup' | 'verify'>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [mode, setMode] = useState<AuthMode>(initialMode)
-  const { user } = useAuth()
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const { user, refreshUser } = useAuth()
   const router = useRouter()
 
   const validatePassword = (pass: string) => {
@@ -41,22 +40,91 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
     return ''
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setMessage(null)
+
+    const redirectTo = new URL('/auth/callback', window.location.origin).toString()
+    
+    console.log('Auth Debug - Starting authentication:', {
+      mode,
+      email,
+      redirectTo,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      origin: window.location.origin
+    })
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: redirectTo,
+          shouldCreateUser: mode === 'signup',
+        },
+      })
+
+      console.log('Auth Debug - OTP Response:', {
+        error: error ? {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        } : null,
+        timestamp: new Date().toISOString(),
+        redirectTo
+      })
+
+      if (error) {
+        throw error
+      }
+
+      setMessage({
+        type: 'success',
+        text: 'Email link sent! Please continue via the link in your email inbox. You can close this page.'
+      })
+    } catch (error: any) {
+      console.error('Auth Debug - Error details:', {
+        error: {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+          stack: error.stack
+        },
+        timestamp: new Date().toISOString()
+      })
+
+      setMessage({
+        type: 'error',
+        text: error.message || 'An error occurred. Please try again.'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!email.endsWith('.edu')) {
-      setMessage('⚠️ Please use your .edu email address to verify your student status')
+      setMessage({
+        type: 'error',
+        text: '⚠️ Please use your .edu email address to verify your student status'
+      })
       return
     }
 
     const passwordError = validatePassword(password)
     if (passwordError) {
-      setMessage(`⚠️ ${passwordError}`)
+      setMessage({
+        type: 'error',
+        text: `⚠️ ${passwordError}`
+      })
       return
     }
     
     setIsLoading(true)
-    setMessage('')
+    setMessage(null)
     
     try {
       const { error } = await supabase.auth.signUp({
@@ -72,42 +140,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
       })
       
       if (error) {
-        setMessage(`⚠️ ${error.message}`)
+        setMessage({
+          type: 'error',
+          text: `⚠️ ${error.message}`
+        })
         console.error('Supabase error:', error)
       } else {
         setMode('verify')
-        setMessage('✅ Please check your email for the verification code. If you don\'t see it, check your spam folder.')
+        setMessage({
+          type: 'success',
+          text: '✅ Please check your email for the verification code. If you don\'t see it, check your spam folder.'
+        })
       }
     } catch (error) {
-      setMessage('⚠️ An error occurred. Please try again.')
-      console.error('Network or unexpected error:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setMessage('')
-
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-          shouldCreateUser: false
-        }
+      setMessage({
+        type: 'error',
+        text: '⚠️ An error occurred. Please try again.'
       })
-
-      if (error) {
-        setMessage(`⚠️ ${error.message}`)
-      } else {
-        setMessage('✅ Check your email for the magic link to sign in. If you don\'t see it, check your spam folder.')
-        onClose()
-      }
-    } catch (error) {
-      setMessage('⚠️ An error occurred. Please try again.')
+      console.error('Network or unexpected error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -116,7 +166,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setMessage('')
+    setMessage(null)
 
     try {
       const { error } = await supabase.auth.verifyOtp({
@@ -127,16 +177,31 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
 
       if (error) {
         if (error.message.includes('Invalid OTP')) {
-          setMessage('⚠️ Invalid verification code. Please check the code and try again.')
+          setMessage({
+            type: 'error',
+            text: '⚠️ Invalid verification code. Please check the code and try again.'
+          })
         } else if (error.message.includes('expired')) {
-          setMessage('⚠️ Verification code has expired. Please request a new code.')
+          setMessage({
+            type: 'error',
+            text: '⚠️ Verification code has expired. Please request a new code.'
+          })
         } else if (error.message.includes('rate limit')) {
-          setMessage('⚠️ Too many attempts. Please wait a few minutes before trying again.')
+          setMessage({
+            type: 'error',
+            text: '⚠️ Too many attempts. Please wait a few minutes before trying again.'
+          })
         } else {
-          setMessage(`⚠️ ${error.message}`)
+          setMessage({
+            type: 'error',
+            text: `⚠️ ${error.message}`
+          })
         }
       } else {
-        setMessage('✅ Email verified successfully! Redirecting...')
+        setMessage({
+          type: 'success',
+          text: '✅ Email verified successfully! Redirecting...'
+        })
         setTimeout(() => {
           // Check if user has completed profile setup
           const checkProfile = async () => {
@@ -157,7 +222,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
         }, 1500)
       }
     } catch (error) {
-      setMessage('⚠️ An error occurred. Please try again.')
+      setMessage({
+        type: 'error',
+        text: '⚠️ An error occurred. Please try again.'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -167,8 +235,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
     setEmail('')
     setPassword('')
     setOtp('')
-    setMessage('')
-    setMode('signup')
+    setMessage(null)
+    setMode('signin')
     onClose()
   }
 
@@ -178,9 +246,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
         return (
           <form onSubmit={handleSignUp} className="space-y-4 mt-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                .edu Email Address
-              </label>
+              <Label htmlFor="email">.edu Email Address</Label>
               <Input
                 id="email"
                 type="email"
@@ -193,9 +259,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -212,16 +276,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
 
             {message && (
               <div className={`p-3 rounded-md ${
-                message.includes('⚠️') 
-                  ? 'bg-red-50 border border-red-200' 
-                  : 'bg-green-50 border border-green-200'
+                message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
               }`}>
                 <p className={`text-sm font-medium ${
-                  message.includes('⚠️') 
-                    ? 'text-red-800' 
-                    : 'text-green-800'
+                  message.type === 'success' ? 'text-green-800' : 'text-red-800'
                 }`}>
-                  {message}
+                  {message.text}
                 </p>
               </div>
             )}
@@ -252,37 +312,28 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
 
       case 'signin':
         return (
-          <form onSubmit={handleSignIn} className="space-y-4 mt-4">
+          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email Address
-              </label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@university.edu"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full"
                 required
+                className="w-full"
               />
-              <p className="text-xs text-gray-500">
-                We'll send you a magic link to sign in securely
-              </p>
             </div>
 
             {message && (
               <div className={`p-3 rounded-md ${
-                message.includes('⚠️') 
-                  ? 'bg-red-50 border border-red-200' 
-                  : 'bg-green-50 border border-green-200'
+                message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
               }`}>
                 <p className={`text-sm font-medium ${
-                  message.includes('⚠️') 
-                    ? 'text-red-800' 
-                    : 'text-green-800'
+                  message.type === 'success' ? 'text-green-800' : 'text-red-800'
                 }`}>
-                  {message}
+                  {message.text}
                 </p>
               </div>
             )}
@@ -292,7 +343,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
               className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E]"
               disabled={isLoading}
             >
-              {isLoading ? 'Sending magic link...' : 'Send Magic Link'}
+              {isLoading ? 'Sending...' : 'Sign In'}
             </Button>
 
             <div className="text-center">
@@ -311,9 +362,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
         return (
           <form onSubmit={handleVerifyOTP} className="space-y-4 mt-4">
             <div className="space-y-2">
-              <label htmlFor="otp" className="text-sm font-medium text-gray-700">
-                Verification Code
-              </label>
+              <Label htmlFor="otp">Verification Code</Label>
               <Input
                 id="otp"
                 type="text"
@@ -333,16 +382,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
 
             {message && (
               <div className={`p-3 rounded-md ${
-                message.includes('⚠️') 
-                  ? 'bg-red-50 border border-red-200' 
-                  : 'bg-green-50 border border-green-200'
+                message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
               }`}>
                 <p className={`text-sm font-medium ${
-                  message.includes('⚠️') 
-                    ? 'text-red-800' 
-                    : 'text-green-800'
+                  message.type === 'success' ? 'text-green-800' : 'text-red-800'
                 }`}>
-                  {message}
+                  {message.text}
                 </p>
               </div>
             )}
@@ -363,7 +408,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
                 type="button"
                 onClick={() => {
                   setMode('signup')
-                  setMessage('')
+                  setMessage(null)
                 }}
                 className="text-sm text-[#2C3E50] hover:underline"
               >
@@ -380,9 +425,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signup' }: A
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-[#2C3E50]">
-            {mode === 'signup' ? 'Create Your Account' :
-             mode === 'signin' ? 'Welcome Back' :
-             'Verify Your Email'}
+            {mode === 'signin' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Verify Email'}
           </DialogTitle>
           <DialogDescription className="text-gray-600 mt-2">
             {mode === 'signup' ? 'Sign up with your .edu email to get started.' :

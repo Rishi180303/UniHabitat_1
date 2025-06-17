@@ -4,6 +4,7 @@ import Header from '../components/Header'
 import Hero from '../components/Hero'
 import Features from '../components/Features'
 import Footer from '../components/Footer'
+import AuthError from '../components/AuthError'
 import { motion } from "framer-motion"
 
 export default function Home() {
@@ -16,6 +17,8 @@ export default function Home() {
       >
         <Header />
       </motion.div>
+
+      <AuthError />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
