@@ -1,24 +1,20 @@
 'use client'
 
-import { ShieldCheck, PlusCircle, Smartphone } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function Features() {
   const features = [
     {
-      icon: <ShieldCheck className="w-6 h-6 text-[#2C3E50]" />,
       title: "Verified .edu Users",
       description: "All listings are verified by students with valid .edu email addresses, ensuring a safe and trustworthy community.",
       emoji: "🎓"
     },
     {
-      icon: <PlusCircle className="w-6 h-6 text-[#2C3E50]" />,
       title: "Easy Listing Creation",
       description: "Create and manage your property listings in minutes with our intuitive interface and smart templates.",
       emoji: "✨"
     },
     {
-      icon: <Smartphone className="w-6 h-6 text-[#2C3E50]" />,
       title: "Mobile-First Design",
       description: "Browse and manage listings on any device with our responsive, mobile-optimized platform.",
       emoji: "📱"
@@ -54,10 +50,7 @@ export default function Features() {
               className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
-                <div className="feature-icon-bg w-16 h-16 rounded-full flex items-center justify-center">
-                  {feature.icon}
-                </div>
-                <span className="text-3xl">{feature.emoji}</span>
+                <span className="text-4xl">{feature.emoji}</span>
               </div>
               <h3 className="text-xl font-semibold mb-4 text-[#2C3E50]">
                 {feature.title}
