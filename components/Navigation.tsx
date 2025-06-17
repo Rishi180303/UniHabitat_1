@@ -53,7 +53,7 @@ export default function Navigation({ isScrolled }: NavigationProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      className="hidden md:flex items-center space-x-8"
+      className="flex items-center space-x-8"
     >
       {isLandingPage && (
         <>
@@ -104,29 +104,16 @@ export default function Navigation({ isScrolled }: NavigationProps) {
       )}
 
       {isLandingPage && !user && (
-        <div className="flex items-center space-x-4">
-          <Button 
-            onClick={() => handleOpenAuthModal('signin')}
-            className={`transition-all duration-300 ${
-              isScrolled 
-                ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
-                : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
-            }`}
-          >
-            Sign In
-          </Button>
-          <Button 
-            onClick={() => handleOpenAuthModal('signup')}
-            variant="outline"
-            className={`transition-all duration-300 ${
-              isScrolled 
-                ? 'border-[#2C3E50] text-[#2C3E50] hover:bg-[#2C3E50] hover:text-white' 
-                : 'border-[#2C3E50] text-[#2C3E50] hover:bg-[#2C3E50] hover:text-white'
-            }`}
-          >
-            Create Account
-          </Button>
-        </div>
+        <Button 
+          onClick={() => handleOpenAuthModal('signin')}
+          className={`transition-all duration-300 ${
+            isScrolled 
+              ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
+              : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
+          }`}
+        >
+          Sign In
+        </Button>
       )}
 
       <AuthModal 

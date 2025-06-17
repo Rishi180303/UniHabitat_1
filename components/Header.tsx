@@ -2,9 +2,7 @@
 
 import Link from 'next/link'
 import Navigation from './Navigation'
-import MobileMenu from './MobileMenu'
 import { useEffect, useState } from 'react'
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import AuthModal from "./AuthModal"
 
@@ -42,7 +40,6 @@ export default function Header() {
         </motion.div>
         
         <Navigation isScrolled={isScrolled} />
-        <MobileMenu isScrolled={isScrolled} />
       </div>
 
       <AuthModal 
