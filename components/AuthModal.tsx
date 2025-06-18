@@ -81,7 +81,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
 
       setMessage({
         type: 'success',
-        text: 'Email link sent! Please continue via the link in your email inbox. You can close this page.'
+        text: 'Check your email for the login link!'
       })
     } catch (error: any) {
       console.error('Auth Debug - Error details:', {
