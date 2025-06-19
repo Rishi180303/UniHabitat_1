@@ -77,11 +77,33 @@ export default function Navigation({ isScrolled }: NavigationProps) {
           >
             Contact
           </button>
+          {user && (
+            <Link 
+              href="/dashboard"
+              className={`transition-colors ${
+                isScrolled 
+                  ? 'text-gray-600 hover:text-[#2C3E50]' 
+                  : 'text-[#2C3E50] hover:text-[#34495E]'
+              }`}
+            >
+              Dashboard
+            </Link>
+          )}
         </>
       )}
       
       {!isLandingPage && user && (
         <div className="flex items-center space-x-4">
+          <Link 
+            href="/dashboard"
+            className={`transition-colors ${
+              isScrolled 
+                ? 'text-gray-600 hover:text-[#2C3E50]' 
+                : 'text-[#2C3E50] hover:text-[#34495E]'
+            }`}
+          >
+            Dashboard
+          </Link>
           <span className={`${
             isScrolled 
               ? 'text-gray-600' 

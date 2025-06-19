@@ -65,8 +65,8 @@ export async function GET(request: Request) {
         console.log('Code exchange successful', {
           timestamp: new Date().toISOString()
         })
-        // Redirect to profile page after successful login
-        return NextResponse.redirect(`${requestUrl.origin}/profile`)
+        // Redirect to dashboard after successful login
+        return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
       } catch (e) {
         console.error('Unexpected error during code exchange:', {
           error: e,

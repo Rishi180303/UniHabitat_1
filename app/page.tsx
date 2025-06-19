@@ -6,8 +6,13 @@ import Features from '../components/Features'
 import Footer from '../components/Footer'
 import AuthError from '../components/AuthError'
 import { motion } from "framer-motion"
+import { useAuth } from '../components/auth-provider'
 
 export default function Home() {
+  const { user, loading } = useAuth()
+
+  console.log('Home page rendering:', { user, loading })
+
   return (
     <main className="min-h-screen bg-[#FDF6ED]">
       <motion.div
