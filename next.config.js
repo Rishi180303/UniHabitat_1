@@ -4,6 +4,17 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
+  webpack: (config, { isServer }) => {
+    // Suppress the critical dependency warning from Supabase realtime client
+    config.ignoreWarnings = [
+      {
+        module: /node_modules\/@supabase\/realtime-js/,
+        message: /Critical dependency: the request of a dependency is an expression/,
+      },
+    ];
+    
+    return config;
+  },
 }
 
 module.exports = nextConfig 

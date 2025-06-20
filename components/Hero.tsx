@@ -7,7 +7,6 @@ import AuthModal from "./AuthModal"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useAuth } from "./auth-provider"
-import Link from "next/link"
 
 export default function Hero() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -54,36 +53,39 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 1 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          {user ? (
-            <Link href="/dashboard">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white hover:from-[#34495E] hover:to-[#2C3E50] transition-all duration-300"
-              >
-                View Dashboard
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          ) : (
-            <>
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white hover:from-[#34495E] hover:to-[#2C3E50] transition-all duration-300"
-                onClick={() => setIsAuthModalOpen(true)}
-              >
-                Find Your Home
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="bg-white text-[#2C3E50] border-[#2C3E50]/20 hover:bg-[#FDF6ED] hover:text-[#34495E] transition-all duration-300"
-                onClick={() => setIsAuthModalOpen(true)}
-              >
-                List Your Unit
-              </Button>
-            </>
-          )}
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white hover:from-[#34495E] hover:to-[#2C3E50] transition-all duration-300"
+            onClick={() => setIsAuthModalOpen(true)}
+          >
+            Find Your Home
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="bg-white text-[#2C3E50] border-[#2C3E50]/20 hover:bg-[#FDF6ED] hover:text-[#34495E] transition-all duration-300"
+            onClick={() => setIsAuthModalOpen(true)}
+          >
+            List Your Unit
+          </Button>
         </motion.div>
+
+        {!user && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+            className="mt-8"
+          >
+            <Button 
+              variant="ghost" 
+              className="text-[#2C3E50] hover:text-[#34495E] hover:bg-[#FDF6ED] transition-all duration-300"
+              onClick={() => setIsAuthModalOpen(true)}
+            >
+              Already have an account? Sign In
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       <AuthModal 

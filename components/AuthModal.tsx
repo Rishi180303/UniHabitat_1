@@ -45,7 +45,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
     setIsLoading(true)
     setMessage(null)
 
-    const redirectTo = 'http://localhost:3000/auth/callback'
+    const redirectTo = new URL('/auth/callback', window.location.origin).toString()
     
     console.log('Auth Debug - Starting authentication:', {
       mode,
