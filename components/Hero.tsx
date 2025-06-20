@@ -69,23 +69,6 @@ export default function Hero() {
             List Your Unit
           </Button>
         </motion.div>
-
-        {!user && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="mt-8"
-          >
-            <Button 
-              variant="ghost" 
-              className="text-[#2C3E50] hover:text-[#34495E] hover:bg-[#FDF6ED] transition-all duration-300"
-              onClick={() => setIsAuthModalOpen(true)}
-            >
-              Already have an account? Sign In
-            </Button>
-          </motion.div>
-        )}
       </div>
 
       <AuthModal 
