@@ -15,6 +15,14 @@ export default function Hero() {
   const text = "Find Your Next Home on Campus"
   const words = text.split(" ")
 
+  const handleOpenAuthModal = () => {
+    setIsAuthModalOpen(true)
+  }
+
+  const handleCloseAuthModal = () => {
+    setIsAuthModalOpen(false)
+  }
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       <HeroBackground />
@@ -56,7 +64,7 @@ export default function Hero() {
           <Button 
             size="lg" 
             className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white hover:from-[#34495E] hover:to-[#2C3E50] transition-all duration-300"
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={handleOpenAuthModal}
           >
             Find Your Home
           </Button>
@@ -64,7 +72,7 @@ export default function Hero() {
             size="lg" 
             variant="outline" 
             className="bg-white text-[#2C3E50] border-[#2C3E50]/20 hover:bg-[#FDF6ED] hover:text-[#34495E] transition-all duration-300"
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={handleOpenAuthModal}
           >
             List Your Unit
           </Button>
@@ -73,7 +81,8 @@ export default function Hero() {
 
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+        onClose={handleCloseAuthModal}
+        initialMode="signup"
       />
     </section>
   )
