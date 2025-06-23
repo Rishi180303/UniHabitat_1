@@ -12,13 +12,14 @@ import { useRouter } from "next/navigation"
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
-  initialMode?: 'signin' | 'signup'
+  initialMode?: 'signin' | 'signup' | 'verify'
 }
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModalProps) {
-  const [mode, setMode] = useState<'signin' | 'signup'>(initialMode)
+  const [mode, setMode] = useState<'signin' | 'signup' | 'verify'>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const { user, refreshUser } = useAuth()
@@ -30,6 +31,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       setMode(initialMode)
       setEmail('')
       setPassword('')
+      setOtp('')
       setMessage(null)
     }
   }, [isOpen, initialMode])
@@ -64,28 +66,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       port: window.location.port
     })
 
-    // Test Supabase configuration
-    console.log('Supabase Debug - Configuration:', {
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      timestamp: new Date().toISOString()
-    })
-
     try {
-      let result
+      let result: any = null
       
       if (mode === 'signup') {
-        // For signup, use OTP (magic link) - no password needed
+        // For signup, send OTP code (not magic link)
         if (!email.endsWith('.edu')) {
           throw new Error('Please use your .edu email address to verify your student status')
         }
         
-        const redirectTo = 'http://localhost:3000/auth/callback'
-        
         result = await supabase.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: redirectTo,
             shouldCreateUser: true,
             data: {
               email: email,
@@ -93,7 +85,17 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
             }
           }
         })
-      } else {
+
+        console.log('Signup OTP result:', {
+          error: result.error ? {
+            message: result.error.message,
+            status: result.error.status,
+            name: result.error.name
+          } : null,
+          success: !result.error,
+          timestamp: new Date().toISOString()
+        })
+      } else if (mode === 'signin') {
         // For signin, use password authentication
         if (!password) {
           throw new Error('Password is required for sign in')
@@ -103,6 +105,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
           email,
           password
         })
+      }
+
+      if (!result) {
+        throw new Error('Authentication failed - no response received')
       }
 
       console.log('Auth Debug - Response:', {
@@ -120,11 +126,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       }
 
       if (mode === 'signup') {
+        setMode('verify')
         setMessage({
           type: 'success',
-          text: 'Check your email for the verification link!'
+          text: 'Check your email for the verification code!'
         })
-      } else {
+      } else if (mode === 'signin') {
         setMessage({
           type: 'success',
           text: 'Sign in successful! Redirecting...'
@@ -145,10 +152,112 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         timestamp: new Date().toISOString()
       })
 
+      // Handle specific error cases - log the exact error message
+      console.log('Error message analysis:', {
+        message: error.message,
+        includesAlready: error.message.includes('already'),
+        includesRegistered: error.message.includes('registered'),
+        includesExists: error.message.includes('exists'),
+        includesUser: error.message.includes('user'),
+        fullMessage: error.message
+      })
+
+      // Handle specific error cases
+      if (error.message.includes('already registered') || 
+          error.message.includes('already exists') ||
+          error.message.includes('User already registered') ||
+          error.message.includes('already been registered')) {
+        setMode('signin')
+        setMessage({
+          type: 'error',
+          text: 'This email is already registered. Please sign in instead.'
+        })
+      } else {
+        setMessage({
+          type: 'error',
+          text: error.message || 'An error occurred. Please try again.'
+        })
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setMessage(null)
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'email'
+      })
+
+      if (error) {
+        if (error.message.includes('Invalid OTP')) {
+          setMessage({
+            type: 'error',
+            text: 'Invalid verification code. Please check the code and try again.'
+          })
+        } else if (error.message.includes('expired')) {
+          setMessage({
+            type: 'error',
+            text: 'Verification code has expired. Please request a new code.'
+          })
+        } else {
+          setMessage({
+            type: 'error',
+            text: error.message
+          })
+        }
+      } else {
+        // After successful OTP verification, update the user's password
+        if (password) {
+          console.log('Updating user password after OTP verification...')
+          const { error: updateError } = await supabase.auth.updateUser({
+            password: password
+          })
+          
+          if (updateError) {
+            console.error('Password update error:', updateError)
+            // Don't fail the whole process if password update fails
+            // The user can still access their account
+          } else {
+            console.log('Password updated successfully')
+          }
+        }
+
+        setMessage({
+          type: 'success',
+          text: 'Email verified successfully! Redirecting...'
+        })
+        setTimeout(() => {
+          // Check if user has completed profile setup
+          const checkProfile = async () => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('email', email)
+              .single()
+
+            if (profile) {
+              router.push('/dashboard')
+            } else {
+              router.push('/profile/setup')
+            }
+            onClose()
+          }
+          checkProfile()
+        }, 1500)
+      }
+    } catch (error) {
       setMessage({
         type: 'error',
-        text: error.message || 'An error occurred. Please try again.'
+        text: 'An error occurred. Please try again.'
       })
+      console.error('Network or unexpected error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -157,9 +266,92 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
   const handleClose = () => {
     setEmail('')
     setPassword('')
+    setOtp('')
     setMessage(null)
     setMode(initialMode)
     onClose()
+  }
+
+  const renderForm = () => {
+    if (mode === 'verify') {
+      return (
+        <form onSubmit={handleVerifyOTP} className="space-y-4">
+          <div>
+            <Label htmlFor="otp">Verification Code</Label>
+            <Input
+              id="otp"
+              type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter the code from your email"
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Verifying...' : 'Verify Email'}
+          </Button>
+        </form>
+      )
+    }
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={mode === 'signup' ? "your.email@university.edu" : "Enter your email"}
+            required
+          />
+          {mode === 'signup' && (
+            <p className="text-sm text-gray-500 mt-1">
+              Use your .edu email to verify your student status
+            </p>
+          )}
+        </div>
+        
+        {mode === 'signin' && (
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+        )}
+        
+        {mode === 'signup' && (
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create a password"
+              required
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Password must be at least 8 characters with uppercase, lowercase, number, and special character.
+            </p>
+          </div>
+        )}
+
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading 
+            ? (mode === 'signup' ? 'Sending verification...' : 'Signing in...') 
+            : (mode === 'signup' ? 'Sign Up' : 'Sign In')
+          }
+        </Button>
+      </form>
+    )
   }
 
   return (
@@ -167,10 +359,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'signup' ? 'Create Account' : 'Sign In'}
+            {mode === 'verify' ? 'Verify Your Email' : (mode === 'signup' ? 'Create Account' : 'Sign In')}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'signup'
+            {mode === 'verify' 
+              ? 'Enter the verification code sent to your email'
+              : mode === 'signup'
               ? 'Create your student account with your .edu email'
               : 'Sign in to your account'
             }
@@ -187,75 +381,22 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={mode === 'signup' ? "your.email@university.edu" : "Enter your email"}
-              required
-            />
-            {mode === 'signup' && (
-              <p className="text-sm text-gray-500 mt-1">
-                Use your .edu email to verify your student status
-              </p>
-            )}
+        {renderForm()}
+
+        {mode !== 'verify' && (
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              {mode === 'signin' 
+                ? "Don't have an account? Sign up" 
+                : "Already have an account? Sign in"
+              }
+            </button>
           </div>
-          
-          {mode === 'signin' && (
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-          )}
-          
-          {mode === 'signup' && (
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password"
-                required
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Password must be at least 8 characters with uppercase, lowercase, number, and special character.
-              </p>
-            </div>
-          )}
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading 
-              ? (mode === 'signup' ? 'Sending verification...' : 'Signing in...') 
-              : (mode === 'signup' ? 'Sign Up' : 'Sign In')
-            }
-          </Button>
-        </form>
-
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-            className="text-sm text-blue-600 hover:text-blue-800"
-          >
-            {mode === 'signin' 
-              ? "Don't have an account? Sign up" 
-              : "Already have an account? Sign in"
-            }
-          </button>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   )

@@ -38,6 +38,7 @@ export default function Navbar() {
                 List Property
               </Link>
               <Button 
+                size="lg"
                 variant="outline" 
                 className="border-white text-white hover:bg-white/10"
                 onClick={() => handleOpenAuthModal('signin')}

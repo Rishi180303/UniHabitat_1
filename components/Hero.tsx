@@ -7,15 +7,28 @@ import AuthModal from "./AuthModal"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useAuth } from "./auth-provider"
+import { supabase } from "@/lib/supabase"
 
 export default function Hero() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup')
   const { user } = useAuth()
 
   const text = "Find Your Next Home on Campus"
   const words = text.split(" ")
 
-  const handleOpenAuthModal = () => {
+  const handleOpenAuthModal = async () => {
+    // Check if user is already logged in
+    if (user) {
+      // If logged in, redirect to dashboard
+      window.location.href = '/dashboard'
+      return
+    }
+
+    // For now, default to signup mode
+    // In a real app, you might want to check if the email exists
+    // but for simplicity, we'll let users choose signin/signup
+    setAuthMode('signup')
     setIsAuthModalOpen(true)
   }
 
@@ -82,7 +95,7 @@ export default function Hero() {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={handleCloseAuthModal}
-        initialMode="signup"
+        initialMode={authMode}
       />
     </section>
   )
