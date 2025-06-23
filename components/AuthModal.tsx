@@ -56,7 +56,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
     setIsLoading(true)
     setMessage(null)
 
-    const redirectTo = new URL('/auth/callback', window.location.origin).toString()
+    // Use a consistent redirect URL
+    const redirectTo = 'http://localhost:3000/auth/callback'
     
     console.log('Auth Debug - Starting authentication:', {
       mode,
@@ -64,30 +65,44 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       redirectTo,
       timestamp: new Date().toISOString(),
       url: window.location.href,
-      origin: window.location.origin
+      origin: window.location.origin,
+      hostname: window.location.hostname,
+      port: window.location.port
+    })
+
+    // Test Supabase configuration
+    console.log('Supabase Debug - Configuration:', {
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      timestamp: new Date().toISOString()
     })
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const result = await supabase.auth.signInWithOtp({
         email,
         options: {
           emailRedirectTo: redirectTo,
           shouldCreateUser: mode === 'signup',
-        },
+          data: mode === 'signup' ? {
+            email: email,
+            is_student: true
+          } : undefined
+        }
       })
 
-      console.log('Auth Debug - OTP Response:', {
-        error: error ? {
-          message: error.message,
-          status: error.status,
-          name: error.name
+      console.log('Auth Debug - Response:', {
+        error: result.error ? {
+          message: result.error.message,
+          status: result.error.status,
+          name: result.error.name
         } : null,
+        data: result.data ? 'present' : 'missing',
         timestamp: new Date().toISOString(),
         redirectTo
       })
 
-      if (error) {
-        throw error
+      if (result.error) {
+        throw result.error
       }
 
       setMessage({
@@ -142,7 +157,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: 'http://localhost:3000/auth/callback',
           data: {
             email: email,
             is_student: true

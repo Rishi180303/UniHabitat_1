@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['framer-motion'],
-  experimental: {
-    appDir: true,
-  },
   webpack: (config, { isServer }) => {
     // Suppress the critical dependency warning from Supabase realtime client
     config.ignoreWarnings = [

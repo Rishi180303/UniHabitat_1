@@ -102,29 +102,17 @@ export default function Navigation({ isScrolled }: NavigationProps) {
           </Button>
         </div>
       ) : (
-        <div className="flex items-center space-x-4">
-          <Button 
-            variant="ghost"
-            onClick={() => handleOpenAuthModal('signin')}
-            className={`transition-all duration-300 ${
-              isScrolled 
-                ? 'text-gray-600 hover:text-[#2C3E50] hover:bg-gray-100' 
-                : 'text-[#2C3E50] hover:text-[#34495E] hover:bg-[#FDF6ED]'
-            }`}
-          >
-            Sign In
-          </Button>
-          <Button 
-            onClick={() => handleOpenAuthModal('signup')}
-            className={`transition-all duration-300 ${
-              isScrolled 
-                ? 'bg-[#2C3E50] text-white hover:bg-[#34495E]' 
-                : 'bg-[#2C3E50] text-white hover:bg-[#34495E]'
-            }`}
-          >
-            Get Started
-          </Button>
-        </div>
+        <Button 
+          variant="ghost"
+          onClick={() => handleOpenAuthModal('signin')}
+          className={`transition-all duration-300 ${
+            isScrolled 
+              ? 'text-gray-600 hover:text-[#2C3E50] hover:bg-gray-100' 
+              : 'text-[#2C3E50] hover:text-[#34495E] hover:bg-[#FDF6ED]'
+          }`}
+        >
+          Sign In
+        </Button>
       )}
 
       <AuthModal 

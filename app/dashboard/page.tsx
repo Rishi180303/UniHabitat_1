@@ -1,7 +1,12 @@
 'use client'
 
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useAuth } from "@/components/auth-provider"
+import { useRouter } from "next/navigation"
+import { checkUserProfile, hasCompleteProfile } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { User, Settings } from "lucide-react"
 
 // Dummy data for listings
 const dummyListings = [
@@ -96,13 +101,50 @@ const dummyListings = [
 ]
 
 export default function Dashboard() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
   const [filter, setFilter] = useState('all')
+  const [profile, setProfile] = useState<any>(null)
+  const [checkingProfile, setCheckingProfile] = useState(true)
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/')
+      return
+    }
+
+    if (user && checkingProfile) {
+      checkUserProfile(user.id).then((userProfile) => {
+        setProfile(userProfile)
+        setCheckingProfile(false)
+        
+        // If user doesn't have a complete profile, redirect to setup
+        if (!hasCompleteProfile(userProfile)) {
+          router.push('/profile/setup')
+        }
+      })
+    }
+  }, [user, loading, router, checkingProfile])
 
   const filteredListings = filter === 'all' 
     ? dummyListings 
     : dummyListings.filter(listing => 
         filter === 'available' ? listing.available : !listing.available
       )
+
+  // Show loading while checking profile
+  if (loading || checkingProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="animate-pulse text-[#2C3E50] text-lg">Loading...</div>
+      </div>
+    )
+  }
+
+  // If no user, redirect (handled by useEffect)
+  if (!user) {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -114,7 +156,7 @@ export default function Dashboard() {
               <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
               <p className="text-gray-600 mt-1">Find your perfect student housing</p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex items-center space-x-3">
               <select 
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -124,6 +166,15 @@ export default function Dashboard() {
                 <option value="available">Available</option>
                 <option value="rented">Rented</option>
               </select>
+              
+              <Button
+                onClick={() => router.push('/profile')}
+                variant="outline"
+                className="flex items-center space-x-2"
+              >
+                <User className="w-4 h-4" />
+                <span>Profile</span>
+              </Button>
             </div>
           </div>
         </div>
@@ -131,6 +182,22 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Message */}
+        {profile && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-sm p-6 mb-8"
+          >
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Welcome back, {profile.full_name}! 👋
+            </h2>
+            <p className="text-gray-600">
+              {profile.university} • {profile.major} • Class of {profile.graduation_year}
+            </p>
+          </motion.div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <motion.div 
@@ -199,26 +266,26 @@ export default function Dashboard() {
             <div className="flex items-center">
               <div className="p-2 bg-purple-100 rounded-lg">
                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Avg. Price</p>
-                <p className="text-2xl font-bold text-gray-900">$2,400</p>
+                <p className="text-sm font-medium text-gray-600">Saved</p>
+                <p className="text-2xl font-bold text-gray-900">0</p>
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Listings Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredListings.map((listing, index) => (
             <motion.div
               key={listing.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+              className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
             >
               <div className="relative">
                 <img 
@@ -231,76 +298,20 @@ export default function Dashboard() {
                     Rented
                   </div>
                 )}
-                {listing.available && (
-                  <div className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                    Available
-                  </div>
-                )}
               </div>
-              
               <div className="p-4">
-                <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-1">
-                  {listing.title}
-                </h3>
-                
-                <div className="flex items-center text-gray-600 text-sm mb-3">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  {listing.location}
-                </div>
-
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
-                      </svg>
-                      {listing.bedrooms} BR
-                    </span>
-                    <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-                      </svg>
-                      {listing.bathrooms} BA
-                    </span>
-                    <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                      </svg>
-                      {listing.sqft} sqft
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-xl font-bold text-blue-600">{listing.price}</span>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium">
-                    View Details
-                  </button>
+                <h3 className="font-semibold text-gray-900 mb-2">{listing.title}</h3>
+                <p className="text-2xl font-bold text-blue-600 mb-2">{listing.price}</p>
+                <p className="text-gray-600 text-sm mb-3">{listing.location}</p>
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>{listing.bedrooms} bed</span>
+                  <span>{listing.bathrooms} bath</span>
+                  <span>{listing.sqft} sqft</span>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
-
-        {filteredListings.length === 0 && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <div className="text-gray-500">
-              <svg className="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <p className="text-lg font-medium">No listings found</p>
-              <p className="text-sm">Try adjusting your filters</p>
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   )
