@@ -26,6 +26,7 @@ export default function ProfileSetup() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentStep, setCurrentStep] = useState<Step>('personal')
   const [checkingProfile, setCheckingProfile] = useState(true)
+  const [profileComplete, setProfileComplete] = useState(false)
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: '',
     university: '',
@@ -47,6 +48,7 @@ export default function ProfileSetup() {
         
         // If user already has a complete profile, redirect to dashboard
         if (hasCompleteProfile(userProfile)) {
+          setProfileComplete(true)
           router.push('/dashboard')
         }
       })
@@ -86,6 +88,7 @@ export default function ProfileSetup() {
     
     console.log('Profile Setup Debug - Starting submission:', {
       userId: user?.id,
+      userEmail: user?.email,
       formData,
       timestamp: new Date().toISOString()
     })
@@ -94,6 +97,7 @@ export default function ProfileSetup() {
       // Match the exact column structure from the profiles table
       const profileData = {
         id: user?.id,
+        email: user?.email,
         full_name: formData.full_name,
         university: formData.university,
         year: formData.graduation_year, // Map graduation_year to year column
@@ -126,6 +130,7 @@ export default function ProfileSetup() {
       }
       
       console.log('Profile Setup Debug - Success, redirecting to dashboard')
+      setProfileComplete(true)
       router.push('/dashboard')
     } catch (error: any) {
       console.error('Error saving profile:', error)
@@ -148,10 +153,12 @@ export default function ProfileSetup() {
     else if (currentStep === 'avatar') setCurrentStep('about')
   }
 
-  if (loading || checkingProfile) {
+  if (loading || checkingProfile || profileComplete) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDF6ED]">
-        <div className="animate-pulse text-[#2C3E50] text-lg">Loading...</div>
+        <div className="animate-pulse text-[#2C3E50] text-lg">
+          {profileComplete ? 'Redirecting to dashboard...' : 'Loading...'}
+        </div>
       </div>
     )
   }

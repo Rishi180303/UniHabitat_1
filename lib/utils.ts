@@ -10,7 +10,7 @@ export async function checkUserProfile(userId: string) {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, university, major, graduation_year, bio, avatar_url')
+      .select('id, full_name, university, year, bio, avatar_url, email, created_at')
       .eq('id', userId)
       .single()
 
@@ -32,8 +32,7 @@ export function hasCompleteProfile(profile: any) {
   return !!(
     profile.full_name &&
     profile.university &&
-    profile.major &&
-    profile.graduation_year &&
+    profile.year &&
     profile.bio
   )
 }
