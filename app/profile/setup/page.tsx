@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { Input } from '@/components/ui/input'
 import { GraduationCap, BookOpen, User, ArrowRight, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 import { checkUserProfile, hasCompleteProfile } from '@/lib/utils'
+import UniversitySearch from '@/components/UniversitySearch'
 
 interface ProfileFormData {
   full_name: string
@@ -36,6 +37,7 @@ export default function ProfileSetup() {
     bio: '',
     avatar_url: ''
   })
+  const [universityDropdownOpen, setUniversityDropdownOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -210,22 +212,17 @@ export default function ProfileSetup() {
               </p>
             </div>
             <div className="max-w-md mx-auto space-y-6">
-              <div className="space-y-2">
+              <div className={`space-y-2 transition-all duration-200 ${universityDropdownOpen ? 'mb-40' : ''}`}>
                 <label htmlFor="university" className="text-sm font-medium text-gray-700">
                   University
                 </label>
-                <div className="relative">
-                  <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input
-                    id="university"
-                    name="university"
-                    value={formData.university}
-                    onChange={handleInputChange}
-                    placeholder="Your University"
-                    className="pl-10 focus:ring-2 focus:ring-[#2C3E50] focus:border-transparent"
-                    required
-                  />
-                </div>
+                <UniversitySearch
+                  value={formData.university}
+                  onChange={(value) => setFormData(prev => ({ ...prev, university: value }))}
+                  placeholder="Search for your university"
+                  className="w-full"
+                  onDropdownOpenChange={setUniversityDropdownOpen}
+                />
               </div>
               <div className="space-y-2">
                 <label htmlFor="graduation_year" className="text-sm font-medium text-gray-700">

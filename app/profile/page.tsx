@@ -20,6 +20,7 @@ import {
   Clock
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import UniversitySearch from '@/components/UniversitySearch'
 
 export default function ProfilePage() {
   const { user, loading } = useAuth()
@@ -293,13 +294,11 @@ export default function ProfilePage() {
                     University
                   </label>
                   {editMode ? (
-                    <Input
-                      id="university"
-                      name="university"
+                    <UniversitySearch
                       value={editData?.university || ''}
-                      onChange={handleEditChange}
-                      placeholder="University"
-                      className={getFieldError('university') ? 'border-red-500 bg-red-50' : ''}
+                      onChange={(value) => setEditData((prev: any) => ({ ...prev, university: value }))}
+                      placeholder="Search for your university"
+                      className="w-full"
                     />
                   ) : (
                     <p className="text-lg font-semibold text-slate-900">
