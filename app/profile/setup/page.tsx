@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@/components/auth-provider'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
@@ -22,6 +22,8 @@ type Step = 'personal' | 'academic' | 'about' | 'avatar'
 export default function ProfileSetup() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams();
+  const isEditMode = searchParams.get('edit') === '1';
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentStep, setCurrentStep] = useState<Step>('personal')
@@ -41,19 +43,34 @@ export default function ProfileSetup() {
       return
     }
 
-    // Check if user already has a complete profile
+    // In edit mode, always load the profile and prefill
     if (user && checkingProfile) {
       checkUserProfile(user.id).then((userProfile) => {
-        setCheckingProfile(false)
-        
-        // If user already has a complete profile, redirect to dashboard
-        if (hasCompleteProfile(userProfile)) {
-          setProfileComplete(true)
-          router.push('/dashboard')
+        if (userProfile) {
+          if (isEditMode) {
+            setFormData({
+              full_name: userProfile.full_name || '',
+              university: userProfile.university || '',
+              graduation_year: userProfile.year || '',
+              bio: userProfile.bio || '',
+              avatar_url: userProfile.avatar_url || ''
+            })
+            setCheckingProfile(false)
+          } else {
+            // If not in edit mode and profile is complete, redirect to dashboard
+            if (hasCompleteProfile(userProfile)) {
+              setProfileComplete(true)
+              router.push('/dashboard')
+              return
+            }
+            setCheckingProfile(false)
+          }
+        } else {
+          setCheckingProfile(false)
         }
       })
     }
-  }, [user, loading, router, checkingProfile])
+  }, [user, loading, router, checkingProfile, isEditMode])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -77,64 +94,34 @@ export default function ProfileSetup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Validate required fields (removing major since it doesn't exist in the table)
     if (!formData.full_name || !formData.university || !formData.graduation_year || !formData.bio) {
       alert('Please fill in all required fields before submitting.')
       return
     }
-    
     setIsSubmitting(true)
-    
-    console.log('Profile Setup Debug - Starting submission:', {
-      userId: user?.id,
-      userEmail: user?.email,
-      formData,
-      timestamp: new Date().toISOString()
-    })
-    
     try {
-      // Match the exact column structure from the profiles table
       const profileData = {
         id: user?.id,
         email: user?.email,
         full_name: formData.full_name,
         university: formData.university,
-        year: formData.graduation_year, // Map graduation_year to year column
+        year: formData.graduation_year,
         bio: formData.bio,
         avatar_url: formData.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.full_name),
         created_at: new Date().toISOString()
       }
-      
-      console.log('Profile Setup Debug - Data to insert:', profileData)
-      
       const { data, error } = await supabase
         .from('profiles')
         .upsert(profileData)
         .select()
-      
-      console.log('Profile Setup Debug - Supabase response:', {
-        data: data ? 'present' : 'missing',
-        error: error ? {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint
-        } : null,
-        timestamp: new Date().toISOString()
-      })
-      
-      if (error) {
-        console.error('Profile Setup Error:', error)
-        throw error
-      }
-      
-      console.log('Profile Setup Debug - Success, redirecting to dashboard')
+      if (error) throw error
       setProfileComplete(true)
-      router.push('/dashboard')
+      if (isEditMode) {
+        router.push('/profile')
+      } else {
+        router.push('/dashboard')
+      }
     } catch (error: any) {
-      console.error('Error saving profile:', error)
-      // Add user feedback for errors
       alert(`Error saving profile: ${error.message || 'Please try again.'}`)
     } finally {
       setIsSubmitting(false)
@@ -157,7 +144,7 @@ export default function ProfileSetup() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDF6ED]">
         <div className="animate-pulse text-[#2C3E50] text-lg">
-          {profileComplete ? 'Redirecting to dashboard...' : 'Loading...'}
+          {profileComplete ? (isEditMode ? 'Redirecting to profile...' : 'Redirecting to dashboard...') : 'Loading...'}
         </div>
       </div>
     )

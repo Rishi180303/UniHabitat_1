@@ -19,11 +19,15 @@ import {
   BookOpen,
   Clock
 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 
 export default function ProfilePage() {
   const { user, loading } = useAuth()
   const [profile, setProfile] = useState<any>(null)
   const [profileLoading, setProfileLoading] = useState(true)
+  const [editMode, setEditMode] = useState(false)
+  const [editData, setEditData] = useState<any>(null)
+  const [saving, setSaving] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -32,6 +36,7 @@ export default function ProfilePage() {
         const userProfile = await checkUserProfile(user.id)
         setProfile(userProfile)
         setProfileLoading(false)
+        setEditData(userProfile)
       }
     }
 
@@ -50,7 +55,40 @@ export default function ProfilePage() {
   }
 
   const handleEditProfile = () => {
-    router.push('/profile/setup')
+    setEditData(profile)
+    setEditMode(true)
+  }
+
+  const handleCancelEdit = () => {
+    setEditData(profile)
+    setEditMode(false)
+  }
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setEditData((prev: any) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSaveEdit = async () => {
+    if (!user) return;
+    setSaving(true)
+    try {
+      const updatedProfile = {
+        ...editData,
+        id: user.id,
+        email: user.email,
+        year: editData.year || '',
+        avatar_url: editData.avatar_url || '',
+      }
+      const { error } = await supabase.from('profiles').upsert(updatedProfile)
+      if (error) throw error
+      setProfile(updatedProfile)
+      setEditMode(false)
+    } catch (err: any) {
+      alert('Error saving profile: ' + (err.message || 'Please try again.'))
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleBackToDashboard = () => {
@@ -93,13 +131,15 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button
-                onClick={handleEditProfile}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-2xl transition-all duration-200"
-              >
-                <Edit3 className="w-4 h-4 mr-2" />
-                Edit Profile
-              </Button>
+              {!editMode && (
+                <Button
+                  onClick={handleEditProfile}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-2xl transition-all duration-200"
+                >
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </Button>
+              )}
               <Button
                 onClick={handleSignOut}
                 variant="outline"
@@ -125,7 +165,16 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div className="relative inline-block mb-6">
                 <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  {profile?.avatar_url ? (
+                  {editMode ? (
+                    <Input
+                      id="avatar_url"
+                      name="avatar_url"
+                      value={editData?.avatar_url || ''}
+                      onChange={handleEditChange}
+                      placeholder="Avatar URL"
+                      className="w-full h-full text-center"
+                    />
+                  ) : profile?.avatar_url ? (
                     <img 
                       src={profile.avatar_url} 
                       alt={profile.full_name}
@@ -135,15 +184,23 @@ export default function ProfilePage() {
                     <User className="w-16 h-16 text-white" />
                   )}
                 </div>
-                <button className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200">
-                  <Camera className="w-4 h-4 text-slate-600" />
-                </button>
               </div>
 
               {/* Name */}
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                {profile?.full_name || 'Your Name'}
-              </h2>
+              {editMode ? (
+                <Input
+                  id="full_name"
+                  name="full_name"
+                  value={editData?.full_name || ''}
+                  onChange={handleEditChange}
+                  placeholder="Full Name"
+                  className="mt-4 text-center"
+                />
+              ) : (
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                  {profile?.full_name || 'Your Name'}
+                </h2>
+              )}
 
               {/* Email */}
               <div className="flex items-center justify-center space-x-2 text-slate-600 mb-4">
@@ -172,15 +229,23 @@ export default function ProfilePage() {
                 <User className="w-5 h-5 mr-2 text-blue-600" />
                 Personal Information
               </h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-medium text-slate-600 mb-2 block">Full Name</label>
-                  <p className="text-lg font-semibold text-slate-900">
-                    {profile?.full_name || 'Not set'}
-                  </p>
+                  {editMode ? (
+                    <Input
+                      id="full_name"
+                      name="full_name"
+                      value={editData?.full_name || ''}
+                      onChange={handleEditChange}
+                      placeholder="Full Name"
+                    />
+                  ) : (
+                    <p className="text-lg font-semibold text-slate-900">
+                      {profile?.full_name || 'Not set'}
+                    </p>
+                  )}
                 </div>
-                
                 <div>
                   <label className="text-sm font-medium text-slate-600 mb-2 block">Email Address</label>
                   <p className="text-lg font-semibold text-slate-900">{user.email}</p>
@@ -194,26 +259,44 @@ export default function ProfilePage() {
                 <GraduationCap className="w-5 h-5 mr-2 text-emerald-600" />
                 Academic Information
               </h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-medium text-slate-600 mb-2 block flex items-center">
                     <MapPin className="w-4 h-4 mr-1" />
                     University
                   </label>
-                  <p className="text-lg font-semibold text-slate-900">
-                    {profile?.university || 'Not set'}
-                  </p>
+                  {editMode ? (
+                    <Input
+                      id="university"
+                      name="university"
+                      value={editData?.university || ''}
+                      onChange={handleEditChange}
+                      placeholder="University"
+                    />
+                  ) : (
+                    <p className="text-lg font-semibold text-slate-900">
+                      {profile?.university || 'Not set'}
+                    </p>
+                  )}
                 </div>
-                
                 <div>
                   <label className="text-sm font-medium text-slate-600 mb-2 block flex items-center">
                     <Calendar className="w-4 h-4 mr-1" />
                     Graduation Year
                   </label>
-                  <p className="text-lg font-semibold text-slate-900">
-                    {profile?.year || 'Not set'}
-                  </p>
+                  {editMode ? (
+                    <Input
+                      id="year"
+                      name="year"
+                      value={editData?.year || ''}
+                      onChange={handleEditChange}
+                      placeholder="Graduation Year"
+                    />
+                  ) : (
+                    <p className="text-lg font-semibold text-slate-900">
+                      {profile?.year || 'Not set'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -224,12 +307,22 @@ export default function ProfilePage() {
                 <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
                 About Me
               </h3>
-              
               <div>
                 <label className="text-sm font-medium text-slate-600 mb-2 block">Bio</label>
-                <p className="text-lg text-slate-900 leading-relaxed">
-                  {profile?.bio || 'No bio added yet. Click "Edit Profile" to add your bio.'}
-                </p>
+                {editMode ? (
+                  <textarea
+                    id="bio"
+                    name="bio"
+                    value={editData?.bio || ''}
+                    onChange={handleEditChange}
+                    placeholder="Tell us about yourself"
+                    className="w-full min-h-[100px] rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-[#2C3E50] focus:border-transparent"
+                  />
+                ) : (
+                  <p className="text-lg text-slate-900 leading-relaxed">
+                    {profile?.bio || 'No bio added yet. Click "Edit Profile" to add your bio.'}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -239,7 +332,6 @@ export default function ProfilePage() {
                 <Clock className="w-5 h-5 mr-2 text-slate-600" />
                 Account Information
               </h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-medium text-slate-600 mb-2 block">Member Since</label>
@@ -254,7 +346,6 @@ export default function ProfilePage() {
                     }
                   </p>
                 </div>
-                
                 <div>
                   <label className="text-sm font-medium text-slate-600 mb-2 block">Last Sign In</label>
                   <p className="text-lg font-semibold text-slate-900">
@@ -272,6 +363,27 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+
+            {/* Save/Cancel Buttons */}
+            {editMode && (
+              <div className="flex justify-end space-x-4 pt-4">
+                <Button
+                  onClick={handleCancelEdit}
+                  variant="outline"
+                  className="px-6 py-2 rounded-2xl"
+                  disabled={saving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveEdit}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-2xl"
+                  disabled={saving}
+                >
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>
