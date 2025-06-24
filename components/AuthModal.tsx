@@ -70,11 +70,29 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       let result: any = null
       
       if (mode === 'signup') {
-        // For signup, send OTP code (not magic link)
+        // For signup, first check if user already exists
         if (!email.endsWith('.edu')) {
           throw new Error('Please use your .edu email address to verify your student status')
         }
+
+        // Check if user already exists by attempting to sign in with a dummy password
+        // This will fail with "Invalid login credentials" if user exists, or "User not found" if user doesn't exist
+        const { error: checkError } = await supabase.auth.signInWithPassword({
+          email,
+          password: 'dummy_password_for_check'
+        })
         
+        // If error message indicates user exists (Invalid login credentials), switch to signin mode
+        if (checkError && checkError.message.includes('Invalid login credentials')) {
+          setMode('signin')
+          setMessage({
+            type: 'error',
+            text: 'This email is already registered. Please sign in instead.'
+          })
+          return
+        }
+        
+        // User doesn't exist, proceed with signup OTP
         result = await supabase.auth.signInWithOtp({
           email,
           options: {
