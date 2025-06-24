@@ -74,7 +74,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         if (!email.endsWith('.edu')) {
           throw new Error('Please use your .edu email address to verify your student status')
         }
-
+        
         // Check if user already exists by attempting to sign in with a dummy password
         // This will fail with "Invalid login credentials" if user exists, or "User not found" if user doesn't exist
         const { error: checkError } = await supabase.auth.signInWithPassword({

@@ -28,6 +28,7 @@ export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [saving, setSaving] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -69,9 +70,28 @@ export default function ProfilePage() {
     setEditData((prev: any) => ({ ...prev, [name]: value }))
   }
 
+  const isEditValid = editData && editData.full_name && editData.university && editData.year
+
+  const getFieldError = (fieldName: string) => {
+    if (!editMode) return null;
+    if (!editData?.[fieldName] && ['full_name', 'university', 'year'].includes(fieldName)) {
+      return 'This field is required';
+    }
+    return null;
+  }
+
   const handleSaveEdit = async () => {
     if (!user) return;
+    if (!isEditValid) {
+      const missingFields = [];
+      if (!editData?.full_name) missingFields.push('Full Name');
+      if (!editData?.university) missingFields.push('University');
+      if (!editData?.year) missingFields.push('Graduation Year');
+      setEditError(`Please fill in: ${missingFields.join(', ')}`);
+      return;
+    }
     setSaving(true)
+    setEditError(null)
     try {
       const updatedProfile = {
         ...editData,
@@ -85,7 +105,7 @@ export default function ProfilePage() {
       setProfile(updatedProfile)
       setEditMode(false)
     } catch (err: any) {
-      alert('Error saving profile: ' + (err.message || 'Please try again.'))
+      setEditError('Error saving profile: ' + (err.message || 'Please try again.'))
     } finally {
       setSaving(false)
     }
@@ -194,12 +214,15 @@ export default function ProfilePage() {
                   value={editData?.full_name || ''}
                   onChange={handleEditChange}
                   placeholder="Full Name"
-                  className="mt-4 text-center"
+                  className={`mt-4 text-center ${getFieldError('full_name') ? 'border-red-500 bg-red-50' : ''}`}
                 />
               ) : (
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">
                   {profile?.full_name || 'Your Name'}
                 </h2>
+              )}
+              {getFieldError('full_name') && (
+                <p className="text-red-500 text-xs mt-1">Full name is required</p>
               )}
 
               {/* Email */}
@@ -239,11 +262,15 @@ export default function ProfilePage() {
                       value={editData?.full_name || ''}
                       onChange={handleEditChange}
                       placeholder="Full Name"
+                      className={getFieldError('full_name') ? 'border-red-500 bg-red-50' : ''}
                     />
                   ) : (
                     <p className="text-lg font-semibold text-slate-900">
                       {profile?.full_name || 'Not set'}
                     </p>
+                  )}
+                  {getFieldError('full_name') && (
+                    <p className="text-red-500 text-xs mt-1">Full name is required</p>
                   )}
                 </div>
                 <div>
@@ -272,11 +299,15 @@ export default function ProfilePage() {
                       value={editData?.university || ''}
                       onChange={handleEditChange}
                       placeholder="University"
+                      className={getFieldError('university') ? 'border-red-500 bg-red-50' : ''}
                     />
                   ) : (
                     <p className="text-lg font-semibold text-slate-900">
                       {profile?.university || 'Not set'}
                     </p>
+                  )}
+                  {getFieldError('university') && (
+                    <p className="text-red-500 text-xs mt-1">University is required</p>
                   )}
                 </div>
                 <div>
@@ -291,11 +322,15 @@ export default function ProfilePage() {
                       value={editData?.year || ''}
                       onChange={handleEditChange}
                       placeholder="Graduation Year"
+                      className={getFieldError('year') ? 'border-red-500 bg-red-50' : ''}
                     />
                   ) : (
                     <p className="text-lg font-semibold text-slate-900">
                       {profile?.year || 'Not set'}
                     </p>
+                  )}
+                  {getFieldError('year') && (
+                    <p className="text-red-500 text-xs mt-1">Graduation year is required</p>
                   )}
                 </div>
               </div>
@@ -366,22 +401,27 @@ export default function ProfilePage() {
 
             {/* Save/Cancel Buttons */}
             {editMode && (
-              <div className="flex justify-end space-x-4 pt-4">
-                <Button
-                  onClick={handleCancelEdit}
-                  variant="outline"
-                  className="px-6 py-2 rounded-2xl"
-                  disabled={saving}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSaveEdit}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-2xl"
-                  disabled={saving}
-                >
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </Button>
+              <div className="flex flex-col items-end pt-4 space-y-2">
+                {editError && (
+                  <span className="text-red-600 text-sm mb-2">{editError}</span>
+                )}
+                <div className="flex space-x-4">
+                  <Button
+                    onClick={handleCancelEdit}
+                    variant="outline"
+                    className="px-6 py-2 rounded-2xl"
+                    disabled={saving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSaveEdit}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-2xl"
+                    disabled={saving || !isEditValid}
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                </div>
               </div>
             )}
           </motion.div>

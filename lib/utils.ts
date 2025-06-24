@@ -32,7 +32,6 @@ export function hasCompleteProfile(profile: any) {
   return !!(
     profile.full_name &&
     profile.university &&
-    profile.year &&
-    profile.bio
+    profile.year
   )
 }
