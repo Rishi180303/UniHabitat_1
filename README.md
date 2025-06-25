@@ -42,30 +42,59 @@ npm run dev
 ```
 unihabitat/
 ├── app/
+│   ├── auth/
+│   │   ├── callback/
+│   │   │   └── route.ts
+│   │   └── error/
+│   │       └── page.tsx
+│   ├── dashboard/
+│   │   └── page.tsx
+│   ├── profile/
+│   │   ├── page.tsx           # Profile view & in-place edit
+│   │   └── setup/
+│   │       └── page.tsx       # Profile setup & edit wizard
+│   ├── globals.css
 │   ├── layout.tsx
-│   ├── page.tsx
-│   └── globals.css
+│   └── page.tsx               # Landing page
 ├── components/
+│   ├── AuthError.tsx
+│   ├── AuthModal.tsx
 │   ├── Header.tsx
 │   ├── Hero.tsx
+│   ├── HeroBackground.tsx
 │   ├── Features.tsx
 │   ├── Footer.tsx
+│   ├── ListingCard.tsx
+│   ├── MobileMenu.tsx
+│   ├── Navbar.tsx
+│   ├── Navigation.tsx
+│   ├── Step.tsx
+│   ├── StepContent.tsx
+│   ├── UniversitySearch.tsx   # Smart university dropdown
+│   ├── auth-provider.tsx
+│   ├── providers.tsx
 │   └── ui/
 │       ├── button.tsx
-│       └── input.tsx
+│       ├── dialog.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       └── tabs.tsx
 ├── lib/
+│   ├── supabase.ts
 │   └── utils.ts
-└── public/
+├── public/
+│   └── universities/
+│       ├── berkeley.svg
+│       ├── harvard.svg
+│       ├── mit.svg
+│       └── stanford.svg
+├── package.json
+├── package-lock.json
+├── tailwind.config.js
+├── tsconfig.json
+├── next.config.js
+├── postcss.config.js
+└── README.md
 ```
 
-## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. # UniHabitat_1
