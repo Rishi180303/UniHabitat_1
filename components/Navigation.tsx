@@ -103,13 +103,13 @@ export default function Navigation({ isScrolled }: NavigationProps) {
         </div>
       ) : (
         <Button 
-          variant="ghost"
           onClick={() => handleOpenAuthModal('signin')}
-          className={`transition-all duration-300 ${
+          className={`transition-all duration-300 px-6 py-2 rounded-xl bg-[#2C3E50] text-white font-semibold shadow hover:bg-[#34495E] focus:ring-2 focus:ring-[#2C3E50]/40 focus:outline-none ${
             isScrolled 
-              ? 'text-gray-600 hover:text-[#2C3E50] hover:bg-gray-100' 
-              : 'text-[#2C3E50] hover:text-[#34495E] hover:bg-[#FDF6ED]'
+              ? 'text-white' 
+              : 'text-white'
           }`}
+          style={{ minWidth: 100 }}
         >
           Sign In
         </Button>

@@ -1,6 +1,4 @@
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
+import { Facebook, Twitter, Instagram, Linkedin, Mail } from "lucide-react"
 
 export default function Footer() {
   return (
@@ -31,21 +29,20 @@ export default function Footer() {
           
           <div>
             <h4 className="text-lg font-semibold text-white mb-4">
-              Stay Updated
+              Contact Us
             </h4>
             <p className="mb-6 text-gray-400">
-              Subscribe to our newsletter for the latest updates and housing tips.
+              If you have any issues or questions, feel free to reach out to us directly.
             </p>
-            <div className="flex gap-3">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-              />
-              <Button className="gradient-bg text-white hover:opacity-90 transition-opacity">
-                Subscribe
-              </Button>
-            </div>
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=rsenthi4@asu.edu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow hover:bg-blue-700 transition-colors"
+            >
+              <Mail className="w-5 h-5 mr-2" />
+              Email Us
+            </a>
           </div>
         </div>
         
