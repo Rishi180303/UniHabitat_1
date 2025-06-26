@@ -15,9 +15,9 @@ export default function Features() {
       emoji: "✨"
     },
     {
-      title: "Mobile-First Design",
-      description: "Browse and manage listings on any device with our responsive, mobile-optimized platform.",
-      emoji: "📱"
+      title: "Community-Driven Safety",
+      description: "Our platform is built on student trust. Users can rate, review, and report listings to keep the community safe and reliable for everyone.",
+      emoji: "🛡️"
     }
   ]
 
@@ -32,32 +32,41 @@ export default function Features() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-6">
-            Why Choose UniHabitat? <span className="text-3xl">🏠</span>
+            How UniHabitat Works <span className="text-3xl">🔑</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            We're making student housing simple, safe, and stress-free with our unique features
+            A simple, safe, and modern way to find student housing
           </p>
         </motion.div>
 
-        <div className="max-w-2xl mx-auto space-y-12">
+        <div className="max-w-3xl mx-auto flex flex-col gap-24">
           {features.map((feature, index) => (
-            <motion.div 
+            <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              whileHover={{ scale: 1.02 }}
-              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
+              transition={{ duration: 0.7, delay: index * 0.2 }}
+              className="flex flex-col md:flex-row items-center md:items-start gap-8 relative"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-4xl">{feature.emoji}</span>
+              {/* Step number and vertical line */}
+              <div className="flex flex-col items-center md:items-start min-w-[60px]">
+                <div className="w-12 h-12 rounded-full bg-[#2C3E50] flex items-center justify-center text-white text-2xl font-bold mb-2 shadow-md">
+                  {index + 1}
+                </div>
+                {index < features.length - 1 && (
+                  <div className="hidden md:block w-1 h-24 bg-[#2C3E50]/10 mx-auto my-2 rounded-full" />
+                )}
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-[#2C3E50]">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {feature.description}
-              </p>
+              {/* Emoji/Icon and content */}
+              <div className="flex-1 text-center md:text-left">
+                <div className="text-4xl mb-4">{feature.emoji}</div>
+                <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-lg text-[#34495E] max-w-xl mx-auto md:mx-0">
+                  {feature.description}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>

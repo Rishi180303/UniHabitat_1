@@ -15,9 +15,6 @@ export default function Hero() {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup')
   const { user } = useAuth()
 
-  const text = "Find Your Next Home on Campus"
-  const words = text.split(" ")
-
   const handleOpenAuthModal = async () => {
     // Check if user is already logged in
     if (user) {
@@ -42,39 +39,33 @@ export default function Hero() {
       <HeroBackground />
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center lg:items-stretch">
           {/* Left side - Text content */}
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center lg:text-left"
+            className="text-center lg:text-left flex flex-col justify-center h-full"
           >
-            <div className="flex flex-wrap justify-center lg:justify-start gap-2 mb-6">
-              {words.map((word, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.5,
-                    delay: index * 0.1,
-                    type: "spring",
-                    stiffness: 100
-                  }}
-                  className="text-4xl md:text-6xl font-bold text-[#2C3E50] inline-block"
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-6"
+            >
+              <h1 className="text-4xl md:text-6xl font-bold text-[#2C3E50] leading-tight">
+                <span className="block">Find student housing</span>
+                <span className="block text-[#34495E]">from real students,</span>
+              </h1>
+            </motion.div>
+            
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="text-xl md:text-2xl text-gray-700 mb-12 max-w-2xl mx-auto lg:mx-0"
+              className="text-xl md:text-2xl text-gray-700 mb-12 max-w-2xl mx-auto lg:mx-0 font-medium"
             >
-              The trusted platform for students to find and list off-campus housing
+              The safest way to find and list off-campus housing near your university
             </motion.p>
             
             <motion.div 
@@ -106,22 +97,21 @@ export default function Hero() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex justify-center lg:justify-end"
+            className="flex justify-center lg:justify-end h-full items-stretch"
           >
-            <div className="relative w-full max-w-lg lg:max-w-xl">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+            <div className="relative w-full max-w-lg lg:max-w-xl flex flex-col h-full justify-center">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl h-full flex items-stretch">
                 <Image
                   src="/images/landingpage.png"
                   alt="Student housing illustration"
                   width={600}
                   height={600}
-                  className="w-full h-auto object-cover"
+                  className="w-full h-full object-cover"
                   priority
                 />
                 {/* Subtle gradient overlay for depth */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
               </div>
-              
               {/* Floating decorative elements */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
