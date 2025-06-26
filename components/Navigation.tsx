@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import { Menu, User } from "lucide-react"
 import { useAuth } from "./auth-provider"
 import { supabase } from "@/lib/supabase"
 import { useRouter, usePathname } from "next/navigation"
@@ -21,6 +21,7 @@ export default function Navigation({ isScrolled }: NavigationProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
 
   const isLandingPage = pathname === '/'
 
@@ -81,26 +82,55 @@ export default function Navigation({ isScrolled }: NavigationProps) {
       )}
       
       {user ? (
-        <div className="flex items-center space-x-4">
-          <span className={`${
-            isScrolled 
-              ? 'text-gray-600' 
-              : 'text-[#2C3E50]'
-          }`}>
-            {user.email}
-          </span>
-          <Button 
-            onClick={handleLogout}
-            className={`transition-all duration-300 ${
+        isLandingPage ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowProfileMenu((v) => !v)}
+              className={`flex items-center justify-center w-11 h-11 rounded-full border-2 border-[#2C3E50]/10 bg-white/60 hover:bg-[#FDF6ED] shadow transition-all duration-200 focus:outline-none`}
+              aria-label="Open profile menu"
+            >
+              <User className="w-6 h-6 text-[#2C3E50]" />
+            </button>
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg py-2 z-50 border border-slate-100">
+                <button
+                  onClick={() => { router.push('/profile'); setShowProfileMenu(false); }}
+                  className="w-full text-left px-4 py-2 text-[#2C3E50] hover:bg-[#FDF6ED] rounded-t-xl transition-colors"
+                >
+                  Profile
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-xl transition-colors"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Logging out...' : 'Logout'}
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center space-x-4">
+            <span className={`${
               isScrolled 
-                ? 'bg-red-500 text-white hover:bg-red-600' 
-                : 'bg-red-500 text-white hover:bg-red-600'
-            }`}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Logging out...' : 'Logout'}
-          </Button>
-        </div>
+                ? 'text-gray-600' 
+                : 'text-[#2C3E50]'
+            }`}>
+              {user.email}
+            </span>
+            <Button 
+              onClick={handleLogout}
+              className={`transition-all duration-300 ${
+                isScrolled 
+                  ? 'bg-red-500 text-white hover:bg-red-600' 
+                  : 'bg-red-500 text-white hover:bg-red-600'
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging out...' : 'Logout'}
+            </Button>
+          </div>
+        )
       ) : (
         <Button 
           onClick={() => handleOpenAuthModal('signin')}
