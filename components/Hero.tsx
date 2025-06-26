@@ -55,7 +55,7 @@ export default function Hero() {
             >
               <h1 className="text-4xl md:text-6xl font-bold text-[#2C3E50] leading-tight">
                 <span className="block">Find student housing</span>
-                <span className="block text-[#34495E]">from real students,</span>
+                <span className="block text-[#34495E]">from real students</span>
               </h1>
             </motion.div>
             
@@ -85,7 +85,14 @@ export default function Hero() {
                 size="lg" 
                 variant="outline" 
                 className="bg-white text-[#2C3E50] border-[#2C3E50]/20 hover:bg-[#FDF6ED] hover:text-[#34495E] transition-all duration-300"
-                onClick={handleOpenAuthModal}
+                onClick={() => {
+                  if (user) {
+                    window.location.href = '/dashboard/list'
+                  } else {
+                    setAuthMode('signup')
+                    setIsAuthModalOpen(true)
+                  }
+                }}
               >
                 List Your Unit
               </Button>
