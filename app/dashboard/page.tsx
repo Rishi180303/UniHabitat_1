@@ -68,10 +68,10 @@ export default function Dashboard() {
   // Show loading while checking profile
   if (loading || checkingProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#FDF6ED]">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-slate-600 font-medium">Loading your dashboard...</p>
+          <div className="w-8 h-8 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#34495E] font-medium">Loading your dashboard...</p>
         </div>
       </div>
     )
@@ -85,7 +85,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-xl border-b border-[#F5E6D6] sticky top-0 z-50">
+      <div className="bg-[#FDF6ED]/90 backdrop-blur-xl border-b border-[#F5E6D6] sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
@@ -97,7 +97,7 @@ export default function Dashboard() {
                 <select 
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
-                  className="appearance-none bg-white/80 border border-[#F5E6D6] rounded-2xl px-4 py-2.5 pr-10 text-[#2C3E50] font-medium focus:outline-none focus:ring-2 focus:ring-[#2C3E50]/10 focus:border-[#2C3E50] transition-all duration-200"
+                  className="appearance-none bg-[#FDF6ED]/80 border border-[#F5E6D6] rounded-2xl px-4 py-2.5 pr-10 text-[#2C3E50] font-medium focus:outline-none focus:ring-2 focus:ring-[#2C3E50]/10 focus:border-[#2C3E50] transition-all duration-200 shadow-md"
                 >
                   <option value="all">All Listings</option>
                   <option value="available">Available</option>
@@ -109,12 +109,12 @@ export default function Dashboard() {
               {/* Hamburger Menu Button */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2.5 bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl hover:bg-white hover:border-slate-300 transition-all duration-200"
+                className="p-2.5 bg-[#FDF6ED]/70 backdrop-blur-sm border border-[#F5E6D6] rounded-2xl hover:bg-[#FDF6ED] hover:border-[#E8D5C4] transition-all duration-200 shadow-md"
               >
                 {isMenuOpen ? (
-                  <X className="w-5 h-5 text-slate-700" />
+                  <X className="w-5 h-5 text-[#2C3E50]" />
                 ) : (
-                  <Menu className="w-5 h-5 text-slate-700" />
+                  <Menu className="w-5 h-5 text-[#2C3E50]" />
                 )}
               </button>
             </div>
@@ -136,17 +136,17 @@ export default function Dashboard() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute right-0 top-0 h-full w-80 bg-white/95 backdrop-blur-xl border-l border-slate-200/50 shadow-2xl"
+            className="absolute right-0 top-0 h-full w-80 bg-[#FDF6ED]/95 backdrop-blur-xl border-l border-[#F5E6D6] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-xl font-bold text-slate-900">Menu</h2>
+                <h2 className="text-xl font-bold text-[#2C3E50]">Menu</h2>
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-2 rounded-full hover:bg-slate-100 transition-colors"
+                  className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors shadow-sm"
                 >
-                  <X className="w-5 h-5 text-slate-600" />
+                  <X className="w-5 h-5 text-[#2C3E50]" />
                 </button>
               </div>
 
@@ -154,28 +154,28 @@ export default function Dashboard() {
                 {/* Profile Option */}
                 <button
                   onClick={() => handleMenuAction('profile')}
-                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-slate-50 transition-all duration-200 group"
+                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-[#F5E6D6] transition-all duration-200 group shadow-md hover:shadow-lg"
                 >
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+                  <div className="p-2 bg-gradient-to-br from-[#2C3E50] to-[#34495E] rounded-xl shadow-md">
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="font-semibold text-slate-900">Profile</p>
-                    <p className="text-sm text-slate-600">Manage your account</p>
+                    <p className="font-semibold text-[#2C3E50]">Profile</p>
+                    <p className="text-sm text-[#34495E]">Manage your account</p>
                   </div>
                 </button>
 
                 {/* Homepage Option */}
                 <button
                   onClick={() => handleMenuAction('homepage')}
-                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-slate-50 transition-all duration-200 group"
+                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-[#F5E6D6] transition-all duration-200 group shadow-md hover:shadow-lg"
                 >
-                  <div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl">
+                  <div className="p-2 bg-gradient-to-br from-[#34495E] to-[#2C3E50] rounded-xl shadow-md">
                     <Home className="w-5 h-5 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="font-semibold text-slate-900">Homepage</p>
-                    <p className="text-sm text-slate-600">Back to landing page</p>
+                    <p className="font-semibold text-[#2C3E50]">Homepage</p>
+                    <p className="text-sm text-[#34495E]">Back to landing page</p>
                   </div>
                 </button>
 
@@ -183,26 +183,26 @@ export default function Dashboard() {
                 <button
                   onClick={() => handleMenuAction('logout')}
                   disabled={isLoggingOut}
-                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-red-50 transition-all duration-200 group"
+                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-red-50 transition-all duration-200 group shadow-md hover:shadow-lg"
                 >
-                  <div className="p-2 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl">
+                  <div className="p-2 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl shadow-md">
                     <LogOut className="w-5 h-5 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-[#2C3E50]">
                       {isLoggingOut ? 'Logging out...' : 'Logout'}
                     </p>
-                    <p className="text-sm text-slate-600">Sign out of your account</p>
+                    <p className="text-sm text-[#34495E]">Sign out of your account</p>
                   </div>
                 </button>
               </div>
 
               {/* User Info */}
               {profile && (
-                <div className="mt-8 p-4 bg-slate-50 rounded-2xl">
-                  <p className="text-sm font-medium text-slate-600 mb-1">Signed in as</p>
-                  <p className="font-semibold text-slate-900">{profile.full_name}</p>
-                  <p className="text-sm text-slate-600">{user.email}</p>
+                <div className="mt-8 p-4 bg-[#F5E6D6] rounded-2xl shadow-md">
+                  <p className="text-sm font-medium text-[#34495E] mb-1">Signed in as</p>
+                  <p className="font-semibold text-[#2C3E50]">{profile.full_name}</p>
+                  <p className="text-sm text-[#34495E]">{user.email}</p>
                 </div>
               )}
             </div>
@@ -217,7 +217,7 @@ export default function Dashboard() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-sm border border-[#F5E6D6] p-8 mb-8"
+            className="bg-[#FDF6ED]/90 backdrop-blur-sm rounded-3xl shadow-xl border border-[#F5E6D6] p-8 mb-8"
           >
             <h2 className="text-2xl font-bold text-[#2C3E50] mb-2">
               Welcome back, {profile.full_name}! 👋
@@ -230,7 +230,7 @@ export default function Dashboard() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-sm border border-[#F5E6D6] p-6 flex flex-col items-center justify-center min-h-[120px]">
+          <div className="bg-[#FDF6ED]/90 backdrop-blur-sm rounded-3xl shadow-xl border border-[#F5E6D6] p-6 flex flex-col items-center justify-center min-h-[120px]">
             <span className="text-[#BFAE9B] text-lg">No listing data yet</span>
           </div>
         </div>
