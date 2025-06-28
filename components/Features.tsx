@@ -41,7 +41,7 @@ export default function Features() {
 
         <div className="max-w-3xl mx-auto flex flex-col gap-24">
           {features.map((feature, index) => (
-            <motion.div
+            <motion.div 
               key={index}
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -61,11 +61,11 @@ export default function Features() {
               <div className="flex-1 text-center md:text-left">
                 <div className="text-4xl mb-4">{feature.emoji}</div>
                 <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
-                  {feature.title}
-                </h3>
+                {feature.title}
+              </h3>
                 <p className="text-lg text-[#34495E] max-w-xl mx-auto md:mx-0">
-                  {feature.description}
-                </p>
+                {feature.description}
+              </p>
               </div>
             </motion.div>
           ))}

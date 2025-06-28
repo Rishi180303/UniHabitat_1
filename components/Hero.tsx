@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import HeroBackground from "./HeroBackground"
 import AuthModal from "./AuthModal"
-import { useState } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
 import { useAuth } from "./auth-provider"
 import { supabase } from "@/lib/supabase"
 import Image from "next/image"
@@ -14,6 +14,12 @@ export default function Hero() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup')
   const { user } = useAuth()
+
+  // Scroll progress for parallax effect
+  const { scrollY } = useScroll()
+  const imageScale = useTransform(scrollY, [0, 500], [1.3, 1])
+  const imageOpacity = useTransform(scrollY, [0, 300], [1, 0.8])
+  const imageY = useTransform(scrollY, [0, 500], [0, 50])
 
   const handleOpenAuthModal = async () => {
     // Check if user is already logged in
@@ -67,7 +73,7 @@ export default function Hero() {
             >
               The safest way to find and list off-campus housing near your university
             </motion.p>
-            
+        
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -99,7 +105,7 @@ export default function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Right side - Image */}
+          {/* Right side - Image with parallax zoom effect */}
           <motion.div 
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -107,7 +113,14 @@ export default function Hero() {
             className="flex justify-center lg:justify-end h-full items-stretch"
           >
             <div className="relative w-full max-w-lg lg:max-w-xl flex flex-col h-full justify-center">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl h-full flex items-stretch">
+              <motion.div 
+                className="relative rounded-3xl overflow-hidden shadow-2xl h-full flex items-stretch"
+                style={{
+                  scale: imageScale,
+                  opacity: imageOpacity,
+                  y: imageY,
+                }}
+              >
                 <Image
                   src="/images/landingpage.png"
                   alt="Student housing illustration"
@@ -118,7 +131,7 @@ export default function Hero() {
                 />
                 {/* Subtle gradient overlay for depth */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
-              </div>
+              </motion.div>
               {/* Floating decorative elements */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}

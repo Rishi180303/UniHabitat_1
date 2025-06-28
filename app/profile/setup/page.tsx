@@ -57,12 +57,12 @@ export default function ProfileSetup() {
               bio: userProfile.bio || '',
               avatar_url: userProfile.avatar_url || ''
             })
-            setCheckingProfile(false)
+        setCheckingProfile(false)
           } else {
             // If not in edit mode and profile is complete, redirect to dashboard
-            if (hasCompleteProfile(userProfile)) {
-              setProfileComplete(true)
-              router.push('/dashboard')
+        if (hasCompleteProfile(userProfile)) {
+          setProfileComplete(true)
+          router.push('/dashboard')
               return
             }
             setCheckingProfile(false)
@@ -121,7 +121,7 @@ export default function ProfileSetup() {
       if (isEditMode) {
         router.push('/profile')
       } else {
-        router.push('/dashboard')
+      router.push('/dashboard')
       }
     } catch (error: any) {
       alert(`Error saving profile: ${error.message || 'Please try again.'}`)
@@ -217,7 +217,7 @@ export default function ProfileSetup() {
                   University
                 </label>
                 <UniversitySearch
-                  value={formData.university}
+                    value={formData.university}
                   onChange={(value) => setFormData(prev => ({ ...prev, university: value }))}
                   placeholder="Search for your university"
                   className="w-full"

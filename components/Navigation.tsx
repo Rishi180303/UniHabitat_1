@@ -110,26 +110,26 @@ export default function Navigation({ isScrolled }: NavigationProps) {
             )}
           </div>
         ) : (
-          <div className="flex items-center space-x-4">
-            <span className={`${
+        <div className="flex items-center space-x-4">
+          <span className={`${
+            isScrolled 
+              ? 'text-gray-600' 
+              : 'text-[#2C3E50]'
+          }`}>
+            {user.email}
+          </span>
+          <Button 
+            onClick={handleLogout}
+            className={`transition-all duration-300 ${
               isScrolled 
-                ? 'text-gray-600' 
-                : 'text-[#2C3E50]'
-            }`}>
-              {user.email}
-            </span>
-            <Button 
-              onClick={handleLogout}
-              className={`transition-all duration-300 ${
-                isScrolled 
-                  ? 'bg-red-500 text-white hover:bg-red-600' 
-                  : 'bg-red-500 text-white hover:bg-red-600'
-              }`}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Logging out...' : 'Logout'}
-            </Button>
-          </div>
+                ? 'bg-red-500 text-white hover:bg-red-600' 
+                : 'bg-red-500 text-white hover:bg-red-600'
+            }`}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging out...' : 'Logout'}
+          </Button>
+        </div>
         )
       ) : (
         <Button 
