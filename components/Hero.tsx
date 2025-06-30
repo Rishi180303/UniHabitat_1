@@ -78,7 +78,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8 md:mb-12"
             >
               <Button 
                 size="lg" 
@@ -110,7 +110,7 @@ export default function Hero() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex justify-center lg:justify-end h-full items-stretch"
+            className="flex justify-center lg:justify-end h-full items-stretch mt-8 md:mt-12"
           >
             <div className="relative w-full max-w-lg lg:max-w-xl flex flex-col h-full justify-center">
               <motion.div 
