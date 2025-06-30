@@ -118,10 +118,10 @@ export default function ProfilePage() {
 
   if (loading || profileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#FDF6ED]">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-slate-600 font-medium">Loading your profile...</p>
+          <div className="w-8 h-8 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#34495E] font-medium">Loading your profile...</p>
         </div>
       </div>
     )
@@ -134,28 +134,28 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 sticky top-0 z-50">
+      <div className="bg-[#FDF6ED]/90 backdrop-blur-xl border-b border-[#F5E6D6] sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleBackToDashboard}
-                className="p-2 rounded-full hover:bg-slate-100 transition-colors"
+                className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-slate-600" />
+                <ArrowLeft className="w-5 h-5 text-[#2C3E50]" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-[#2C3E50] to-[#34495E] bg-clip-text text-transparent">
                   Profile
                 </h1>
-                <p className="text-slate-600 mt-1 font-medium">Manage your account</p>
+                <p className="text-[#34495E] mt-1 font-medium">Manage your account</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
               {!editMode && (
                 <Button
                   onClick={handleEditProfile}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-2xl transition-all duration-200"
+                  className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-4 py-2 rounded-2xl transition-all duration-200 shadow hover:from-[#34495E] hover:to-[#2C3E50]"
                 >
                   <Edit3 className="w-4 h-4 mr-2" />
                   Edit Profile
@@ -182,10 +182,10 @@ export default function ProfilePage() {
             animate={{ opacity: 1, y: 0 }}
             className="lg:col-span-1"
           >
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-slate-200/50 p-8 text-center">
+            <div className="bg-[#2C3E50]/90 rounded-3xl shadow-lg border border-[#F5E6D6] p-8 text-center">
               {/* Avatar */}
               <div className="relative inline-block mb-6">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-[#34495E]/30 to-[#2C3E50]/30 flex items-center justify-center">
                   {editMode ? (
                     <Input
                       id="avatar_url"
@@ -198,44 +198,25 @@ export default function ProfilePage() {
                   ) : profile?.avatar_url ? (
                     <img 
                       src={profile.avatar_url} 
-                      alt={profile.full_name}
+                      alt="Avatar"
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-16 h-16 text-white" />
+                    <User className="w-16 h-16 text-[#34495E]" />
                   )}
                 </div>
               </div>
-
-              {/* Name */}
-              {editMode ? (
-                <Input
-                  id="full_name"
-                  name="full_name"
-                  value={editData?.full_name || ''}
-                  onChange={handleEditChange}
-                  placeholder="Full Name"
-                  className={`mt-4 text-center ${getFieldError('full_name') ? 'border-red-500 bg-red-50' : ''}`}
-                />
-              ) : (
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                  {profile?.full_name || 'Your Name'}
-                </h2>
-              )}
-              {getFieldError('full_name') && (
-                <p className="text-red-500 text-xs mt-1">Full name is required</p>
-              )}
-
-              {/* Email */}
-              <div className="flex items-center justify-center space-x-2 text-slate-600 mb-4">
-                <Mail className="w-4 h-4" />
-                <span className="text-sm">{user.email}</span>
-              </div>
-
-              {/* Status Badge */}
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-sm font-medium">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
-                Active Student
+              <h2 className="text-2xl font-bold text-white mb-1">{profile?.full_name}</h2>
+              <p className="text-[#FDF6ED] mb-2">{profile?.email}</p>
+              <div className="flex flex-col items-center gap-2 mb-4">
+                <span className="inline-flex items-center gap-2 text-[#FDF6ED]">
+                  <GraduationCap className="w-4 h-4" />
+                  {profile?.university}
+                </span>
+                <span className="inline-flex items-center gap-2 text-[#FDF6ED]">
+                  <Calendar className="w-4 h-4" />
+                  Class of {profile?.year}
+                </span>
               </div>
             </div>
           </motion.div>
@@ -248,7 +229,7 @@ export default function ProfilePage() {
             className="lg:col-span-2 space-y-6"
           >
             {/* Personal Information */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-slate-200/50 p-8">
+            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <User className="w-5 h-5 mr-2 text-blue-600" />
                 Personal Information
@@ -282,7 +263,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Academic Information */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-slate-200/50 p-8">
+            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <GraduationCap className="w-5 h-5 mr-2 text-emerald-600" />
                 Academic Information
@@ -336,7 +317,7 @@ export default function ProfilePage() {
             </div>
 
             {/* About Me */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-slate-200/50 p-8">
+            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
                 About Me
@@ -361,7 +342,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Information */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-slate-200/50 p-8">
+            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-slate-600" />
                 Account Information
