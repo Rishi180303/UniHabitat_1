@@ -47,5 +47,5 @@ export async function getUserListings(userId: string) {
 }
 
 export function hasCompleteProfile(profile: any) {
-  return profile && profile.full_name && profile.university && profile.year && profile.bio
+  return profile && profile.full_name && profile.university && profile.year
 }
