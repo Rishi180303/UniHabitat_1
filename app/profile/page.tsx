@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/auth-provider'
-import { checkUserProfile } from '@/lib/utils'
+import { checkUserProfile, getUserListings } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { 
   User, 
@@ -17,7 +17,13 @@ import {
   Camera,
   MapPin,
   BookOpen,
-  Clock
+  Clock,
+  Home,
+  Bed,
+  Bath,
+  DollarSign,
+  Plus,
+  Eye
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import UniversitySearch from '@/components/UniversitySearch'
@@ -26,6 +32,8 @@ export default function ProfilePage() {
   const { user, loading } = useAuth()
   const [profile, setProfile] = useState<any>(null)
   const [profileLoading, setProfileLoading] = useState(true)
+  const [listings, setListings] = useState<any[]>([])
+  const [listingsLoading, setListingsLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [saving, setSaving] = useState(false)
@@ -33,12 +41,18 @@ export default function ProfilePage() {
   const router = useRouter()
 
   useEffect(() => {
-    const loadProfile = async () => {
+    const loadProfileAndListings = async () => {
       if (user) {
+        // Load profile
         const userProfile = await checkUserProfile(user.id)
         setProfile(userProfile)
         setProfileLoading(false)
         setEditData(userProfile)
+
+        // Load listings
+        const userListings = await getUserListings(user.id)
+        setListings(userListings)
+        setListingsLoading(false)
       }
     }
 
@@ -47,7 +61,7 @@ export default function ProfilePage() {
         router.push('/')
         return
       }
-      loadProfile()
+      loadProfileAndListings()
     }
   }, [user, loading, router])
 
@@ -135,7 +149,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#FDF6ED]">
       {/* Header */}
       <div className="bg-[#FDF6ED]/90 backdrop-blur-xl border-b border-[#F5E6D6] sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
               <button
@@ -145,7 +159,7 @@ export default function ProfilePage() {
                 <ArrowLeft className="w-5 h-5 text-[#2C3E50]" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-[#2C3E50] to-[#34495E] bg-clip-text text-transparent">
+                <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#2C3E50] to-[#34495E] bg-clip-text text-transparent tracking-tight">
                   Profile
                 </h1>
                 <p className="text-[#34495E] mt-1 font-medium">Manage your account</p>
@@ -155,7 +169,7 @@ export default function ProfilePage() {
               {!editMode && (
                 <Button
                   onClick={handleEditProfile}
-                  className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-4 py-2 rounded-2xl transition-all duration-200 shadow hover:from-[#34495E] hover:to-[#2C3E50]"
+                  className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-4 py-2 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50]"
                 >
                   <Edit3 className="w-4 h-4 mr-2" />
                   Edit Profile
@@ -164,7 +178,7 @@ export default function ProfilePage() {
               <Button
                 onClick={handleSignOut}
                 variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-4 py-2 rounded-2xl transition-all duration-200"
+                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-4 py-2 rounded-2xl font-semibold"
               >
                 Sign Out
               </Button>
@@ -174,15 +188,15 @@ export default function ProfilePage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-5xl mx-auto px-4 lg:px-8 py-10">
+        <div className="flex flex-col lg:flex-row gap-10">
           {/* Profile Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-1"
+            className="lg:w-1/3 w-full flex-shrink-0"
           >
-            <div className="bg-[#2C3E50]/90 rounded-3xl shadow-lg border border-[#F5E6D6] p-8 text-center">
+            <div className="bg-[#2C3E50]/90 rounded-3xl shadow-lg border border-[#F5E6D6] p-8 text-center flex flex-col items-center">
               {/* Avatar */}
               <div className="relative inline-block mb-6">
                 <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-[#34495E]/30 to-[#2C3E50]/30 flex items-center justify-center">
@@ -208,25 +222,25 @@ export default function ProfilePage() {
               </div>
               <h2 className="text-2xl font-bold text-white mb-1">{profile?.full_name}</h2>
               <p className="text-[#FDF6ED] mb-2">{profile?.email}</p>
-              <div className="flex flex-col items-center gap-2 mb-4">
-                <span className="inline-flex items-center gap-2 text-[#FDF6ED]">
-                  <GraduationCap className="w-4 h-4" />
+              <div className="flex flex-col items-center gap-2 text-[#FDF6ED] mt-4">
+                <span className="inline-flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
                   {profile?.university}
                 </span>
-                <span className="inline-flex items-center gap-2 text-[#FDF6ED]">
-                  <Calendar className="w-4 h-4" />
+                <span className="inline-flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4" />
                   Class of {profile?.year}
                 </span>
               </div>
             </div>
           </motion.div>
 
-          {/* Profile Details */}
+          {/* Info + Listings Column */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="lg:col-span-2 space-y-6"
+            className="lg:w-2/3 w-full flex flex-col gap-8"
           >
             {/* Personal Information */}
             <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
@@ -377,6 +391,99 @@ export default function ProfilePage() {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Your Listings */}
+            <div className="bg-white rounded-3xl shadow border border-[#F5E6D6] p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-[#2C3E50] flex items-center">
+                  <Home className="w-5 h-5 mr-2 text-orange-600" />
+                  Your Listings
+                </h3>
+                <Button
+                  onClick={() => router.push('/dashboard/list')}
+                  className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-4 py-2 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50]"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Listing
+                </Button>
+              </div>
+
+              {listingsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-3 text-[#34495E]">Loading your listings...</span>
+                </div>
+              ) : listings.length === 0 ? (
+                <div className="text-center py-8">
+                  <Home className="w-12 h-12 text-[#BFAE9B] mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold text-[#2C3E50] mb-2">No listings yet</h4>
+                  <p className="text-[#34495E] mb-4">Start by creating your first listing to rent out your space.</p>
+                  <Button
+                    onClick={() => router.push('/dashboard/list')}
+                    className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-6 py-3 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50]"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Your First Listing
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {listings.map((listing) => (
+                    <motion.div
+                      key={listing.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-[#FDF6ED] rounded-2xl p-6 border border-[#F5E6D6] shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                    >
+                      <div className="flex flex-col gap-2 mb-4">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-lg font-semibold text-[#2C3E50]">{listing.title}</h4>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            listing.sublease_type === 'private-bedroom' 
+                              ? 'bg-blue-100 text-blue-700' 
+                              : 'bg-green-100 text-green-700'
+                          }`}>
+                            {listing.sublease_type === 'private-bedroom' ? 'Private Bedroom' : 'Entire Place'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#34495E] text-sm">
+                          <MapPin className="w-4 h-4" />
+                          <span>{listing.address}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#34495E] text-sm">
+                          <DollarSign className="w-4 h-4" />
+                          <span className="font-semibold">${listing.price}/month</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#34495E] text-sm">
+                          <Bed className="w-4 h-4" />
+                          <span>{listing.total_bedrooms} bed</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#34495E] text-sm">
+                          <Bath className="w-4 h-4" />
+                          <span>{listing.total_bathrooms} bath</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#34495E] text-sm">
+                          <span>Available: {listing.move_in_date} - {listing.move_out_date}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#34495E] text-sm">
+                          <span>Created: {new Date(listing.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-[#F5E6D6] text-[#2C3E50] hover:bg-[#F5E6D6]"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Save/Cancel Buttons */}

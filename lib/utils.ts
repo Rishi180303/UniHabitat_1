@@ -26,12 +26,26 @@ export async function checkUserProfile(userId: string) {
   }
 }
 
+export async function getUserListings(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('listings')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching user listings:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error fetching user listings:', error)
+    return []
+  }
+}
+
 export function hasCompleteProfile(profile: any) {
-  if (!profile) return false
-  
-  return !!(
-    profile.full_name &&
-    profile.university &&
-    profile.year
-  )
+  return profile && profile.full_name && profile.university && profile.year && profile.bio
 }

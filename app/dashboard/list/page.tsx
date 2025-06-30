@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight, Upload, Home, Bed, Bath, Calendar, MapPin, DollarSign, Camera, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { createListing } from '@/lib/listings'
+import { useAuth } from '@/components/auth-provider'
 
 const steps = [
   { id: 1, title: "What you're subleasing", icon: Home, description: "Choose what you're offering" },
@@ -20,6 +22,7 @@ const steps = [
 
 export default function ListUnit() {
   const router = useRouter()
+  const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     // Step 1: What you're subleasing
@@ -51,6 +54,9 @@ export default function ListUnit() {
     photos: [] as File[],
     video: null as File | null,
   })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -82,6 +88,48 @@ export default function ListUnit() {
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handlePublishListing = async () => {
+    if (!user) return
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      // Prepare the listing object for Supabase
+      const listing = {
+        user_id: user.id,
+        title: `${formData.subleaseType === 'private-bedroom' ? 'Private Bedroom' : 'Entire Place'} near campus`,
+        description: '', // You can add a description field in your form if needed
+        address: formData.address,
+        unit_number: formData.unitNumber,
+        university: '', // Add university if you collect it
+        price: Number(formData.monthlyRent),
+        sublease_type: formData.subleaseType,
+        furnishing: formData.furnishing,
+        lease_type: formData.leaseType,
+        total_bedrooms: Number(formData.totalBedrooms),
+        available_bedrooms: Number(formData.availableBedrooms),
+        total_bathrooms: Number(formData.totalBathrooms),
+        move_in_date: formData.moveInDate,
+        move_out_date: formData.moveOutDate,
+        amenities: [], // Add amenities if you collect them
+        images: [], // Image upload to Supabase Storage can be added later
+        video_url: '', // Video upload to Supabase Storage can be added later
+        created_at: new Date().toISOString(),
+      }
+      // Debug logs
+      console.log('DEBUG: user.id', user?.id)
+      console.log('DEBUG: listing.user_id', listing.user_id)
+      console.log('DEBUG: listing', listing)
+      await createListing(listing)
+      setSubmitSuccess(true)
+      setTimeout(() => router.push('/dashboard'), 1500)
+    } catch (err: any) {
+      setSubmitError(err.message || 'Failed to publish listing')
+      console.error('DEBUG: Supabase insert error', err)
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -600,14 +648,15 @@ export default function ListUnit() {
               </div>
             </div>
 
+            {submitError && <div className="text-red-600 font-medium text-center">{submitError}</div>}
+            {submitSuccess && <div className="text-green-600 font-medium text-center">Listing published! Redirecting...</div>}
+
             <Button 
               className="w-full bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white py-4 text-lg font-semibold hover:from-[#34495E] hover:to-[#2C3E50] transition-all duration-300 shadow-lg"
-              onClick={() => {
-                alert('Listing submitted successfully! (This is a demo)')
-                router.push('/dashboard')
-              }}
+              onClick={handlePublishListing}
+              disabled={submitting}
             >
-              Publish Listing
+              {submitting ? 'Publishing...' : 'Publish Listing'}
             </Button>
           </motion.div>
         )
