@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight, Upload, Home, Bed, Bath, Calendar, MapPin, DollarSign, Camera, Check, ChevronLeft, ChevronRight } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { createListing } from '@/lib/listings'
+import { useRouter, useSearchParams } from "next/navigation"
+import { createListing, getListingById, updateListing } from '@/lib/listings'
 import { useAuth } from '@/components/auth-provider'
 
 const steps = [
@@ -22,6 +22,9 @@ const steps = [
 
 export default function ListUnit() {
   const router = useRouter()
+  const searchParams = useSearchParams();
+  const editMode = searchParams.get('edit') === '1';
+  const listingId = searchParams.get('listingId');
   const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -57,6 +60,31 @@ export default function ListUnit() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+
+  // Prefill form in edit mode
+  useEffect(() => {
+    if (editMode && listingId) {
+      getListingById(listingId).then(listing => {
+        if (listing) {
+          setFormData({
+            subleaseType: listing.sublease_type || '',
+            furnishing: listing.furnishing || '',
+            leaseType: listing.lease_type || '',
+            totalBedrooms: listing.total_bedrooms?.toString() || '',
+            availableBedrooms: listing.available_bedrooms?.toString() || '',
+            totalBathrooms: listing.total_bathrooms?.toString() || '',
+            moveInDate: listing.move_in_date || '',
+            moveOutDate: listing.move_out_date || '',
+            address: listing.address || '',
+            unitNumber: listing.unit_number || '',
+            monthlyRent: listing.price?.toString() || '',
+            photos: [], // You may want to handle existing images differently
+            video: null, // You may want to handle existing video differently
+          })
+        }
+      })
+    }
+  }, [editMode, listingId])
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -96,14 +124,13 @@ export default function ListUnit() {
     setSubmitting(true)
     setSubmitError(null)
     try {
-      // Prepare the listing object for Supabase
       const listing = {
         user_id: user.id,
         title: `${formData.subleaseType === 'private-bedroom' ? 'Private Bedroom' : 'Entire Place'} near campus`,
-        description: '', // You can add a description field in your form if needed
+        description: '',
         address: formData.address,
         unit_number: formData.unitNumber,
-        university: '', // Add university if you collect it
+        university: '',
         price: Number(formData.monthlyRent),
         sublease_type: formData.subleaseType,
         furnishing: formData.furnishing,
@@ -113,21 +140,23 @@ export default function ListUnit() {
         total_bathrooms: Number(formData.totalBathrooms),
         move_in_date: formData.moveInDate,
         move_out_date: formData.moveOutDate,
-        amenities: [], // Add amenities if you collect them
-        images: [], // Image upload to Supabase Storage can be added later
-        video_url: '', // Video upload to Supabase Storage can be added later
+        amenities: [],
+        images: [],
+        video_url: '',
         created_at: new Date().toISOString(),
       }
-      // Debug logs
-      console.log('DEBUG: user.id', user?.id)
-      console.log('DEBUG: listing.user_id', listing.user_id)
-      console.log('DEBUG: listing', listing)
-      await createListing(listing)
+      if (editMode && listingId) {
+        // Update existing listing
+        await updateListing({ ...listing, id: listingId })
+      } else {
+        // Create new listing
+        await createListing(listing)
+      }
       setSubmitSuccess(true)
       setTimeout(() => router.push('/dashboard'), 1500)
     } catch (err: any) {
-      setSubmitError(err.message || 'Failed to publish listing')
-      console.error('DEBUG: Supabase insert error', err)
+      setSubmitError(err.message || 'Failed to save listing')
+      console.error('DEBUG: Supabase insert/update error', err)
     } finally {
       setSubmitting(false)
     }
@@ -656,7 +685,7 @@ export default function ListUnit() {
               onClick={handlePublishListing}
               disabled={submitting}
             >
-              {submitting ? 'Publishing...' : 'Publish Listing'}
+              {submitting ? (editMode ? 'Saving...' : 'Publishing...') : (editMode ? 'Confirm Changes' : 'Publish Listing')}
             </Button>
           </motion.div>
         )
@@ -700,8 +729,39 @@ export default function ListUnit() {
                   const isActive = currentStep === step.id
                   const isCompleted = currentStep > step.id
                   const isUpcoming = currentStep < step.id
-                  
-                  return (
+                  // If in edit mode, make step clickable
+                  const stepButton = (
+                    <div
+                      key={step.id}
+                      className={`flex items-start space-x-4 cursor-pointer ${isActive ? '' : 'hover:bg-[#F5E6D6]'}`}
+                      onClick={() => editMode && setCurrentStep(step.id)}
+                      style={{ pointerEvents: editMode ? 'auto' : 'none', opacity: editMode ? 1 : 1 }}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                        isActive 
+                          ? 'bg-[#2C3E50] text-white shadow-lg' 
+                          : isCompleted 
+                            ? 'bg-[#34495E] text-white' 
+                            : 'bg-[#F5E6D6] text-[#BFAE9B]'
+                      }`}>
+                        {isCompleted ? (
+                          <Check className="w-5 h-5" />
+                        ) : (
+                          <step.icon className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div className={`flex-1 min-w-0 ${isUpcoming ? 'opacity-50' : ''}`}>
+                        <h3 className={`font-semibold text-sm ${
+                          isActive ? 'text-[#2C3E50]' : 'text-[#34495E]'
+                        }`}>
+                          {step.title}
+                        </h3>
+                        <p className="text-xs text-[#BFAE9B] mt-1">{step.description}</p>
+                      </div>
+                    </div>
+                  );
+                  // If not in edit mode, render as non-clickable
+                  const stepDiv = (
                     <div key={step.id} className="flex items-start space-x-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
                         isActive 
@@ -725,7 +785,8 @@ export default function ListUnit() {
                         <p className="text-xs text-[#BFAE9B] mt-1">{step.description}</p>
                       </div>
                     </div>
-                  )
+                  );
+                  return editMode ? stepButton : stepDiv;
                 })}
               </div>
             </div>

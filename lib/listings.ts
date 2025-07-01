@@ -51,4 +51,15 @@ export async function getListingById(id: string) {
     .single()
   if (error) throw error
   return data
+}
+
+export async function updateListing(listing: Listing) {
+  if (!listing.id) throw new Error('Listing ID is required for update')
+  const { data, error } = await supabase
+    .from('listings')
+    .update(listing)
+    .eq('id', listing.id)
+    .select()
+  if (error) throw error
+  return data[0]
 } 
