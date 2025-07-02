@@ -514,7 +514,7 @@ export default function ListUnit() {
                     handleInputChange('address', address);
                     handleInputChange('locationLatLng', latLng);
                   }}
-                  apiKey="AIzaSyCHSEqTLG35k8xzj-AQV0tVg5PKWIsiWaE"
+                  apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
                 />
               </div>
 
