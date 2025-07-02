@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Upload, Home, Bed, Bath, Calendar, MapPin, Dolla
 import { useRouter, useSearchParams } from "next/navigation"
 import { createListing, getListingById, updateListing } from '@/lib/listings'
 import { useAuth } from '@/components/auth-provider'
+import LocationSearchInput from '@/components/LocationSearchInput'
 
 const steps = [
   { id: 1, title: "What you're subleasing", icon: Home, description: "Choose what you're offering" },
@@ -507,12 +508,13 @@ export default function ListUnit() {
             <div className="space-y-4">
               <div>
                 <label className="block text-lg font-semibold text-[#2C3E50] mb-3">Address</label>
-                <input 
-                  type="text"
+                <LocationSearchInput
                   value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  placeholder="Enter your full address"
-                  className="w-full p-4 rounded-2xl border-2 border-[#F5E6D6] bg-[#FDF6ED] text-[#2C3E50] font-medium focus:outline-none focus:border-[#2C3E50] transition-all duration-200"
+                  onSelect={(address, latLng) => {
+                    handleInputChange('address', address);
+                    handleInputChange('locationLatLng', latLng);
+                  }}
+                  apiKey="AIzaSyCHSEqTLG35k8xzj-AQV0tVg5PKWIsiWaE"
                 />
               </div>
 
