@@ -243,7 +243,7 @@ export default function ProfilePage() {
             className="lg:w-2/3 w-full flex flex-col gap-8"
           >
             {/* Personal Information */}
-            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
+            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <User className="w-5 h-5 mr-2 text-blue-600" />
                 Personal Information
@@ -277,7 +277,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Academic Information */}
-            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
+            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <GraduationCap className="w-5 h-5 mr-2 text-emerald-600" />
                 Academic Information
@@ -331,7 +331,7 @@ export default function ProfilePage() {
             </div>
 
             {/* About Me */}
-            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
+            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
                 About Me
@@ -356,7 +356,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Information */}
-            <div className="bg-[#FDF6ED] rounded-3xl shadow border border-[#F5E6D6] p-8">
+            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-slate-600" />
                 Account Information
@@ -479,21 +479,12 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex flex-col sm:flex-row gap-3 mt-auto w-full">
                           <Button
-                            variant="outline"
                             size="lg"
-                            className="border-[#F5E6D6] text-[#2C3E50] hover:bg-[#F5E6D6] text-base w-full"
-                          >
-                            <Eye className="w-5 h-5 mr-2" />
-                            View
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="lg"
-                            className="border-[#F5E6D6] text-[#2C3E50] hover:bg-[#F5E6D6] text-base w-full"
+                            className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white text-lg font-semibold rounded-2xl shadow w-full py-4 hover:from-[#34495E] hover:to-[#2C3E50] flex items-center justify-center"
                             onClick={() => router.push(`/dashboard/list?edit=1&listingId=${listing.id}`)}
                           >
                             <Edit3 className="w-5 h-5 mr-2" />
-                            Edit
+                            Edit Listing
                           </Button>
                         </div>
                       </motion.div>
