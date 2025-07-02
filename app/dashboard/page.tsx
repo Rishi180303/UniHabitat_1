@@ -8,6 +8,9 @@ import { checkUserProfile, hasCompleteProfile } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import LocationSearchInput from '@/components/LocationSearchInput'
+import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -17,6 +20,9 @@ export default function Dashboard() {
   const [checkingProfile, setCheckingProfile] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [moveInDate, setMoveInDate] = useState('')
+  const [moveOutDate, setMoveOutDate] = useState('')
+  const [location, setLocation] = useState('')
 
   useEffect(() => {
     if (!loading && !user) {
@@ -84,43 +90,71 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
-      {/* Header */}
-      <div className="bg-[#FDF6ED]/90 backdrop-blur-xl border-b border-[#F5E6D6] sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-[#2C3E50]">Dashboard</h1>
-              <p className="text-[#34495E] mt-1 font-medium">Find your perfect student housing</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <select 
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="appearance-none bg-[#FDF6ED]/80 border border-[#F5E6D6] rounded-2xl px-4 py-2.5 pr-10 text-[#2C3E50] font-medium focus:outline-none focus:ring-2 focus:ring-[#2C3E50]/10 focus:border-[#2C3E50] transition-all duration-200 shadow-md"
-                >
-                  <option value="all">All Listings</option>
-                  <option value="available">Available</option>
-                  <option value="rented">Rented</option>
-                </select>
-                <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#BFAE9B] pointer-events-none" />
+      {/* Modern Dashboard Header */}
+      <header className="sticky top-0 z-50 bg-[#FDF6ED]/90 backdrop-blur-md shadow-sm">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-8 h-20">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold text-[#2C3E50] tracking-tight">UniHabitat</span>
+          </div>
+
+          {/* Pill-shaped Search Bar */}
+          <form className="flex items-center bg-white rounded-full shadow px-4 py-2 gap-6 w-full max-w-2xl mx-8 border border-[#F5E6D6]">
+            <div className="flex items-center gap-2">
+              <Filter className="w-5 h-5 text-[#2C3E50]" />
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-[#34495E] leading-none">Location</span>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                  placeholder="Add location"
+                  className="bg-transparent outline-none text-sm font-medium text-[#2C3E50] placeholder-[#BFAE9B] min-w-[120px]"
+                />
               </div>
-              
-              {/* Hamburger Menu Button */}
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2.5 bg-[#FDF6ED]/70 backdrop-blur-sm border border-[#F5E6D6] rounded-2xl hover:bg-[#FDF6ED] hover:border-[#E8D5C4] transition-all duration-200 shadow-md"
-              >
-                {isMenuOpen ? (
-                  <X className="w-5 h-5 text-[#2C3E50]" />
-                ) : (
-                  <Menu className="w-5 h-5 text-[#2C3E50]" />
-                )}
-              </button>
             </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-[#34495E] leading-none">Move-in</span>
+              <input
+                type="date"
+                value={moveInDate}
+                onChange={e => setMoveInDate(e.target.value)}
+                placeholder="Add move-in"
+                className="bg-transparent outline-none text-sm font-medium text-[#2C3E50] placeholder-[#BFAE9B] min-w-[100px]"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-[#34495E] leading-none">Move-out</span>
+              <input
+                type="date"
+                value={moveOutDate}
+                onChange={e => setMoveOutDate(e.target.value)}
+                placeholder="Add move-out"
+                className="bg-transparent outline-none text-sm font-medium text-[#2C3E50] placeholder-[#BFAE9B] min-w-[100px]"
+              />
+            </div>
+            <button type="submit" className="ml-2 bg-gradient-to-r from-[#2C3E50] to-[#34495E] hover:from-[#34495E] hover:to-[#2C3E50] rounded-full p-2 flex items-center justify-center transition-colors shadow">
+              <Search className="w-5 h-5 text-white" />
+            </button>
+          </form>
+
+          {/* Navigation & Hamburger/Profile */}
+          <div className="flex items-center gap-6">
+            <button className="text-base font-medium text-[#2C3E50] hover:text-[#34495E] transition-colors">List your place</button>
+            {/* Hamburger/Profile menu */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="ml-2 flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow hover:bg-[#F5E6D6] transition-all"
+            >
+              {profile?.avatar_url ? (
+                <Image src={profile.avatar_url} alt="Profile" width={32} height={32} className="rounded-full object-cover" />
+              ) : (
+                <Menu className="w-6 h-6 text-[#2C3E50]" />
+              )}
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Hamburger Menu Overlay */}
       {isMenuOpen && (
@@ -212,31 +246,9 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        {/* Welcome Message */}
-        {profile && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-[#FDF6ED]/90 backdrop-blur-sm rounded-3xl shadow-xl border border-[#F5E6D6] p-8 mb-8"
-          >
-            <h2 className="text-2xl font-bold text-[#2C3E50] mb-2">
-              Welcome back, {profile.full_name}! 👋
-            </h2>
-            <p className="text-[#34495E] font-medium">
-              {profile.university} • {profile.major} • Class of {profile.graduation_year}
-            </p>
-          </motion.div>
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-[#FDF6ED]/90 backdrop-blur-sm rounded-3xl shadow-xl border border-[#F5E6D6] p-6 flex flex-col items-center justify-center min-h-[120px]">
-            <span className="text-[#BFAE9B] text-lg">No listing data yet</span>
-          </div>
-        </div>
-
         {/* Listings Grid */}
-        <div className="flex flex-col items-center justify-center py-16">
+        <div className="w-full flex flex-wrap justify-center gap-10">
+          {/* TODO: Render filtered listings here. For now, show empty state. */}
           <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
         </div>
       </div>

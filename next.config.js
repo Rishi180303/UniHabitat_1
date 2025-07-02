@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['framer-motion'],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+      },
+    ],
+  },
   webpack: (config, { isServer }) => {
     // Suppress the critical dependency warning from Supabase realtime client
     config.ignoreWarnings = [
