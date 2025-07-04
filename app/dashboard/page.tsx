@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import LocationSearchInput from '@/components/LocationSearchInput'
+import DatePicker from '@/components/ui/date-picker'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
@@ -114,23 +115,21 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-semibold text-[#34495E] leading-none">Move-in</span>
-              <input
-                type="date"
+              <DatePicker
                 value={moveInDate}
-                onChange={e => setMoveInDate(e.target.value)}
+                onChange={setMoveInDate}
                 placeholder="Add move-in"
-                className="bg-transparent outline-none text-sm font-medium text-[#2C3E50] placeholder-[#BFAE9B] min-w-[100px]"
+                label="Move-in"
+                className="min-w-[120px]"
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-semibold text-[#34495E] leading-none">Move-out</span>
-              <input
-                type="date"
+              <DatePicker
                 value={moveOutDate}
-                onChange={e => setMoveOutDate(e.target.value)}
+                onChange={setMoveOutDate}
                 placeholder="Add move-out"
-                className="bg-transparent outline-none text-sm font-medium text-[#2C3E50] placeholder-[#BFAE9B] min-w-[100px]"
+                label="Move-out"
+                className="min-w-[120px]"
               />
             </div>
             <button type="submit" className="ml-2 bg-gradient-to-r from-[#2C3E50] to-[#34495E] hover:from-[#34495E] hover:to-[#2C3E50] rounded-full p-2 flex items-center justify-center transition-colors shadow">
