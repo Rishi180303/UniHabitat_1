@@ -92,7 +92,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
       {/* Modern Dashboard Header */}
-      <header className="sticky top-0 z-50 bg-[#FDF6ED]/90 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-50 bg-[#FDF6ED]/90 backdrop-blur-md pt-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-8 h-20">
           {/* Logo */}
           <div className="flex items-center gap-2">

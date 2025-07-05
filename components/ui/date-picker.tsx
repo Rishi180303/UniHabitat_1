@@ -27,8 +27,12 @@ export default function DatePicker({
 
   useEffect(() => {
     if (value) {
-      setInputValue(value)
-      setSelectedDate(new Date(value))
+      const date = new Date(value)
+      setInputValue(formatDate(date))
+      setSelectedDate(date)
+    } else {
+      setInputValue('')
+      setSelectedDate(null)
     }
   }, [value])
 
@@ -80,7 +84,11 @@ export default function DatePicker({
     return { daysInMonth, startingDay }
   }
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
+  const navigateMonth = (direction: 'prev' | 'next', e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     setCurrentDate(prev => {
       const newDate = new Date(prev)
       if (direction === 'prev') {
@@ -124,7 +132,12 @@ export default function DatePicker({
       days.push(
         <button
           key={day}
-          onClick={() => handleDateSelect(date)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            handleDateSelect(date)
+          }}
           className={`
             h-10 w-10 rounded-full text-sm font-medium transition-all duration-200
             ${isSelectedDay 
@@ -191,13 +204,15 @@ export default function DatePicker({
               </h3>
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => navigateMonth('prev')}
+                  type="button"
+                  onClick={(e) => navigateMonth('prev', e)}
                   className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4 text-[#2C3E50]" />
                 </button>
                 <button
-                  onClick={() => navigateMonth('next')}
+                  type="button"
+                  onClick={(e) => navigateMonth('next', e)}
                   className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors"
                 >
                   <ChevronRight className="w-4 h-4 text-[#2C3E50]" />
@@ -224,7 +239,12 @@ export default function DatePicker({
 
             {/* Today button */}
             <button
-              onClick={() => handleDateSelect(new Date())}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleDateSelect(new Date())
+              }}
               className="w-full py-2 px-4 bg-[#F5E6D6] text-[#2C3E50] rounded-xl font-medium hover:bg-[#E8D5C0] transition-colors"
             >
               Today
