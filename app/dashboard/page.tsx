@@ -12,6 +12,7 @@ import LocationSearchInput from '@/components/LocationSearchInput'
 import DatePicker from '@/components/ui/date-picker'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import FilterDialog, { FilterState } from '@/components/FilterDialog'
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -24,6 +25,16 @@ export default function Dashboard() {
   const [moveInDate, setMoveInDate] = useState('')
   const [moveOutDate, setMoveOutDate] = useState('')
   const [location, setLocation] = useState('')
+  const [filterState, setFilterState] = useState<FilterState>({
+    subleaseType: '',
+    furnishing: '',
+    leaseType: '',
+    totalBedrooms: '',
+    availableBedrooms: '',
+    totalBathrooms: '',
+    minPrice: '',
+    maxPrice: '',
+  })
 
   useEffect(() => {
     if (!loading && !user) {
@@ -72,6 +83,19 @@ export default function Dashboard() {
     }
   }
 
+  const handleFilterChange = (newFilter: FilterState) => setFilterState(newFilter)
+  const handleFilterApply = () => {/* TODO: implement filter logic */}
+  const handleFilterClear = () => setFilterState({
+    subleaseType: '',
+    furnishing: '',
+    leaseType: '',
+    totalBedrooms: '',
+    availableBedrooms: '',
+    totalBathrooms: '',
+    minPrice: '',
+    maxPrice: '',
+  })
+
   // Show loading while checking profile
   if (loading || checkingProfile) {
     return (
@@ -102,7 +126,6 @@ export default function Dashboard() {
           {/* Pill-shaped Search Bar */}
           <form className="flex items-center bg-white rounded-full shadow px-4 py-2 gap-6 w-full max-w-2xl mx-8 border border-[#F5E6D6]">
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-[#2C3E50]" />
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-[#34495E] leading-none">Location</span>
                 <input
@@ -133,6 +156,15 @@ export default function Dashboard() {
                 className="min-w-[120px]"
                 type="move-out"
                 minDate={moveInDate}
+              />
+            </div>
+            {/* Filter Button */}
+            <div className="flex flex-col justify-end">
+              <FilterDialog
+                filter={filterState}
+                onChange={handleFilterChange}
+                onApply={handleFilterApply}
+                onClear={handleFilterClear}
               />
             </div>
             <button type="submit" className="ml-2 bg-gradient-to-r from-[#2C3E50] to-[#34495E] hover:from-[#34495E] hover:to-[#2C3E50] rounded-full p-2 flex items-center justify-center transition-colors shadow">
