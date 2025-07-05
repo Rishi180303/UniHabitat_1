@@ -10,6 +10,8 @@ interface DatePickerProps {
   placeholder?: string
   label?: string
   className?: string
+  type?: 'move-in' | 'move-out'
+  minDate?: string
 }
 
 export default function DatePicker({ 
@@ -17,13 +19,25 @@ export default function DatePicker({
   onChange, 
   placeholder = "Select date",
   label,
-  className = ""
+  className = "",
+  type = "move-out",
+  minDate
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(value ? new Date(value) : null)
   const [inputValue, setInputValue] = useState(value || '')
   const pickerRef = useRef<HTMLDivElement>(null)
+
+  // Auto-select today's date for move-in picker when opened
+  useEffect(() => {
+    if (type === 'move-in' && !value && isOpen) {
+      const today = new Date()
+      setSelectedDate(today)
+      setInputValue(formatDate(today))
+      onChange(today.toISOString().split('T')[0])
+    }
+  }, [isOpen, type, value, onChange])
 
   useEffect(() => {
     if (value) {
@@ -114,6 +128,21 @@ export default function DatePicker({
            date.getFullYear() === currentDate.getFullYear()
   }
 
+  const isDateDisabled = (date: Date) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    date.setHours(0, 0, 0, 0)
+    if (type === 'move-in') {
+      return date < today
+    }
+    if (type === 'move-out' && minDate) {
+      const min = new Date(minDate)
+      min.setHours(0, 0, 0, 0)
+      return date <= min
+    }
+    return date < today
+  }
+
   const renderCalendar = () => {
     const { daysInMonth, startingDay } = getDaysInMonth(currentDate)
     const days = []
@@ -128,22 +157,26 @@ export default function DatePicker({
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
       const isCurrentDay = isToday(date)
       const isSelectedDay = isSelected(date)
+      const isDisabled = isDateDisabled(date)
       
       days.push(
         <button
           key={day}
           type="button"
+          disabled={isDisabled}
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            handleDateSelect(date)
+            if (!isDisabled) {
+              handleDateSelect(date)
+            }
           }}
           className={`
             h-10 w-10 rounded-full text-sm font-medium transition-all duration-200
-            ${isSelectedDay 
-              ? 'bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white shadow-lg' 
-              : isCurrentDay 
-                ? 'bg-[#F5E6D6] text-[#2C3E50] border-2 border-[#2C3E50]' 
+            ${isSelectedDay
+              ? 'bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white shadow-lg'
+              : isDisabled
+                ? 'text-[#D1C7B7] cursor-not-allowed'
                 : 'text-[#34495E] hover:bg-[#F5E6D6] hover:text-[#2C3E50]'
             }
           `}
@@ -236,19 +269,6 @@ export default function DatePicker({
                 {renderCalendar()}
               </div>
             </div>
-
-            {/* Today button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleDateSelect(new Date())
-              }}
-              className="w-full py-2 px-4 bg-[#F5E6D6] text-[#2C3E50] rounded-xl font-medium hover:bg-[#E8D5C0] transition-colors"
-            >
-              Today
-            </button>
           </motion.div>
         )}
       </AnimatePresence>

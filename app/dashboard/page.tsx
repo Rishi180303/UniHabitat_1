@@ -121,6 +121,7 @@ export default function Dashboard() {
                 placeholder="Add move-in"
                 label="Move-in"
                 className="min-w-[120px]"
+                type="move-in"
               />
             </div>
             <div className="flex flex-col">
@@ -130,6 +131,8 @@ export default function Dashboard() {
                 placeholder="Add move-out"
                 label="Move-out"
                 className="min-w-[120px]"
+                type="move-out"
+                minDate={moveInDate}
               />
             </div>
             <button type="submit" className="ml-2 bg-gradient-to-r from-[#2C3E50] to-[#34495E] hover:from-[#34495E] hover:to-[#2C3E50] rounded-full p-2 flex items-center justify-center transition-colors shadow">
