@@ -14,6 +14,12 @@ interface DatePickerProps {
   minDate?: string
 }
 
+// Helper to parse YYYY-MM-DD as local date
+function parseLocalDate(str: string): Date {
+  const [year, month, day] = str.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
 export default function DatePicker({ 
   value, 
   onChange, 
@@ -41,7 +47,7 @@ export default function DatePicker({
 
   useEffect(() => {
     if (value) {
-      const date = new Date(value)
+      const date = parseLocalDate(value)
       setInputValue(formatDate(date))
       setSelectedDate(date)
     } else {
@@ -136,7 +142,7 @@ export default function DatePicker({
       return date < today
     }
     if (type === 'move-out' && minDate) {
-      const min = new Date(minDate)
+      const min = parseLocalDate(minDate)
       min.setHours(0, 0, 0, 0)
       return date <= min
     }
