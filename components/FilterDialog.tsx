@@ -33,12 +33,9 @@ export default function FilterDialog({ filter, onChange, onApply, onClear }: Fil
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="flex items-center gap-2 border-[#F5E6D6] bg-white text-[#2C3E50] px-6 py-2 rounded-full shadow-none h-12 min-w-[120px] font-medium hover:bg-[#F5E6D6] focus:ring-2 focus:ring-[#2C3E50]"
-        >
-          <Filter className="w-5 h-5 mr-1" /> Filters
-        </Button>
+        <button className="w-14 h-14 bg-gray-50 hover:bg-gray-100 text-[#2C3E50] rounded-full transition-all duration-200 flex items-center justify-center">
+          <Filter className="w-6 h-6" />
+        </button>
       </DialogTrigger>
       <DialogContent className="max-w-xl w-full">
         <DialogHeader>

@@ -197,12 +197,6 @@ export default function DatePicker({
 
   return (
     <div className={`relative ${className}`} ref={pickerRef}>
-      {label && (
-        <span className="text-xs font-semibold text-[#34495E] leading-none block mb-1">
-          {label}
-        </span>
-      )}
-      
       <div className="relative">
         <input
           type="text"
@@ -211,19 +205,19 @@ export default function DatePicker({
           onClick={handleInputClick}
           placeholder={placeholder}
           readOnly
-          className="w-full bg-transparent outline-none text-sm font-medium text-[#2C3E50] placeholder-[#BFAE9B] cursor-pointer"
+          className="w-full p-4 rounded-2xl border-2 border-white/20 bg-white text-[#2C3E50] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-all duration-200 hover:border-white/40 cursor-pointer"
         />
         
         <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {inputValue && (
             <button
               onClick={handleClear}
-              className="p-1 rounded-full hover:bg-[#F5E6D6] transition-colors"
+              className="p-1 rounded-full hover:bg-[#F5E6D6] transition-colors mr-2"
             >
-              <X className="w-3 h-3 text-[#BFAE9B]" />
+              <X className="w-3 h-3 text-gray-400" />
             </button>
           )}
-          <Calendar className="w-4 h-4 text-[#BFAE9B]" />
+          <Calendar className="w-4 h-4 text-gray-400 mr-3" />
         </div>
       </div>
 

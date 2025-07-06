@@ -6,7 +6,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { checkUserProfile, hasCompleteProfile } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X } from "lucide-react"
+import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import LocationSearchInput from '@/components/LocationSearchInput'
 import DatePicker from '@/components/ui/date-picker'
@@ -116,76 +116,103 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
       {/* Modern Dashboard Header */}
-      <header className="sticky top-0 z-50 bg-[#FDF6ED]/90 backdrop-blur-md pt-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-8 h-20">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-[#2C3E50] tracking-tight">UniHabitat</span>
+      <header className="bg-[#FDF6ED]/90 backdrop-blur-md pt-4 pb-3">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-between mb-4">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold text-[#2C3E50] tracking-tight">UniHabitat</span>
+            </div>
+
+            {/* Navigation & Profile */}
+            <div className="flex items-center gap-4">
+              <button className="text-base font-medium text-[#2C3E50] hover:text-[#34495E] transition-colors">
+                List your place
+              </button>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow hover:bg-[#F5E6D6] transition-all"
+              >
+                {profile?.avatar_url ? (
+                  <Image src={profile.avatar_url} alt="Profile" width={32} height={32} className="rounded-full object-cover" />
+                ) : (
+                  <Menu className="w-6 h-6 text-[#2C3E50]" />
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Pill-shaped Search Bar */}
-          <form className="flex items-center bg-white rounded-full shadow px-4 py-2 gap-6 w-full max-w-2xl mx-8 border border-[#F5E6D6]">
-            <div className="flex items-center gap-2">
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-[#34495E] leading-none">Location</span>
-                <input
-                  type="text"
-                  value={location}
-                  onChange={e => setLocation(e.target.value)}
-                  placeholder="Add location"
-                  className="bg-transparent outline-none text-sm font-medium text-[#2C3E50] placeholder-[#BFAE9B] min-w-[120px]"
-                />
+          {/* Housing Search Interface */}
+          <div className="bg-[#FDF6ED] py-3">
+            <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+              <div className="max-w-5xl mx-auto">
+                {/* Compact Search Bar */}
+                <div className="bg-white rounded-full shadow-lg border border-gray-200 px-2 py-0.5 flex items-center gap-0.5 min-h-[64px]">
+                  {/* Filters Button */}
+                  <div className="flex-shrink-0">
+                    <FilterDialog
+                      filter={filterState}
+                      onChange={handleFilterChange}
+                      onApply={handleFilterApply}
+                      onClear={handleFilterClear}
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div className="flex-1 min-w-0 px-3 py-1.5">
+                    <div className="text-xs font-semibold text-[#2C3E50] mb-0.5">Location</div>
+                    <input
+                      type="text"
+                      placeholder="University or area"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="w-full text-[#2C3E50] placeholder-gray-400 bg-transparent border-0 focus:outline-none text-base"
+                    />
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-px h-8 bg-gray-200"></div>
+
+                  {/* Move-in Date */}
+                  <div className="flex-1 min-w-0 px-3 py-1.5">
+                    <div className="text-xs font-semibold text-[#2C3E50] mb-0.5">Move-in</div>
+                    <DatePicker
+                      type="move-in"
+                      value={moveInDate}
+                      onChange={setMoveInDate}
+                      placeholder="Add move-in"
+                      className="w-full text-[#2C3E50] placeholder-gray-400 bg-transparent border-0 focus:outline-none text-base"
+                    />
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-px h-8 bg-gray-200"></div>
+
+                  {/* Move-out Date */}
+                  <div className="flex-1 min-w-0 px-3 py-1.5">
+                    <div className="text-xs font-semibold text-[#2C3E50] mb-0.5">Move-out</div>
+                    <DatePicker
+                      type="move-out"
+                      value={moveOutDate}
+                      onChange={setMoveOutDate}
+                      placeholder="Add move-out"
+                      minDate={moveInDate}
+                      className="w-full text-[#2C3E50] placeholder-gray-400 bg-transparent border-0 focus:outline-none text-base"
+                    />
+                  </div>
+
+                  {/* Search Button */}
+                  <div className="flex-shrink-0">
+                    <button
+                      type="submit"
+                      className="w-10 h-10 bg-[#2C3E50] hover:bg-[#34495E] text-white rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg"
+                    >
+                      <Search className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col">
-              <DatePicker
-                value={moveInDate}
-                onChange={setMoveInDate}
-                placeholder="Add move-in"
-                label="Move-in"
-                className="min-w-[120px]"
-                type="move-in"
-              />
-            </div>
-            <div className="flex flex-col">
-              <DatePicker
-                value={moveOutDate}
-                onChange={setMoveOutDate}
-                placeholder="Add move-out"
-                label="Move-out"
-                className="min-w-[120px]"
-                type="move-out"
-                minDate={moveInDate}
-              />
-            </div>
-            {/* Filter Button */}
-            <div className="flex flex-col justify-end">
-              <FilterDialog
-                filter={filterState}
-                onChange={handleFilterChange}
-                onApply={handleFilterApply}
-                onClear={handleFilterClear}
-              />
-            </div>
-            <button type="submit" className="ml-2 bg-gradient-to-r from-[#2C3E50] to-[#34495E] hover:from-[#34495E] hover:to-[#2C3E50] rounded-full p-2 flex items-center justify-center transition-colors shadow">
-              <Search className="w-5 h-5 text-white" />
-            </button>
-          </form>
-
-          {/* Navigation & Hamburger/Profile */}
-          <div className="flex items-center gap-6">
-            <button className="text-base font-medium text-[#2C3E50] hover:text-[#34495E] transition-colors">List your place</button>
-            {/* Hamburger/Profile menu */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="ml-2 flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow hover:bg-[#F5E6D6] transition-all"
-            >
-              {profile?.avatar_url ? (
-                <Image src={profile.avatar_url} alt="Profile" width={32} height={32} className="rounded-full object-cover" />
-              ) : (
-                <Menu className="w-6 h-6 text-[#2C3E50]" />
-              )}
-            </button>
           </div>
         </div>
       </header>
