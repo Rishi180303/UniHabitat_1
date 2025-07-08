@@ -143,13 +143,13 @@ export default function Dashboard() {
           </div>
 
           {/* Housing Search Interface */}
-          <div className="bg-[#FDF6ED] py-3">
+          <div className="bg-[#FDF6ED] py-2">
             <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-              <div className="max-w-5xl mx-auto">
+              <div className="max-w-4xl mx-auto">
                 {/* Compact Search Bar */}
-                <div className="bg-white rounded-full shadow-lg border border-gray-200 px-2 py-0.5 flex items-center gap-0.5 min-h-[64px]">
+                <div className="bg-white rounded-2xl shadow-md border border-gray-100 px-2 py-1 flex items-center gap-2 min-h-[72px]">
                   {/* Filters Button */}
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 flex flex-col items-center justify-center h-full">
                     <FilterDialog
                       filter={filterState}
                       onChange={handleFilterChange}
@@ -159,55 +159,60 @@ export default function Dashboard() {
                   </div>
 
                   {/* Location */}
-                  <div className="flex-1 min-w-0 px-3 py-1.5">
-                    <div className="text-xs font-semibold text-[#2C3E50] mb-0.5">Location</div>
+                  <div className="flex-1 min-w-0 px-2 flex flex-col justify-center gap-1">
+                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight">Location</span>
                     <input
                       type="text"
                       placeholder="University or area"
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
-                      className="w-full text-[#2C3E50] placeholder-gray-400 bg-transparent border-0 focus:outline-none text-base"
+                      className="w-full text-sm text-[#8A939B] placeholder-[#8A939B] bg-transparent border-0 focus:outline-none leading-tight mt-0 h-[28px] p-0"
                     />
                   </div>
 
                   {/* Divider */}
-                  <div className="w-px h-8 bg-gray-200"></div>
+                  <div className="w-px h-8 bg-gray-100 mx-1"></div>
 
                   {/* Move-in Date */}
-                  <div className="flex-1 min-w-0 px-3 py-1.5">
-                    <div className="text-xs font-semibold text-[#2C3E50] mb-0.5">Move-in</div>
-                    <DatePicker
-                      type="move-in"
-                      value={moveInDate}
-                      onChange={setMoveInDate}
-                      placeholder="Add move-in"
-                      className="w-full text-[#2C3E50] placeholder-gray-400 bg-transparent border-0 focus:outline-none text-base"
-                    />
+                  <div className="flex-1 min-w-0 px-2 flex flex-col justify-center gap-1">
+                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight">Move-in</span>
+                    <div className="flex items-center w-full h-[28px]">
+                      <DatePicker
+                        type="move-in"
+                        value={moveInDate}
+                        onChange={setMoveInDate}
+                        placeholder="Add move-in"
+                        className="w-full text-sm text-[#8A939B] placeholder-[#8A939B] bg-transparent border-0 focus:outline-none leading-tight p-0 h-full"
+                      />
+                    </div>
                   </div>
 
                   {/* Divider */}
-                  <div className="w-px h-8 bg-gray-200"></div>
+                  <div className="w-px h-8 bg-gray-100 mx-1"></div>
 
                   {/* Move-out Date */}
-                  <div className="flex-1 min-w-0 px-3 py-1.5">
-                    <div className="text-xs font-semibold text-[#2C3E50] mb-0.5">Move-out</div>
-                    <DatePicker
-                      type="move-out"
-                      value={moveOutDate}
-                      onChange={setMoveOutDate}
-                      placeholder="Add move-out"
-                      minDate={moveInDate}
-                      className="w-full text-[#2C3E50] placeholder-gray-400 bg-transparent border-0 focus:outline-none text-base"
-                    />
+                  <div className="flex-1 min-w-0 px-2 flex flex-col justify-center gap-1">
+                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight">Move-out</span>
+                    <div className="flex items-center w-full h-[28px]">
+                      <DatePicker
+                        type="move-out"
+                        value={moveOutDate}
+                        onChange={setMoveOutDate}
+                        placeholder="Add move-out"
+                        minDate={moveInDate}
+                        className="w-full text-sm text-[#8A939B] placeholder-[#8A939B] bg-transparent border-0 focus:outline-none leading-tight p-0 h-full"
+                      />
+                    </div>
                   </div>
 
                   {/* Search Button */}
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 flex flex-col items-center justify-center h-full">
                     <button
                       type="submit"
-                      className="w-10 h-10 bg-[#2C3E50] hover:bg-[#34495E] text-white rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg"
+                      className="w-9 h-9 bg-[#2C3E50] hover:bg-[#34495E] text-white rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg"
+                      style={{ fontSize: '1.1rem' }}
                     >
-                      <Search className="w-4 h-4" />
+                      <Search className="w-5 h-5" />
                     </button>
                   </div>
                 </div>

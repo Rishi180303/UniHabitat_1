@@ -79,7 +79,7 @@ export default function DatePicker({
     setSelectedDate(date)
     setInputValue(formatDate(date))
     onChange(date.toISOString().split('T')[0])
-    setIsOpen(false)
+    // setIsOpen(false) // Do not close the calendar automatically after selecting a date
   }
 
   const handleInputClick = () => {
@@ -205,9 +205,8 @@ export default function DatePicker({
           onClick={handleInputClick}
           placeholder={placeholder}
           readOnly
-          className="w-full p-4 rounded-2xl border-2 border-white/20 bg-white text-[#2C3E50] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-all duration-200 hover:border-white/40 cursor-pointer"
+          className="w-full text-sm text-[#8A939B] placeholder-[#8A939B] bg-transparent border-0 focus:outline-none leading-tight h-[28px] p-0 cursor-pointer"
         />
-        
         <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {inputValue && (
             <button
@@ -217,7 +216,7 @@ export default function DatePicker({
               <X className="w-3 h-3 text-gray-400" />
             </button>
           )}
-          <Calendar className="w-4 h-4 text-gray-400 mr-3" />
+          <Calendar className="w-4 h-4 text-[#8A939B]" />
         </div>
       </div>
 
