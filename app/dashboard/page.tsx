@@ -161,12 +161,10 @@ export default function Dashboard() {
                   {/* Location */}
                   <div className="flex-1 min-w-0 px-2 flex flex-col justify-center gap-1">
                     <span className="text-xs font-semibold text-[#2C3E50] leading-tight">Location</span>
-                    <input
-                      type="text"
-                      placeholder="University or area"
+                    <LocationSearchInput
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="w-full text-sm text-[#8A939B] placeholder-[#8A939B] bg-transparent border-0 focus:outline-none leading-tight mt-0 h-[28px] p-0"
+                      onSelect={(address, latLng) => setLocation(address)}
+                      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
                     />
                   </div>
 

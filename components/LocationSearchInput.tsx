@@ -19,6 +19,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({ value, onSele
   const autocompleteService = useRef<any>(null);
   const geocoder = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Remove geolocation state and logic
 
   useEffect(() => {
     setInputValue(value || '');
@@ -82,6 +83,8 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({ value, onSele
       handleSelect(suggestions[activeIndex]);
     }
   };
+
+  // Remove handleUseCurrentLocation and related state
 
   if (!isLoaded) {
     return <input type="text" value={inputValue} disabled placeholder="Loading..." className="w-full p-4 rounded-2xl border-2 border-[#F5E6D6] bg-[#FDF6ED] text-[#2C3E50] font-medium focus:outline-none focus:border-[#2C3E50] transition-all duration-200" />;
