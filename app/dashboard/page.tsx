@@ -13,6 +13,7 @@ import DatePicker from '@/components/ui/date-picker'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import FilterDialog, { FilterState } from '@/components/FilterDialog'
+import ListingCard from '@/components/ListingCard'
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -35,6 +36,8 @@ export default function Dashboard() {
     minPrice: '',
     maxPrice: '',
   })
+  const [listings, setListings] = useState<any[]>([])
+  const [loadingListings, setLoadingListings] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -54,6 +57,25 @@ export default function Dashboard() {
       })
     }
   }, [user, loading, router, checkingProfile])
+
+  // Fetch all listings on mount or when location changes
+  useEffect(() => {
+    const fetchListings = async () => {
+      setLoadingListings(true)
+      let query = supabase.from('listings').select('*')
+      if (location) {
+        query = query.ilike('address', `%${location}%`)
+      }
+      const { data, error } = await query.order('created_at', { ascending: false })
+      if (!error && data) {
+        setListings(data)
+      } else {
+        setListings([])
+      }
+      setLoadingListings(false)
+    }
+    fetchListings()
+  }, [location])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -312,8 +334,25 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Listings Grid */}
         <div className="w-full flex flex-wrap justify-center gap-10">
-          {/* TODO: Render filtered listings here. For now, show empty state. */}
-          <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
+          {loadingListings ? (
+            <span className="text-[#BFAE9B] text-lg">Loading listings...</span>
+          ) : listings.length === 0 ? (
+            <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
+          ) : (
+            listings.map(listing => {
+              const mappedListing = {
+                id: listing.id,
+                title: listing.title,
+                location: listing.address || '',
+                price: listing.price,
+                image: (listing.images && listing.images.length > 0) ? listing.images[0] : '/public/images/landingpage.png',
+                type: listing.sublease_type || 'Unit',
+                available: listing.available !== false, // default to true if not set
+                rating: listing.rating || 5, // default rating
+              }
+              return <ListingCard key={listing.id} listing={mappedListing} />
+            })
+          )}
         </div>
       </div>
     </div>
