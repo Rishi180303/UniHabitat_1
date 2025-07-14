@@ -14,6 +14,15 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import FilterDialog, { FilterState } from '@/components/FilterDialog'
 import ListingCard from '@/components/ListingCard'
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose
+} from '@/components/ui/dialog'
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -38,6 +47,7 @@ export default function Dashboard() {
   })
   const [listings, setListings] = useState<any[]>([])
   const [loadingListings, setLoadingListings] = useState(false)
+  const [selectedListing, setSelectedListing] = useState<any | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -333,27 +343,69 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Listings Grid */}
-        <div className="w-full flex flex-wrap justify-center gap-10">
-          {loadingListings ? (
-            <span className="text-[#BFAE9B] text-lg">Loading listings...</span>
-          ) : listings.length === 0 ? (
-            <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
-          ) : (
-            listings.map(listing => {
-              const mappedListing = {
-                id: listing.id,
-                title: listing.title,
-                location: listing.address || '',
-                price: listing.price,
-                image: (listing.images && listing.images.length > 0) ? listing.images[0] : '/public/images/landingpage.png',
-                type: listing.sublease_type || 'Unit',
-                available: listing.available !== false, // default to true if not set
-                rating: listing.rating || 5, // default rating
-              }
-              return <ListingCard key={listing.id} listing={mappedListing} />
-            })
-          )}
-        </div>
+        <Dialog open={!!selectedListing} onOpenChange={open => !open && setSelectedListing(null)}>
+          <DialogContent className="max-w-2xl w-full">
+            {selectedListing && (
+              <div className="flex flex-col">
+                {/* Image(s) */}
+                <div className="w-full h-72 bg-gray-100 rounded-lg flex flex-col items-center justify-center overflow-hidden mb-4">
+                  {selectedListing.images && selectedListing.images.length > 0 ? (
+                    <img src={selectedListing.images[0]} alt={selectedListing.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <span className="text-7xl select-none">🏠</span>
+                      <span className="mt-2 text-sm text-gray-500 text-center">(No images available for this listing)</span>
+                    </>
+                  )}
+                </div>
+                <DialogHeader>
+                  <DialogTitle className="text-2xl mb-2">{selectedListing.title}</DialogTitle>
+                  <DialogDescription className="mb-2">
+                    {selectedListing.address}
+                    {selectedListing.unit_number && `, Unit ${selectedListing.unit_number}`}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#34495E] mb-2">
+                  <div><span className="font-semibold">Type:</span> {selectedListing.sublease_type}</div>
+                  <div><span className="font-semibold">Furnishing:</span> {selectedListing.furnishing}</div>
+                  <div><span className="font-semibold">Lease Type:</span> {selectedListing.lease_type}</div>
+                  <div><span className="font-semibold">Bedrooms:</span> {selectedListing.total_bedrooms} total, {selectedListing.available_bedrooms} available</div>
+                  <div><span className="font-semibold">Bathrooms:</span> {selectedListing.total_bathrooms}</div>
+                  <div><span className="font-semibold">Move-in:</span> {selectedListing.move_in_date}</div>
+                  <div><span className="font-semibold">Move-out:</span> {selectedListing.move_out_date}</div>
+                  <div><span className="font-semibold">Monthly Rent:</span> ${selectedListing.price}</div>
+                </div>
+                {/* Add more fields if available */}
+              </div>
+            )}
+          </DialogContent>
+          <div className="w-full flex flex-wrap justify-start gap-6">
+            {loadingListings ? (
+              <span className="text-[#BFAE9B] text-lg">Loading listings...</span>
+            ) : listings.length === 0 ? (
+              <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
+            ) : (
+              listings.map(listing => {
+                return (
+                  <DialogTrigger asChild key={listing.id}>
+                    <div onClick={() => setSelectedListing(listing)}>
+                      <ListingCard listing={{
+                        id: listing.id,
+                        title: listing.title,
+                        location: listing.address || '',
+                        price: listing.price,
+                        image: (listing.images && listing.images.length > 0) ? listing.images[0] : '/public/images/landingpage.png',
+                        type: listing.sublease_type || 'Unit',
+                        available: listing.available !== false,
+                        rating: listing.rating || 5,
+                      }} />
+                    </div>
+                  </DialogTrigger>
+                )
+              })
+            )}
+          </div>
+        </Dialog>
       </div>
     </div>
   )
