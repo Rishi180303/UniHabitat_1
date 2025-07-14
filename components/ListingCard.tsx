@@ -19,19 +19,34 @@ interface ListingCardProps {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
+  // Emoji fallback logic
+  const emojiList = ['🏠', '🏡', '🏢', '🏘️', '🏙️', '🛏️', '🚪', '🪟', '🛋️', '🌇', '🌆']
+  const randomEmoji = emojiList[Math.floor(Math.random() * emojiList.length)]
+  const isValidImage = (url: string | undefined) => {
+    if (!url) return false
+    // Consider URLs that are not empty, not just whitespace, and not a known fallback
+    if (url.trim() === '' || url.includes('landingpage.png')) return false
+    return true
+  }
+  const hasImage = isValidImage(listing.image)
+
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
     >
-      {/* Image */}
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={listing.image}
-          alt={listing.title}
-          className="w-full h-full object-cover"
-        />
+      {/* Image or Emoji */}
+      <div className="relative h-48 overflow-hidden flex items-center justify-center bg-gray-100">
+        {hasImage ? (
+          <img
+            src={listing.image}
+            alt={listing.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-6xl select-none">{randomEmoji}</span>
+        )}
         <div className="absolute top-2 right-2">
           {listing.available ? (
             <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
