@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { createListing, getListingById, updateListing } from '@/lib/listings'
 import { useAuth } from '@/components/auth-provider'
 import LocationSearchInput from '@/components/LocationSearchInput'
+import DatePicker from '@/components/ui/date-picker'
 
 const steps = [
   { id: 1, title: "What you're subleasing", icon: Home, description: "Choose what you're offering" },
@@ -462,22 +463,23 @@ export default function ListUnit() {
               {/* Move-in Date Calendar */}
               <div>
                 <label className="block text-lg font-semibold text-[#2C3E50] mb-4">Move-in date</label>
-                <DatePicker 
-                  selectedDate={formData.moveInDate}
-                  onDateSelect={(date) => handleInputChange('moveInDate', date)}
-                  minDate={new Date()}
+                <DatePicker
+                  value={formData.moveInDate}
+                  onChange={(date) => handleInputChange('moveInDate', date)}
+                  minDate={new Date().toISOString().split('T')[0]}
                   placeholder="Select move-in date"
+                  type="move-in"
                 />
               </div>
-
               {/* Move-out Date Calendar */}
               <div>
                 <label className="block text-lg font-semibold text-[#2C3E50] mb-4">Move-out date</label>
-                <DatePicker 
-                  selectedDate={formData.moveOutDate}
-                  onDateSelect={(date) => handleInputChange('moveOutDate', date)}
-                  minDate={formData.moveInDate ? new Date(formData.moveInDate) : new Date()}
+                <DatePicker
+                  value={formData.moveOutDate}
+                  onChange={(date) => handleInputChange('moveOutDate', date)}
+                  minDate={formData.moveInDate || new Date().toISOString().split('T')[0]}
                   placeholder="Select move-out date"
+                  type="move-out"
                 />
               </div>
             </div>
@@ -827,171 +829,6 @@ export default function ListUnit() {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-// Calendar Component
-function DatePicker({ 
-  selectedDate, 
-  onDateSelect, 
-  minDate = new Date(), 
-  placeholder = "Select date" 
-}: {
-  selectedDate: string
-  onDateSelect: (date: string) => void
-  minDate?: Date
-  placeholder?: string
-}) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [currentMonth, setCurrentMonth] = useState(new Date())
-
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0]
-  }
-
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const daysInMonth = lastDay.getDate()
-    const startingDay = firstDay.getDay()
-    
-    const days = []
-    
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDay; i++) {
-      days.push(null)
-    }
-    
-    // Add all days in the month
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(year, month, i))
-    }
-    
-    return days
-  }
-
-  const isDateDisabled = (date: Date) => {
-    return date < minDate
-  }
-
-  const isDateSelected = (date: Date) => {
-    return formatDate(date) === selectedDate
-  }
-
-  const handleDateClick = (date: Date) => {
-    if (!isDateDisabled(date)) {
-      onDateSelect(formatDate(date))
-      setIsOpen(false)
-    }
-  }
-
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))
-  }
-
-  const prevMonth = () => {
-    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
-    if (newMonth >= new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1)) {
-      setCurrentMonth(newMonth)
-    }
-  }
-
-  const days = getDaysInMonth(currentMonth)
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ]
-
-  return (
-    <div className="relative">
-      {/* Input Field */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-4 rounded-2xl border-2 border-[#F5E6D6] bg-[#FDF6ED] text-[#2C3E50] font-medium focus:outline-none focus:border-[#2C3E50] transition-all duration-200 text-left"
-      >
-        {selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        }) : placeholder}
-      </button>
-
-      {/* Calendar Dropdown */}
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-[#F5E6D6] p-4 z-50">
-          {/* Calendar Header */}
-          <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={prevMonth}
-              className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4 text-[#2C3E50]" />
-            </button>
-            <h3 className="text-lg font-semibold text-[#2C3E50]">
-              {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-            </h3>
-            <button
-              onClick={nextMonth}
-              className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors"
-            >
-              <ChevronRight className="w-4 h-4 text-[#2C3E50]" />
-            </button>
-          </div>
-
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="text-center text-sm font-medium text-[#BFAE9B] py-2">
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((day, index) => (
-              <div key={index} className="aspect-square">
-                {day ? (
-                  <button
-                    onClick={() => handleDateClick(day)}
-                    disabled={isDateDisabled(day)}
-                    className={`w-full h-full rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isDateSelected(day)
-                        ? 'bg-[#2C3E50] text-white shadow-md'
-                        : isDateDisabled(day)
-                          ? 'text-[#BFAE9B] cursor-not-allowed'
-                          : 'text-[#2C3E50] hover:bg-[#F5E6D6] hover:shadow-sm'
-                    }`}
-                  >
-                    {day.getDate()}
-                  </button>
-                ) : (
-                  <div className="w-full h-full" />
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Quick Actions */}
-          <div className="flex justify-between mt-4 pt-4 border-t border-[#F5E6D6]">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-sm text-[#BFAE9B] hover:text-[#2C3E50] transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-sm text-[#2C3E50] font-medium hover:text-[#34495E] transition-colors"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 } 

@@ -20,6 +20,14 @@ function parseLocalDate(str: string): Date {
   return new Date(year, month - 1, day)
 }
 
+// Helper to format date as YYYY-MM-DD in local time
+function formatLocalYYYYMMDD(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export default function DatePicker({ 
   value, 
   onChange, 
@@ -34,6 +42,27 @@ export default function DatePicker({
   const [selectedDate, setSelectedDate] = useState<Date | null>(value ? new Date(value) : null)
   const [inputValue, setInputValue] = useState(value || '')
   const pickerRef = useRef<HTMLDivElement>(null)
+
+  // Always enforce minDate: today for move-in, or provided minDate for move-out
+  const getMinDate = () => {
+    if (type === 'move-in') {
+      return minDate ? parseLocalDate(minDate) : new Date()
+    }
+    if (type === 'move-out') {
+      // For move-out, minDate should be the move-in date (passed as minDate)
+      return minDate ? parseLocalDate(minDate) : new Date()
+    }
+    return new Date()
+  }
+
+  // Prevent navigation to months before minDate
+  const canNavigatePrev = () => {
+    const min = getMinDate()
+    return (
+      currentDate.getFullYear() > min.getFullYear() ||
+      (currentDate.getFullYear() === min.getFullYear() && currentDate.getMonth() > min.getMonth())
+    )
+  }
 
   // Auto-select today's date for move-in picker when opened
   useEffect(() => {
@@ -78,8 +107,7 @@ export default function DatePicker({
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date)
     setInputValue(formatDate(date))
-    onChange(date.toISOString().split('T')[0])
-    // setIsOpen(false) // Do not close the calendar automatically after selecting a date
+    onChange(formatLocalYYYYMMDD(date)) // Use local date string
   }
 
   const handleInputClick = () => {
@@ -111,9 +139,9 @@ export default function DatePicker({
     }
     setCurrentDate(prev => {
       const newDate = new Date(prev)
-      if (direction === 'prev') {
+      if (direction === 'prev' && canNavigatePrev()) {
         newDate.setMonth(newDate.getMonth() - 1)
-      } else {
+      } else if (direction === 'next') {
         newDate.setMonth(newDate.getMonth() + 1)
       }
       return newDate
@@ -135,18 +163,10 @@ export default function DatePicker({
   }
 
   const isDateDisabled = (date: Date) => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const min = getMinDate()
+    min.setHours(0, 0, 0, 0)
     date.setHours(0, 0, 0, 0)
-    if (type === 'move-in') {
-      return date < today
-    }
-    if (type === 'move-out' && minDate) {
-      const min = parseLocalDate(minDate)
-      min.setHours(0, 0, 0, 0)
-      return date <= min
-    }
-    return date < today
+    return date < min
   }
 
   const renderCalendar = () => {
@@ -239,6 +259,7 @@ export default function DatePicker({
                   type="button"
                   onClick={(e) => navigateMonth('prev', e)}
                   className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors"
+                  disabled={!canNavigatePrev()}
                 >
                   <ChevronLeft className="w-4 h-4 text-[#2C3E50]" />
                 </button>
