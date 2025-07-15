@@ -83,12 +83,13 @@ export default function UniversitySearch({
     setSearchTerm(newValue)
     setIsTyping(true)
     setSelectedIndex(-1)
-    
     if (newValue.trim()) {
       debouncedSearch(newValue)
+      setIsOpen(true)
     } else {
       setUniversities([])
       setLoading(false)
+      setIsOpen(false)
     }
   }
 
@@ -138,7 +139,7 @@ export default function UniversitySearch({
 
   // Handle input focus
   const handleFocus = () => {
-    if (searchTerm.trim() && universities.length > 0) {
+    if (searchTerm.trim()) {
       setIsOpen(true)
     }
   }
@@ -202,9 +203,10 @@ export default function UniversitySearch({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           placeholder={placeholder}
-          className="pr-10"
+          className={`w-full pr-10 rounded-xl border border-[#E8D5C4] bg-white text-base h-10 px-3 py-2 focus:ring-2 focus:ring-[#2C3E50] focus:border-[#2C3E50] placeholder-[#8A939B] ${className}`}
+          style={{ boxShadow: 'none' }}
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-1 pointer-events-none">
           {loading && (
             <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
           )}
@@ -226,13 +228,14 @@ export default function UniversitySearch({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.18 }}
-              className="z-[1000] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-y-auto max-h-64 ring-1 ring-black/5 focus:outline-none scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
+              className="z-[1000] bg-white border border-[#E8D5C4] rounded-b-xl rounded-t-none overflow-y-auto max-h-64 focus:outline-none scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
               style={{
                 position: 'absolute',
-                top: dropdownPosition.top,
+                top: dropdownPosition.top - 4, // overlap top border
                 left: dropdownPosition.left,
                 width: dropdownPosition.width,
-                boxShadow: '0 8px 32px 0 rgba(60,60,60,0.12), 0 1.5px 6px 0 rgba(60,60,60,0.08)',
+                borderTop: 'none',
+                boxShadow: '0 4px 16px 0 rgba(60,60,60,0.10)',
                 WebkitOverflowScrolling: 'touch',
               }}
             >

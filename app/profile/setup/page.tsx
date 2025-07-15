@@ -9,10 +9,12 @@ import { Input } from '@/components/ui/input'
 import { GraduationCap, BookOpen, User, ArrowRight, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 import { checkUserProfile, hasCompleteProfile } from '@/lib/utils'
 import UniversitySearch from '@/components/UniversitySearch'
+import LocationSearchInput from '@/components/LocationSearchInput'
 
 interface ProfileFormData {
   full_name: string
   university: string
+  university_area: string
   graduation_year: string
   bio: string
   avatar_url: string
@@ -33,6 +35,7 @@ export default function ProfileSetup() {
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: '',
     university: '',
+    university_area: '',
     graduation_year: '',
     bio: '',
     avatar_url: ''
@@ -53,6 +56,7 @@ export default function ProfileSetup() {
             setFormData({
               full_name: userProfile.full_name || '',
               university: userProfile.university || '',
+              university_area: userProfile.university_area || '',
               graduation_year: userProfile.year || '',
               bio: userProfile.bio || '',
               avatar_url: userProfile.avatar_url || ''
@@ -96,7 +100,7 @@ export default function ProfileSetup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.full_name || !formData.university || !formData.graduation_year || !formData.bio) {
+    if (!formData.full_name || !formData.university || !formData.university_area || !formData.graduation_year || !formData.bio) {
       alert('Please fill in all required fields before submitting.')
       return
     }
@@ -107,6 +111,7 @@ export default function ProfileSetup() {
         email: user?.email,
         full_name: formData.full_name,
         university: formData.university,
+        university_area: formData.university_area,
         year: formData.graduation_year,
         bio: formData.bio,
         avatar_url: formData.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.full_name),
@@ -222,6 +227,17 @@ export default function ProfileSetup() {
                   placeholder="Search for your university"
                   className="w-full"
                   onDropdownOpenChange={setUniversityDropdownOpen}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="university_area" className="text-sm font-medium text-gray-700">
+                  University Area/Location
+                </label>
+                <LocationSearchInput
+                  value={formData.university_area}
+                  onSelect={(address) => setFormData(prev => ({ ...prev, university_area: address }))}
+                  apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
+                  className="w-full h-10 text-sm bg-white rounded-xl px-3 py-1 shadow-none border border-[#F5E6D6] focus:ring-0 focus:border-[#2C3E50] placeholder-[#8A939B]"
                 />
               </div>
               <div className="space-y-2">

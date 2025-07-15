@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import UniversitySearch from '@/components/UniversitySearch'
+import LocationSearchInput from '@/components/LocationSearchInput'
 
 export default function ProfilePage() {
   const { user, loading } = useAuth()
@@ -85,11 +86,11 @@ export default function ProfilePage() {
     setEditData((prev: any) => ({ ...prev, [name]: value }))
   }
 
-  const isEditValid = editData && editData.full_name && editData.university && editData.year
+  const isEditValid = editData && editData.full_name && editData.university && editData.university_area && editData.year
 
   const getFieldError = (fieldName: string) => {
     if (!editMode) return null;
-    if (!editData?.[fieldName] && ['full_name', 'university', 'year'].includes(fieldName)) {
+    if (!editData?.[fieldName] && ['full_name', 'university', 'university_area', 'year'].includes(fieldName)) {
       return 'This field is required';
     }
     return null;
@@ -97,10 +98,11 @@ export default function ProfilePage() {
 
   const handleSaveEdit = async () => {
     if (!user) return;
-    if (!isEditValid) {
+    if (!isEditValid || !editData?.university || editData.university.trim() === "") {
       const missingFields = [];
       if (!editData?.full_name) missingFields.push('Full Name');
-      if (!editData?.university) missingFields.push('University');
+      if (!editData?.university || editData.university.trim() === "") missingFields.push('University');
+      if (!editData?.university_area) missingFields.push('University Area');
       if (!editData?.year) missingFields.push('Graduation Year');
       setEditError(`Please fill in: ${missingFields.join(', ')}`);
       return;
@@ -228,6 +230,10 @@ export default function ProfilePage() {
                   {profile?.university}
                 </span>
                 <span className="inline-flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  {profile?.university_area}
+                </span>
+                <span className="inline-flex items-center gap-2">
                   <GraduationCap className="w-4 h-4" />
                   Class of {profile?.year}
                 </span>
@@ -243,7 +249,7 @@ export default function ProfilePage() {
             className="lg:w-2/3 w-full flex flex-col gap-8"
           >
             {/* Personal Information */}
-            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
+            <div className="bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] rounded-3xl shadow-xl p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <User className="w-5 h-5 mr-2 text-blue-600" />
                 Personal Information
@@ -258,7 +264,7 @@ export default function ProfilePage() {
                       value={editData?.full_name || ''}
                       onChange={handleEditChange}
                       placeholder="Full Name"
-                      className={getFieldError('full_name') ? 'border-red-500 bg-red-50' : ''}
+                      className={`w-full h-10 text-base bg-white border border-[#E8D5C4] rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#2C3E50] focus:border-[#2C3E50] placeholder-[#8A939B] ${getFieldError('full_name') ? 'border-red-500 bg-red-50' : ''}`}
                     />
                   ) : (
                     <p className="text-lg font-semibold text-slate-900">
@@ -277,7 +283,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Academic Information */}
-            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
+            <div className="bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] rounded-3xl shadow-xl p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <GraduationCap className="w-5 h-5 mr-2 text-emerald-600" />
                 Academic Information
@@ -306,6 +312,27 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-slate-600 mb-2 block flex items-center">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    University Area/Location
+                  </label>
+                  {editMode ? (
+                    <LocationSearchInput
+                      value={editData?.university_area || ''}
+                      onSelect={(address) => setEditData((prev: any) => ({ ...prev, university_area: address }))}
+                      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
+                      className="w-full h-10 text-base bg-white border border-[#E8D5C4] rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#2C3E50] focus:border-[#2C3E50] placeholder-[#8A939B]"
+                    />
+                  ) : (
+                    <p className="text-lg font-semibold text-slate-900">
+                      {profile?.university_area || 'Not set'}
+                    </p>
+                  )}
+                  {getFieldError('university_area') && (
+                    <span className="text-xs text-red-500">{getFieldError('university_area')}</span>
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-600 mb-2 block flex items-center">
                     <Calendar className="w-4 h-4 mr-1" />
                     Graduation Year
                   </label>
@@ -316,7 +343,7 @@ export default function ProfilePage() {
                       value={editData?.year || ''}
                       onChange={handleEditChange}
                       placeholder="Graduation Year"
-                      className={getFieldError('year') ? 'border-red-500 bg-red-50' : ''}
+                      className={`w-full h-10 text-base bg-white border border-[#E8D5C4] rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#2C3E50] focus:border-[#2C3E50] placeholder-[#8A939B] ${getFieldError('year') ? 'border-red-500 bg-red-50' : ''}`}
                     />
                   ) : (
                     <p className="text-lg font-semibold text-slate-900">
@@ -331,7 +358,7 @@ export default function ProfilePage() {
             </div>
 
             {/* About Me */}
-            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
+            <div className="bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] rounded-3xl shadow-xl p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
                 About Me
@@ -345,7 +372,7 @@ export default function ProfilePage() {
                     value={editData?.bio || ''}
                     onChange={handleEditChange}
                     placeholder="Tell us about yourself"
-                    className="w-full min-h-[100px] rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-[#2C3E50] focus:border-transparent"
+                    className="w-full min-h-[100px] rounded-xl border border-[#E8D5C4] bg-white px-3 py-2 text-base focus:ring-2 focus:ring-[#2C3E50] focus:border-[#2C3E50] placeholder-[#8A939B]"
                   />
                 ) : (
                   <p className="text-lg text-slate-900 leading-relaxed">
@@ -355,43 +382,31 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Account Information */}
-            <div className="bg-[#F5E6D6]/90 rounded-3xl shadow-xl p-8 mb-4">
-              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
-                <Clock className="w-5 h-5 mr-2 text-slate-600" />
-                Account Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm font-medium text-slate-600 mb-2 block">Member Since</label>
-                  <p className="text-lg font-semibold text-slate-900">
-                    {profile?.created_at 
-                      ? new Date(profile.created_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })
-                      : 'Recently'
-                    }
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-600 mb-2 block">Last Sign In</label>
-                  <p className="text-lg font-semibold text-slate-900">
-                    {user.last_sign_in_at 
-                      ? new Date(user.last_sign_in_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })
-                      : 'Recently'
-                    }
-                  </p>
+            {/* Save/Cancel Buttons */}
+            {editMode && (
+              <div className="flex flex-col items-end pt-4 space-y-2 mb-8">
+                {editError && (
+                  <span className="text-red-600 text-sm mb-2">{editError}</span>
+                )}
+                <div className="flex space-x-4">
+                  <Button
+                    onClick={handleCancelEdit}
+                    variant="outline"
+                    className="px-6 py-2 rounded-2xl"
+                    disabled={saving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSaveEdit}
+                    className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-6 py-2 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50]"
+                    disabled={saving || !isEditValid}
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </Button>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Your Listings */}
             <div className="w-full">
@@ -431,7 +446,7 @@ export default function ProfilePage() {
                       Create Your First Listing
                     </Button>
                   </div>
-                ) : (
+                ) :
                   <div className="w-full flex flex-wrap justify-center gap-10">
                     {listings.map((listing) => (
                       <motion.div
@@ -490,35 +505,9 @@ export default function ProfilePage() {
                       </motion.div>
                     ))}
                   </div>
-                )}
+                }
               </div>
             </div>
-
-            {/* Save/Cancel Buttons */}
-            {editMode && (
-              <div className="flex flex-col items-end pt-4 space-y-2">
-                {editError && (
-                  <span className="text-red-600 text-sm mb-2">{editError}</span>
-                )}
-                <div className="flex space-x-4">
-                  <Button
-                    onClick={handleCancelEdit}
-                    variant="outline"
-                    className="px-6 py-2 rounded-2xl"
-                    disabled={saving}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSaveEdit}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-2xl"
-                    disabled={saving || !isEditValid}
-                  >
-                    {saving ? 'Saving...' : 'Save Changes'}
-                  </Button>
-                </div>
-              </div>
-            )}
           </motion.div>
         </div>
       </div>

@@ -10,7 +10,7 @@ export async function checkUserProfile(userId: string) {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, university, year, bio, avatar_url, email, created_at')
+      .select('id, full_name, university, university_area, year, bio, avatar_url, email, created_at')
       .eq('id', userId)
       .single()
 
@@ -47,5 +47,5 @@ export async function getUserListings(userId: string) {
 }
 
 export function hasCompleteProfile(profile: any) {
-  return profile && profile.full_name && profile.university && profile.year
+  return profile && profile.full_name && profile.university && profile.university_area && profile.year
 }
