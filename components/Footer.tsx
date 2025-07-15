@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Instagram, Linkedin, Mail } from "lucide-react"
+import { Mail } from "lucide-react"
 
 export default function Footer() {
   return (
@@ -11,20 +11,6 @@ export default function Footer() {
               Making student housing simple, safe, and stress-free.
               Join thousands of students finding their perfect home.
             </p>
-            <div className="flex space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Facebook className="w-6 h-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="w-6 h-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Instagram className="w-6 h-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Linkedin className="w-6 h-6" />
-              </a>
-            </div>
           </div>
           
           <div>
@@ -44,10 +30,6 @@ export default function Footer() {
               Email Us
             </a>
           </div>
-        </div>
-        
-        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
-          <p>&copy; {new Date().getFullYear()} UniHabitat. All rights reserved.</p>
         </div>
       </div>
     </footer>
