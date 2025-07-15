@@ -23,6 +23,7 @@ import {
   DialogDescription,
   DialogClose
 } from '@/components/ui/dialog'
+import { useRef } from "react"
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -48,6 +49,7 @@ export default function Dashboard() {
   const [listings, setListings] = useState<any[]>([])
   const [loadingListings, setLoadingListings] = useState(false)
   const [selectedListing, setSelectedListing] = useState<any | null>(null)
+  const defaultLocationSet = useRef(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -68,22 +70,44 @@ export default function Dashboard() {
     }
   }, [user, loading, router, checkingProfile])
 
+  // Set default location from profile.university_area only once
+  useEffect(() => {
+    if (
+      profile &&
+      profile.university_area &&
+      !location &&
+      !defaultLocationSet.current
+    ) {
+      setLocation(profile.university_area)
+      defaultLocationSet.current = true
+    }
+  }, [profile])
+
   // Fetch all listings on mount or when location changes
   useEffect(() => {
     const fetchListings = async () => {
       setLoadingListings(true)
       let query = supabase.from('listings').select('*')
+      let city = ''
+      let state = ''
       if (location) {
-        query = query.ilike('address', `%${location}%`)
+        // Extract city and state (first two parts before commas)
+        const parts = location.split(',').map(p => p.trim())
+        city = parts[0] || ''
+        state = parts[1] || ''
       }
       const { data, error } = await query.order('created_at', { ascending: false })
-      if (!error && data) {
-        // Filter out listings where user_id matches current user
-        const filtered = user ? data.filter(listing => listing.user_id !== user.id) : data
-        setListings(filtered)
-      } else {
-        setListings([])
+      let filtered = data || []
+      if (city && state) {
+        // Only show listings where address includes both city and state (case-insensitive)
+        filtered = filtered.filter(listing => {
+          const addr = (listing.address || '').toLowerCase()
+          return addr.includes(city.toLowerCase()) && addr.includes(state.toLowerCase())
+        })
       }
+      // Filter out listings where user_id matches current user
+      filtered = user ? filtered.filter(listing => listing.user_id !== user.id) : filtered
+      setListings(filtered)
       setLoadingListings(false)
     }
     fetchListings()
@@ -181,7 +205,7 @@ export default function Dashboard() {
             <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
               <div className="max-w-4xl mx-auto">
                 {/* Compact Search Bar */}
-                <div className="bg-white rounded-2xl shadow-md border border-gray-100 px-2 py-1 flex items-center gap-2 min-h-[72px]">
+                <div className="bg-white rounded-2xl shadow-md border border-gray-100 px-2 py-1 flex items-center gap-2 min-h-[72px] relative z-[200]">
                   {/* Filters Button */}
                   <div className="flex-shrink-0 flex flex-col items-center justify-center h-full">
                     <FilterDialog
@@ -382,14 +406,17 @@ export default function Dashboard() {
               </div>
             )}
           </DialogContent>
-          <div className="w-full flex flex-wrap justify-start gap-6">
-            {loadingListings ? (
-              <span className="text-[#BFAE9B] text-lg">Loading listings...</span>
-            ) : listings.length === 0 ? (
-              <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
-            ) : (
-              listings.map(listing => {
-                return (
+          {loadingListings ? (
+            <div className="w-full flex justify-center items-center min-h-[200px]">
+              <div className="w-8 h-8 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
+              <span className="ml-4 text-[#34495E] text-lg">Loading listings...</span>
+            </div>
+          ) : (
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
+              {listings.length === 0 ? (
+                <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
+              ) : (
+                listings.map(listing => (
                   <DialogTrigger asChild key={listing.id}>
                     <div onClick={() => setSelectedListing(listing)}>
                       <ListingCard listing={{
@@ -404,10 +431,10 @@ export default function Dashboard() {
                       }} />
                     </div>
                   </DialogTrigger>
-                )
-              })
-            )}
-          </div>
+                ))
+              )}
+            </div>
+          )}
         </Dialog>
       </div>
     </div>

@@ -92,7 +92,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({ value, onSele
   }
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <input
         ref={inputRef}
         type="text"
@@ -106,7 +106,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({ value, onSele
         autoComplete="off"
       />
       {showDropdown && suggestions.length > 0 && (
-        <ul className="absolute z-50 left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-[#F5E6D6] max-h-72 overflow-y-auto">
+        <ul className="absolute z-[100] left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-[#F5E6D6] max-h-72 overflow-y-auto">
           {suggestions.map((suggestion, idx) => (
             <li
               key={suggestion.place_id}
