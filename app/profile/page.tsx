@@ -23,11 +23,13 @@ import {
   Bath,
   DollarSign,
   Plus,
-  Eye
+  Eye,
+  Trash2
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import UniversitySearch from '@/components/UniversitySearch'
 import LocationSearchInput from '@/components/LocationSearchInput'
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog'
 
 export default function ProfilePage() {
   const { user, loading } = useAuth()
@@ -39,6 +41,9 @@ export default function ProfilePage() {
   const [editData, setEditData] = useState<any>(null)
   const [saving, setSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
+  const [deletingListing, setDeletingListing] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [listingToDelete, setListingToDelete] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -130,6 +135,45 @@ export default function ProfilePage() {
 
   const handleBackToDashboard = () => {
     router.push('/dashboard')
+  }
+
+  const handleDeleteListing = async (listingId: string) => {
+    const listing = listings.find(l => l.id === listingId)
+    if (!listing) return
+    
+    setListingToDelete(listing)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!listingToDelete || !user) return
+    
+    setDeletingListing(listingToDelete.id)
+    setDeleteDialogOpen(false)
+    
+    try {
+      const { error } = await supabase
+        .from('listings')
+        .delete()
+        .eq('id', listingToDelete.id)
+        .eq('user_id', user.id)
+      
+      if (error) throw error
+      
+      // Remove the listing from the local state
+      setListings(prev => prev.filter(listing => listing.id !== listingToDelete.id))
+    } catch (err: any) {
+      console.error('Error deleting listing:', err)
+      alert('Error deleting listing: ' + (err.message || 'Please try again.'))
+    } finally {
+      setDeletingListing(null)
+      setListingToDelete(null)
+    }
+  }
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false)
+    setListingToDelete(null)
   }
 
   if (loading || profileLoading) {
@@ -492,7 +536,7 @@ export default function ProfilePage() {
                             <span>Created: {new Date(listing.created_at).toLocaleDateString()}</span>
                           </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-3 mt-auto w-full">
+                        <div className="flex flex-col gap-3 mt-auto w-full">
                           <Button
                             size="lg"
                             className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white text-lg font-semibold rounded-2xl shadow w-full py-4 hover:from-[#34495E] hover:to-[#2C3E50] flex items-center justify-center"
@@ -500,6 +544,20 @@ export default function ProfilePage() {
                           >
                             <Edit3 className="w-5 h-5 mr-2" />
                             Edit Listing
+                          </Button>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-2xl font-semibold shadow w-full py-4 flex items-center justify-center"
+                            onClick={() => handleDeleteListing(listing.id)}
+                            disabled={deletingListing === listing.id}
+                          >
+                            {deletingListing === listing.id ? (
+                              <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <Trash2 className="w-5 h-5 mr-2" />
+                            )}
+                            {deletingListing === listing.id ? 'Deleting...' : 'Delete Listing'}
                           </Button>
                         </div>
                       </motion.div>
@@ -511,6 +569,13 @@ export default function ProfilePage() {
           </motion.div>
         </div>
       </div>
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        listingTitle={listingToDelete?.title || 'this listing'}
+        isLoading={deletingListing === listingToDelete?.id}
+      />
     </div>
   )
 } 
