@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from "framer-motion"
-import { Star, MapPin, Home, CheckCircle, XCircle } from "lucide-react"
+import { Star, MapPin, Home, CheckCircle, XCircle, Bed, Bath, Calendar } from "lucide-react"
 
 interface Listing {
   id: number
@@ -12,6 +12,10 @@ interface Listing {
   type: string
   available: boolean
   rating: number
+  move_in_date?: string
+  move_out_date?: string
+  total_bedrooms?: number
+  total_bathrooms?: number
 }
 
 interface ListingCardProps {
@@ -29,6 +33,17 @@ export default function ListingCard({ listing }: ListingCardProps) {
     return true
   }
   const hasImage = isValidImage(listing.image)
+
+  // Format dates
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
+  const availabilityText = listing.move_in_date && listing.move_out_date 
+    ? `${formatDate(listing.move_in_date)} - ${formatDate(listing.move_out_date)}`
+    : ''
 
   return (
     <motion.div
@@ -55,6 +70,24 @@ export default function ListingCard({ listing }: ListingCardProps) {
       <div className="flex items-center gap-2 text-gray-600 text-sm mb-2">
         <MapPin size={16} />
         <span className="line-clamp-1">{listing.location}</span>
+      </div>
+      {availabilityText && (
+        <div className="flex items-center gap-2 text-gray-600 text-sm mb-3">
+          <Calendar size={16} />
+          <span>{availabilityText}</span>
+        </div>
+      )}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-4 text-gray-600 text-sm">
+          <div className="flex items-center gap-1">
+            <Bed size={16} />
+            <span>{listing.total_bedrooms || 'N/A'}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Bath size={16} />
+            <span>{listing.total_bathrooms || 'N/A'}</span>
+          </div>
+        </div>
       </div>
       <div className="text-xl font-bold text-gray-900 mt-2">
         ${listing.price}

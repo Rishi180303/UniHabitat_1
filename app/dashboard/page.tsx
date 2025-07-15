@@ -111,12 +111,26 @@ export default function Dashboard() {
 
       // Strict filter matching
       const strictMatches = areaListings.filter(listing => {
-        // Move-in date
-        if (moveInDate && listing.move_in_date && moveInDate > listing.move_out_date) return false
-        if (moveInDate && listing.move_in_date && moveInDate < listing.move_in_date) return false
-        // Move-out date
-        if (moveOutDate && listing.move_out_date && moveOutDate > listing.move_out_date) return false
-        if (moveOutDate && listing.move_out_date && moveOutDate < listing.move_in_date) return false
+        // Move-in date: user's move-in should be within listing's availability window
+        if (moveInDate && listing.move_in_date && listing.move_out_date) {
+          const userMoveIn = new Date(moveInDate)
+          const listingMoveIn = new Date(listing.move_in_date)
+          const listingMoveOut = new Date(listing.move_out_date)
+          if (userMoveIn < listingMoveIn || userMoveIn > listingMoveOut) return false
+        }
+        // Move-out date: user's move-out should be within listing's availability window
+        if (moveOutDate && listing.move_in_date && listing.move_out_date) {
+          const userMoveOut = new Date(moveOutDate)
+          const listingMoveIn = new Date(listing.move_in_date)
+          const listingMoveOut = new Date(listing.move_out_date)
+          if (userMoveOut < listingMoveIn || userMoveOut > listingMoveOut) return false
+        }
+        // If both dates are set, ensure move-out is after move-in
+        if (moveInDate && moveOutDate) {
+          const userMoveIn = new Date(moveInDate)
+          const userMoveOut = new Date(moveOutDate)
+          if (userMoveOut <= userMoveIn) return false
+        }
         // Sublease type
         if (filterState.subleaseType && listing.sublease_type !== filterState.subleaseType) return false
         // Furnishing
@@ -208,7 +222,12 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-[#2C3E50] tracking-tight">UniHabitat</span>
+              <button 
+                onClick={() => router.push('/')}
+                className="text-2xl font-bold text-[#2C3E50] tracking-tight hover:text-[#34495E] transition-colors cursor-pointer"
+              >
+                UniHabitat
+              </button>
             </div>
 
             {/* Navigation & Profile */}
@@ -456,6 +475,10 @@ export default function Dashboard() {
                           type: listing.sublease_type || 'Unit',
                           available: listing.available !== false,
                           rating: listing.rating || 5,
+                          move_in_date: listing.move_in_date,
+                          move_out_date: listing.move_out_date,
+                          total_bedrooms: listing.total_bedrooms,
+                          total_bathrooms: listing.total_bathrooms,
                         }} />
                       </div>
                     </DialogTrigger>
@@ -483,6 +506,10 @@ export default function Dashboard() {
                               type: listing.sublease_type || 'Unit',
                               available: listing.available !== false,
                               rating: listing.rating || 5,
+                              move_in_date: listing.move_in_date,
+                              move_out_date: listing.move_out_date,
+                              total_bedrooms: listing.total_bedrooms,
+                              total_bathrooms: listing.total_bathrooms,
                             }} />
                           </div>
                         </DialogTrigger>
