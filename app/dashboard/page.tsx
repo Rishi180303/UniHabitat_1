@@ -78,14 +78,16 @@ export default function Dashboard() {
       }
       const { data, error } = await query.order('created_at', { ascending: false })
       if (!error && data) {
-        setListings(data)
+        // Filter out listings where user_id matches current user
+        const filtered = user ? data.filter(listing => listing.user_id !== user.id) : data
+        setListings(filtered)
       } else {
         setListings([])
       }
       setLoadingListings(false)
     }
     fetchListings()
-  }, [location])
+  }, [location, user])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -192,11 +194,12 @@ export default function Dashboard() {
 
                   {/* Location */}
                   <div className="flex-1 min-w-0 px-2 flex flex-col justify-center gap-1">
-                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight">Location</span>
+                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight pl-3">Location</span>
                     <LocationSearchInput
                       value={location}
                       onSelect={(address, latLng) => setLocation(address)}
                       apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
+                      className="w-full h-9 text-sm text-[#8A939B] bg-white rounded-xl px-3 py-1 shadow-none border-none focus:ring-0 focus:border-none placeholder-[#8A939B]"
                     />
                   </div>
 
@@ -205,7 +208,7 @@ export default function Dashboard() {
 
                   {/* Move-in Date */}
                   <div className="flex-1 min-w-0 px-2 flex flex-col justify-center gap-1">
-                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight">Move-in</span>
+                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight mt-[-4px]">Move-in</span>
                     <div className="flex items-center w-full h-[28px]">
                       <DatePicker
                         type="move-in"
@@ -222,7 +225,7 @@ export default function Dashboard() {
 
                   {/* Move-out Date */}
                   <div className="flex-1 min-w-0 px-2 flex flex-col justify-center gap-1">
-                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight">Move-out</span>
+                    <span className="text-xs font-semibold text-[#2C3E50] leading-tight mt-[-4px]">Move-out</span>
                     <div className="flex items-center w-full h-[28px]">
                       <DatePicker
                         type="move-out"

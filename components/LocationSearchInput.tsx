@@ -6,11 +6,12 @@ interface LocationSearchInputProps {
   value: string;
   onSelect: (address: string, latLng: { lat: number; lng: number }) => void;
   apiKey: string;
+  className?: string;
 }
 
 const libraries: Libraries = ['places'];
 
-const LocationSearchInput: React.FC<LocationSearchInputProps> = ({ value, onSelect, apiKey }) => {
+const LocationSearchInput: React.FC<LocationSearchInputProps> = ({ value, onSelect, apiKey, className }) => {
   const { isLoaded } = useLoadScript({ googleMapsApiKey: apiKey, libraries });
   const [inputValue, setInputValue] = useState(value || '');
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -101,7 +102,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({ value, onSele
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder="Search for an address..."
-        className="w-full p-4 rounded-2xl border-2 border-[#F5E6D6] bg-[#FDF6ED] text-[#2C3E50] font-medium focus:outline-none focus:border-[#2C3E50] transition-all duration-200"
+        className={className ? `w-full ${className}` : "w-full p-4 rounded-2xl border-2 border-[#F5E6D6] bg-[#FDF6ED] text-[#2C3E50] font-medium focus:outline-none focus:border-[#2C3E50] transition-all duration-200"}
         autoComplete="off"
       />
       {showDropdown && suggestions.length > 0 && (
