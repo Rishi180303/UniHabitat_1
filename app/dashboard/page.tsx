@@ -46,7 +46,8 @@ export default function Dashboard() {
     minPrice: '',
     maxPrice: '',
   })
-  const [listings, setListings] = useState<any[]>([])
+  const [strictMatches, setStrictMatches] = useState<any[]>([])
+  const [areaMatches, setAreaMatches] = useState<any[]>([])
   const [loadingListings, setLoadingListings] = useState(false)
   const [selectedListing, setSelectedListing] = useState<any | null>(null)
   const defaultLocationSet = useRef(false)
@@ -97,21 +98,49 @@ export default function Dashboard() {
         state = parts[1] || ''
       }
       const { data, error } = await query.order('created_at', { ascending: false })
-      let filtered = data || []
+      let areaListings = data || []
       if (city && state) {
         // Only show listings where address includes both city and state (case-insensitive)
-        filtered = filtered.filter(listing => {
+        areaListings = areaListings.filter(listing => {
           const addr = (listing.address || '').toLowerCase()
           return addr.includes(city.toLowerCase()) && addr.includes(state.toLowerCase())
         })
       }
       // Filter out listings where user_id matches current user
-      filtered = user ? filtered.filter(listing => listing.user_id !== user.id) : filtered
-      setListings(filtered)
+      areaListings = user ? areaListings.filter(listing => listing.user_id !== user.id) : areaListings
+
+      // Strict filter matching
+      const strictMatches = areaListings.filter(listing => {
+        // Move-in date
+        if (moveInDate && listing.move_in_date && moveInDate > listing.move_out_date) return false
+        if (moveInDate && listing.move_in_date && moveInDate < listing.move_in_date) return false
+        // Move-out date
+        if (moveOutDate && listing.move_out_date && moveOutDate > listing.move_out_date) return false
+        if (moveOutDate && listing.move_out_date && moveOutDate < listing.move_in_date) return false
+        // Sublease type
+        if (filterState.subleaseType && listing.sublease_type !== filterState.subleaseType) return false
+        // Furnishing
+        if (filterState.furnishing && listing.furnishing !== filterState.furnishing) return false
+        // Lease type
+        if (filterState.leaseType && listing.lease_type !== filterState.leaseType) return false
+        // Bedrooms
+        if (filterState.totalBedrooms && String(listing.total_bedrooms) !== filterState.totalBedrooms) return false
+        if (filterState.availableBedrooms && String(listing.available_bedrooms) !== filterState.availableBedrooms) return false
+        // Bathrooms
+        if (filterState.totalBathrooms && String(listing.total_bathrooms) !== filterState.totalBathrooms) return false
+        // Price
+        if (filterState.minPrice && Number(listing.price) < Number(filterState.minPrice)) return false
+        if (filterState.maxPrice && Number(listing.price) > Number(filterState.maxPrice)) return false
+        return true
+      })
+      // Area matches are those in area but not strict matches
+      const areaMatches = areaListings.filter(listing => !strictMatches.includes(listing))
+      setStrictMatches(strictMatches)
+      setAreaMatches(areaMatches)
       setLoadingListings(false)
     }
     fetchListings()
-  }, [location, user])
+  }, [location, user, moveInDate, moveOutDate, filterState])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -412,28 +441,61 @@ export default function Dashboard() {
               <span className="ml-4 text-[#34495E] text-lg">Loading listings...</span>
             </div>
           ) : (
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
-              {listings.length === 0 ? (
-                <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
+            <>
+              {strictMatches.length > 0 ? (
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
+                  {strictMatches.map(listing => (
+                    <DialogTrigger asChild key={listing.id}>
+                      <div onClick={() => setSelectedListing(listing)}>
+                        <ListingCard listing={{
+                          id: listing.id,
+                          title: listing.title,
+                          location: listing.address || '',
+                          price: listing.price,
+                          image: (listing.images && listing.images.length > 0) ? listing.images[0] : '/public/images/landingpage.png',
+                          type: listing.sublease_type || 'Unit',
+                          available: listing.available !== false,
+                          rating: listing.rating || 5,
+                        }} />
+                      </div>
+                    </DialogTrigger>
+                  ))}
+                </div>
               ) : (
-                listings.map(listing => (
-                  <DialogTrigger asChild key={listing.id}>
-                    <div onClick={() => setSelectedListing(listing)}>
-                      <ListingCard listing={{
-                        id: listing.id,
-                        title: listing.title,
-                        location: listing.address || '',
-                        price: listing.price,
-                        image: (listing.images && listing.images.length > 0) ? listing.images[0] : '/public/images/landingpage.png',
-                        type: listing.sublease_type || 'Unit',
-                        available: listing.available !== false,
-                        rating: listing.rating || 5,
-                      }} />
+                <>
+                  <div className="text-center w-full mb-8">
+                    <span className="text-[#BFAE9B] text-lg font-semibold block mb-2">Oops, no matching listing found for your filters.</span>
+                    {areaMatches.length > 0 && (
+                      <span className="text-[#34495E] text-base">Here are some other listings in your area:</span>
+                    )}
+                  </div>
+                  {areaMatches.length > 0 ? (
+                    <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
+                      {areaMatches.map(listing => (
+                        <DialogTrigger asChild key={listing.id}>
+                          <div onClick={() => setSelectedListing(listing)}>
+                            <ListingCard listing={{
+                              id: listing.id,
+                              title: listing.title,
+                              location: listing.address || '',
+                              price: listing.price,
+                              image: (listing.images && listing.images.length > 0) ? listing.images[0] : '/public/images/landingpage.png',
+                              type: listing.sublease_type || 'Unit',
+                              available: listing.available !== false,
+                              rating: listing.rating || 5,
+                            }} />
+                          </div>
+                        </DialogTrigger>
+                      ))}
                     </div>
-                  </DialogTrigger>
-                ))
+                  ) : (
+                    <div className="text-center w-full">
+                      <span className="text-[#BFAE9B] text-lg">No listings to display yet.</span>
+                    </div>
+                  )}
+                </>
               )}
-            </div>
+            </>
           )}
         </Dialog>
       </div>
