@@ -9,81 +9,10 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import { useAuth } from "./auth-provider"
 import { supabase } from "@/lib/supabase"
 import Image from "next/image"
-import { Plus, X, Users, Clock, Shield, MessageCircle, Sparkles } from "lucide-react"
-
-interface Card {
-  id: string
-  title: string
-  icon: React.ReactNode
-  description: string
-  bgColor: string
-  iconBgColor: string
-  iconColor: string
-  textColor: string
-}
-
-const cards: Card[] = [
-  {
-    id: "students",
-    title: "Real Students, Real Homes",
-    icon: <Users className="w-10 h-10" />,
-    description:
-      "Every listing comes from a fellow student, so you know you're connecting with people who understand your needs and campus life. This ensures a trustworthy and relatable experience for finding your next home.",
-    bgColor: "bg-white",
-    iconBgColor: "bg-slate-200",
-    iconColor: "text-slate-600",
-    textColor: "text-slate-800",
-  },
-  {
-    id: "minutes",
-    title: "List or Find in Minutes",
-    icon: <Clock className="w-10 h-10" />,
-    description:
-      "Our streamlined process allows you to post your room or find your perfect match in just a few minutes. No complicated forms, just quick and efficient results.",
-    bgColor: "bg-white",
-    iconBgColor: "bg-slate-200",
-    iconColor: "text-slate-600",
-    textColor: "text-slate-800",
-  },
-  {
-    id: "details",
-    title: "Details That Matter",
-    icon: <Shield className="w-10 h-10" />,
-    description:
-      "We provide comprehensive profiles and verified information, ensuring you have all the crucial details before making any decisions. Transparency is key to a good match.",
-    bgColor: "bg-white",
-    iconBgColor: "bg-slate-200",
-    iconColor: "text-slate-600",
-    textColor: "text-slate-800",
-  },
-  {
-    id: "messaging",
-    title: "In-App Messaging",
-    icon: <MessageCircle className="w-10 h-10" />,
-    description:
-      "Communicate directly and securely with potential roommates and landlords through our integrated messaging system. Keep your personal contact information private until you're ready.",
-    bgColor: "bg-slate-800",
-    iconBgColor: "bg-slate-700",
-    iconColor: "text-slate-300",
-    textColor: "text-white",
-  },
-  {
-    id: "matching",
-    title: "Smart Matching",
-    icon: <Sparkles className="w-10 h-10" />,
-    description:
-      "Our intelligent algorithm connects you with compatible roommates and suitable housing options based on your preferences, lifestyle, and academic needs. Find your ideal living situation effortlessly.",
-    bgColor: "bg-slate-800",
-    iconBgColor: "bg-slate-700",
-    iconColor: "text-slate-300",
-    textColor: "text-white",
-  },
-]
 
 export default function Hero() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup')
-  const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const { user } = useAuth()
 
   // Scroll progress for parallax effect
@@ -109,10 +38,6 @@ export default function Hero() {
 
   const handleCloseAuthModal = () => {
     setIsAuthModalOpen(false)
-  }
-
-  const toggleCard = (cardId: string) => {
-    setExpandedCard(expandedCard === cardId ? null : cardId)
   }
 
   return (
@@ -182,71 +107,6 @@ export default function Hero() {
               List Your Unit
             </Button>
           </motion.div>
-
-          {/* Feature Cards */}
-          <div className="w-full max-w-7xl mx-auto mt-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              {cards.map((card) => (
-                <div
-                  key={card.id}
-                  className={`relative rounded-2xl p-4 shadow-md transition-all duration-500 ease-in-out ${card.bgColor} ${
-                    expandedCard === card.id ? "col-span-full lg:col-span-2" : "col-span-1"
-                  }`}
-                >
-                  {/* Plus/Close button */}
-                  <button
-                    onClick={() => toggleCard(card.id)}
-                    className={`absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center border border-blue-500 bg-white text-blue-500 transition-colors duration-200 ease-in-out hover:bg-blue-50`}
-                    aria-expanded={expandedCard === card.id}
-                    aria-controls={`card-content-${card.id}`}
-                  >
-                    {expandedCard === card.id ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                  </button>
-
-                  {/* Card Content */}
-                  <div
-                    className={`flex ${
-                      expandedCard === card.id ? "flex-col sm:flex-row items-start" : "flex-col items-center text-center"
-                    } gap-3`}
-                  >
-                    {/* Icon */}
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center ${card.iconBgColor} ${card.iconColor} flex-shrink-0`}
-                    >
-                      {card.icon}
-                    </div>
-
-                    <div className="flex flex-col">
-                      {/* Title */}
-                      <h3
-                        className={`font-semibold ${card.textColor} ${
-                          expandedCard === card.id ? "text-lg text-left" : "text-base text-center"
-                        }`}
-                      >
-                        {card.title}
-                      </h3>
-
-                      {/* Expandable content with symmetrical sideways animation */}
-                      <div
-                        id={`card-content-${card.id}`}
-                        className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                          expandedCard === card.id ? "max-h-96 mt-2" : "max-h-0"
-                        }`}
-                      >
-                        <p
-                          className={`leading-relaxed text-sm ${card.textColor} text-left transition-transform duration-500 ease-in-out ${
-                            expandedCard === card.id ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
-                          }`}
-                        >
-                          {card.description}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
