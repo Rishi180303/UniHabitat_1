@@ -95,4 +95,14 @@
   .glass-effect {
     @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
+
+  .hero-bg-pattern {
+    background-image: repeating-linear-gradient(
+      135deg,
+      #f5e6d6 0px,
+      #f5e6d6 2px,
+      transparent 2px,
+      transparent 20px
+    );
+  }
 } 

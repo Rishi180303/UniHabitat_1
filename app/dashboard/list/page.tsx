@@ -685,7 +685,7 @@ export default function ListUnit() {
             {submitSuccess && <div className="text-green-600 font-medium text-center">Listing published! Redirecting...</div>}
 
             <Button 
-              className="w-full bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white py-4 text-lg font-semibold hover:from-[#34495E] hover:to-[#2C3E50] transition-all duration-300 shadow-lg"
+              className="w-full bg-[#2C3E50] text-white py-4 text-lg font-semibold hover:bg-[#34495E] transition-all duration-300 shadow-lg"
               onClick={handlePublishListing}
               disabled={submitting}
             >
@@ -818,7 +818,7 @@ export default function ListUnit() {
                 {currentStep < steps.length && (
                   <Button 
                     onClick={nextStep}
-                    className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white hover:from-[#34495E] hover:to-[#2C3E50] transition-all duration-300 shadow-lg"
+                    className="bg-[#2C3E50] text-white hover:bg-[#34495E] transition-all duration-300 shadow-lg"
                   >
                     Next
                     <ArrowRight className="w-4 h-4 ml-2" />

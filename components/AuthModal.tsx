@@ -295,7 +295,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       return (
         <form onSubmit={handleVerifyOTP} className="space-y-4">
           <div>
-            <Label htmlFor="otp">Verification Code</Label>
+            <Label htmlFor="otp" className="text-[#2C3E50] font-medium">Verification Code</Label>
             <Input
               id="otp"
               type="text"
@@ -303,9 +303,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
               onChange={(e) => setOtp(e.target.value)}
               placeholder="Enter the code from your email"
               required
+              className="border-[#F5E6D6] focus:border-[#2C3E50] focus:ring-[#2C3E50]"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E] transition-all duration-300" disabled={isLoading}>
             {isLoading ? 'Verifying...' : 'Verify Email'}
           </Button>
         </form>
@@ -315,7 +316,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
     return (
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-[#2C3E50] font-medium">Email</Label>
           <Input
             id="email"
             type="email"
@@ -323,9 +324,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
             onChange={(e) => setEmail(e.target.value)}
             placeholder={mode === 'signup' ? "your.email@university.edu" : "Enter your email"}
             required
+            className="border-[#F5E6D6] focus:border-[#2C3E50] focus:ring-[#2C3E50]"
           />
           {mode === 'signup' && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[#34495E] mt-1">
               Use your .edu email to verify your student status
             </p>
           )}
@@ -333,7 +335,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         
         {mode === 'signin' && (
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-[#2C3E50] font-medium">Password</Label>
             <Input
               id="password"
               type="password"
@@ -341,13 +343,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
+              className="border-[#F5E6D6] focus:border-[#2C3E50] focus:ring-[#2C3E50]"
             />
           </div>
         )}
         
         {mode === 'signup' && (
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-[#2C3E50] font-medium">Password</Label>
             <Input
               id="password"
               type="password"
@@ -355,14 +358,15 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Create a password"
               required
+              className="border-[#F5E6D6] focus:border-[#2C3E50] focus:ring-[#2C3E50]"
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[#34495E] mt-1">
               Password must be at least 8 characters with uppercase, lowercase, number, and special character.
             </p>
           </div>
         )}
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full bg-[#2C3E50] text-white hover:bg-[#34495E] transition-all duration-300" disabled={isLoading}>
           {isLoading 
             ? (mode === 'signup' ? 'Sending verification...' : 'Signing in...') 
             : (mode === 'signup' ? 'Sign Up' : 'Sign In')
@@ -374,12 +378,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-[#FDF6ED] via-white to-[#F5E6D6] border-2 border-[#F5E6D6] shadow-2xl">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-[#2C3E50] text-2xl font-bold">
             {mode === 'verify' ? 'Verify Your Email' : (mode === 'signup' ? 'Create Account' : 'Sign In')}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-[#34495E] text-base">
             {mode === 'verify' 
               ? 'Enter the verification code sent to your email'
               : mode === 'signup'
@@ -390,10 +394,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         </DialogHeader>
 
         {message && (
-          <div className={`p-3 rounded-md text-sm ${
+          <div className={`p-4 rounded-xl text-sm border-2 ${
             message.type === 'success' 
-              ? 'bg-green-50 text-green-800 border border-green-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'bg-green-50 text-green-800 border-green-200' 
+              : 'bg-red-50 text-red-800 border-red-200'
           }`}>
             {message.text}
           </div>
@@ -406,7 +410,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
             <button
               type="button"
               onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-              className="text-sm text-blue-600 hover:text-blue-800"
+              className="text-sm text-[#2C3E50] hover:text-[#34495E] font-medium transition-colors"
             >
               {mode === 'signin' 
                 ? "Don't have an account? Sign up" 

@@ -205,7 +205,7 @@ export default function ProfilePage() {
                 <ArrowLeft className="w-5 h-5 text-[#2C3E50]" />
               </button>
               <div>
-                <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#2C3E50] to-[#34495E] bg-clip-text text-transparent tracking-tight">
+                <h1 className="text-3xl font-extrabold text-[#2C3E50] tracking-tight">
                   Profile
                 </h1>
                 <p className="text-[#34495E] mt-1 font-medium">Manage your account</p>
@@ -215,7 +215,7 @@ export default function ProfilePage() {
               {!editMode && (
                 <Button
                   onClick={handleEditProfile}
-                  className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-4 py-2 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50]"
+                  className="bg-[#2C3E50] text-white px-4 py-2 rounded-2xl font-semibold shadow hover:bg-[#34495E]"
                 >
                   <Edit3 className="w-4 h-4 mr-2" />
                   Edit Profile
@@ -443,7 +443,7 @@ export default function ProfilePage() {
                   </Button>
                   <Button
                     onClick={handleSaveEdit}
-                    className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-6 py-2 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50]"
+                    className="bg-[#2C3E50] text-white px-6 py-2 rounded-2xl font-semibold shadow hover:bg-[#34495E]"
                     disabled={saving || !isEditValid}
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
@@ -466,7 +466,7 @@ export default function ProfilePage() {
                   </div>
                   <Button
                     onClick={() => router.push('/dashboard/list')}
-                    className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-6 py-3 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50] text-lg"
+                    className="bg-[#2C3E50] text-white px-6 py-3 rounded-2xl font-semibold shadow hover:bg-[#34495E] text-lg"
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     Add New Listing
@@ -484,7 +484,7 @@ export default function ProfilePage() {
                     <p className="text-[#34495E] mb-6 text-lg">Start by creating your first listing to rent out your space.</p>
                     <Button
                       onClick={() => router.push('/dashboard/list')}
-                      className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white px-8 py-4 rounded-2xl font-semibold shadow hover:from-[#34495E] hover:to-[#2C3E50] text-lg"
+                      className="bg-[#2C3E50] text-white px-8 py-4 rounded-2xl font-semibold shadow hover:bg-[#34495E] text-lg"
                     >
                       <Plus className="w-5 h-5 mr-2" />
                       Create Your First Listing
@@ -539,7 +539,7 @@ export default function ProfilePage() {
                         <div className="flex flex-col gap-3 mt-auto w-full">
                           <Button
                             size="lg"
-                            className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white text-lg font-semibold rounded-2xl shadow w-full py-4 hover:from-[#34495E] hover:to-[#2C3E50] flex items-center justify-center"
+                            className="bg-[#2C3E50] text-white text-lg font-semibold rounded-2xl shadow w-full py-4 hover:bg-[#34495E] flex items-center justify-center"
                             onClick={() => router.push(`/dashboard/list?edit=1&listingId=${listing.id}`)}
                           >
                             <Edit3 className="w-5 h-5 mr-2" />

@@ -43,7 +43,7 @@ export default function DeleteConfirmationDialog({
           >
             <div className="bg-[#FDF6ED] rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden border border-[#F5E6D6]">
               {/* Header */}
-              <div className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] p-6 text-white">
+              <div className="bg-[#2C3E50] p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-white/20 rounded-full">
@@ -93,7 +93,7 @@ export default function DeleteConfirmationDialog({
                   </Button>
                   <Button
                     onClick={onConfirm}
-                    className="flex-1 bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white rounded-2xl font-semibold py-3 hover:from-[#34495E] hover:to-[#2C3E50] shadow-lg"
+                    className="flex-1 bg-[#2C3E50] text-white rounded-2xl font-semibold py-3 hover:bg-[#34495E] shadow-lg"
                     disabled={isLoading}
                   >
                     {isLoading ? (

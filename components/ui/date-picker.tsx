@@ -200,7 +200,7 @@ export default function DatePicker({
           className={`
             h-10 w-10 rounded-full text-sm font-medium transition-all duration-200
             ${isSelectedDay
-              ? 'bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white shadow-lg'
+              ? 'bg-[#2C3E50] text-white shadow-lg'
               : isDisabled
                 ? 'text-[#D1C7B7] cursor-not-allowed'
                 : 'text-[#34495E] hover:bg-[#F5E6D6] hover:text-[#2C3E50]'

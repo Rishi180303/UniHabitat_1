@@ -36,7 +36,7 @@ export default function Features() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-6">
-            How UniHabitat Works <span className="text-3xl">🔑</span>
+            How UniHabitat Works
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             A simple, safe, and modern way to find student housing
@@ -66,9 +66,8 @@ export default function Features() {
                 )}
               </div>
               
-              {/* Emoji/Icon and content */}
+              {/* Content */}
               <div className="flex-1 text-center md:text-left">
-                <div className="text-4xl mb-4">{feature.emoji}</div>
                 <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
                   {feature.title}
                 </h3>

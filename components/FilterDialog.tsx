@@ -115,7 +115,7 @@ export default function FilterDialog({ filter, onChange, onApply, onClear }: Fil
         </div>
         <DialogFooter className="pt-2">
           <Button variant="outline" onClick={() => { onClear(); setOpen(false); }} type="button">Clear all</Button>
-          <Button onClick={() => { onApply(); setOpen(false); }} type="button" className="bg-gradient-to-r from-[#2C3E50] to-[#34495E] text-white">Apply</Button>
+          <Button onClick={() => { onApply(); setOpen(false); }} type="button" className="bg-[#2C3E50] text-white hover:bg-[#34495E]">Apply</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
