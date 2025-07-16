@@ -1,29 +1,51 @@
 'use client'
 
 import { motion, useInView } from "framer-motion"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 export default function Features() {
-  const features = [
+  const [activeTab, setActiveTab] = useState("renters")
+
+  const rentersSteps = [
     {
-      title: "Verified .edu Users",
-      description: "All listings are verified by students with valid .edu email addresses, ensuring a safe and trustworthy community.",
-      emoji: "🎓"
+      title: "Search for Housing",
+      description: "Browse verified listings from fellow students near your campus. Filter by location, price, and amenities to find your perfect match.",
+      emoji: "🔍"
     },
     {
-      title: "Easy Listing Creation",
-      description: "Create and manage your property listings in minutes with our intuitive interface and smart templates.",
-      emoji: "✨"
+      title: "View Listing Details",
+      description: "See comprehensive property information including photos, pricing, availability dates, and contact details for each listing.",
+      emoji: "📋"
     },
     {
-      title: "Detailed Property Information",
-      description: "Comprehensive listing forms with property details, availability dates, pricing, and photo uploads to help students make informed decisions.",
-      emoji: "🛡️"
+      title: "Contact Listers Directly",
+      description: "Reach out to student landlords through their provided contact information to schedule viewings and discuss rental terms.",
+      emoji: "📞"
+    }
+  ]
+
+  const listersSteps = [
+    {
+      title: "Create Your Listing",
+      description: "Post your room or apartment in minutes with our simple form. Include photos, pricing, and availability details to attract tenants.",
+      emoji: "📝"
+    },
+    {
+      title: "Manage Your Listings",
+      description: "Edit, update, or remove your listings anytime from your profile dashboard. Keep your property information current.",
+      emoji: "⚙️"
+    },
+    {
+      title: "Handle Inquiries",
+      description: "Respond to student inquiries through your provided contact information. Schedule viewings and finalize agreements directly.",
+      emoji: "💬"
     }
   ]
 
   const containerRef = useRef(null)
   const isInView = useInView(containerRef, { once: true, margin: "-50px" })
+
+  const currentSteps = activeTab === "renters" ? rentersSteps : listersSteps
 
   return (
     <section id="how-it-works" className="py-24 bg-[#FDF6ED]">
@@ -38,15 +60,41 @@ export default function Features() {
           <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-6">
             How UniHabitat Works
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
             A simple, safe, and modern way to find student housing
           </p>
+
+          {/* Toggle Button */}
+          <div className="flex justify-center">
+            <div className="bg-white/50 p-1 rounded-full shadow-sm">
+              <button
+                onClick={() => setActiveTab("renters")}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                  activeTab === "renters"
+                    ? "bg-[#2C3E50] text-white shadow-md"
+                    : "text-[#2C3E50] hover:text-[#34495E]"
+                }`}
+              >
+                Renters
+              </button>
+              <button
+                onClick={() => setActiveTab("listers")}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                  activeTab === "listers"
+                    ? "bg-[#2C3E50] text-white shadow-md"
+                    : "text-[#2C3E50] hover:text-[#34495E]"
+                }`}
+              >
+                Listers
+              </button>
+            </div>
+          </div>
         </motion.div>
 
         <div ref={containerRef} className="max-w-3xl mx-auto flex flex-col gap-24">
-          {features.map((feature, index) => (
-            <motion.div 
-              key={index}
+          {currentSteps.map((step, index) => (
+            <motion.div
+              key={`${activeTab}-${index}`}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ 
@@ -61,18 +109,18 @@ export default function Features() {
                 <div className="w-12 h-12 rounded-full bg-[#2C3E50] flex items-center justify-center text-white text-2xl font-bold mb-2 shadow-md">
                   {index + 1}
                 </div>
-                {index < features.length - 1 && (
+                {index < currentSteps.length - 1 && (
                   <div className="hidden md:block w-1 h-24 bg-[#2C3E50]/10 mx-auto my-2 rounded-full" />
                 )}
               </div>
-              
+
               {/* Content */}
               <div className="flex-1 text-center md:text-left">
                 <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
-                  {feature.title}
+                  {step.title}
                 </h3>
                 <p className="text-lg text-[#34495E] max-w-xl mx-auto md:mx-0">
-                  {feature.description}
+                  {step.description}
                 </p>
               </div>
             </motion.div>

@@ -3,6 +3,7 @@
 import Header from '../components/Header'
 import Hero from '../components/Hero'
 import Features from '../components/Features'
+import PlatformBenefits from '../components/PlatformBenefits'
 import Footer from '../components/Footer'
 import AuthError from '../components/AuthError'
 import { motion } from "framer-motion"
@@ -40,6 +41,14 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
+      >
+        <PlatformBenefits />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.8 }}
       >
         <Footer />
       </motion.div>
