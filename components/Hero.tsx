@@ -9,12 +9,81 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import { useAuth } from "./auth-provider"
 import { supabase } from "@/lib/supabase"
 import Image from "next/image"
-import { Plus, X } from "lucide-react"
+import { Plus, X, Users, Clock, Shield, MessageCircle, Sparkles } from "lucide-react"
+
+interface Card {
+  id: string
+  title: string
+  icon: React.ReactNode
+  description: string
+  bgColor: string
+  iconBgColor: string
+  iconColor: string
+  textColor: string
+}
+
+const cards: Card[] = [
+  {
+    id: "students",
+    title: "Real Students, Real Homes",
+    icon: <Users className="w-10 h-10" />,
+    description:
+      "Every listing comes from a fellow student, so you know you're connecting with people who understand your needs and campus life. This ensures a trustworthy and relatable experience for finding your next home.",
+    bgColor: "bg-white",
+    iconBgColor: "bg-slate-200",
+    iconColor: "text-slate-600",
+    textColor: "text-slate-800",
+  },
+  {
+    id: "minutes",
+    title: "List or Find in Minutes",
+    icon: <Clock className="w-10 h-10" />,
+    description:
+      "Our streamlined process allows you to post your room or find your perfect match in just a few minutes. No complicated forms, just quick and efficient results.",
+    bgColor: "bg-white",
+    iconBgColor: "bg-slate-200",
+    iconColor: "text-slate-600",
+    textColor: "text-slate-800",
+  },
+  {
+    id: "details",
+    title: "Details That Matter",
+    icon: <Shield className="w-10 h-10" />,
+    description:
+      "We provide comprehensive profiles and verified information, ensuring you have all the crucial details before making any decisions. Transparency is key to a good match.",
+    bgColor: "bg-white",
+    iconBgColor: "bg-slate-200",
+    iconColor: "text-slate-600",
+    textColor: "text-slate-800",
+  },
+  {
+    id: "messaging",
+    title: "In-App Messaging",
+    icon: <MessageCircle className="w-10 h-10" />,
+    description:
+      "Communicate directly and securely with potential roommates and landlords through our integrated messaging system. Keep your personal contact information private until you're ready.",
+    bgColor: "bg-slate-800",
+    iconBgColor: "bg-slate-700",
+    iconColor: "text-slate-300",
+    textColor: "text-white",
+  },
+  {
+    id: "matching",
+    title: "Smart Matching",
+    icon: <Sparkles className="w-10 h-10" />,
+    description:
+      "Our intelligent algorithm connects you with compatible roommates and suitable housing options based on your preferences, lifestyle, and academic needs. Find your ideal living situation effortlessly.",
+    bgColor: "bg-slate-800",
+    iconBgColor: "bg-slate-700",
+    iconColor: "text-slate-300",
+    textColor: "text-white",
+  },
+]
 
 export default function Hero() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup')
-  const [expandedCard, setExpandedCard] = useState<number | null>(null)
+  const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const { user } = useAuth()
 
   // Scroll progress for parallax effect
@@ -42,45 +111,22 @@ export default function Hero() {
     setIsAuthModalOpen(false)
   }
 
-  const handleCardToggle = (index: number) => {
-    setExpandedCard(expandedCard === index ? null : index)
+  const toggleCard = (cardId: string) => {
+    setExpandedCard(expandedCard === cardId ? null : cardId)
   }
 
-  const featureCards = [
-    {
-      title: "Real Students, Real Homes",
-      description: "Every listing comes from a fellow student, so you know you're connecting with people who understand your needs and campus life."
-    },
-    {
-      title: "List or Find in Minutes",
-      description: "Skip the hassle. Our platform makes it easy to post your place or discover your next home, all in just a few clicks."
-    },
-    {
-      title: "Details That Matter",
-      description: "See the info you care about, like photos, pricing, and availability, so you can make the right move with confidence."
-    },
-    {
-      title: "In-App Messaging",
-      description: "Coming Soon: Chat directly with landlords and roommates through our secure messaging system. No more phone tag or missed connections."
-    },
-    {
-      title: "Smart Matching",
-      description: "Coming Soon: Our AI-powered system will match you with the perfect housing based on your preferences, budget, and lifestyle."
-    }
-  ]
-
   return (
-    <section className="relative w-full h-[100vh] flex items-center justify-center overflow-hidden hero-bg-pattern">
+    <section className="relative w-full min-h-screen flex items-center justify-center hero-bg-pattern py-20">
       <HeroBackground />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 w-full max-w-7xl mx-auto px-4 lg:px-8">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 lg:px-8 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center justify-center text-center w-full">
           {/* Main Text Content */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mb-12 mt-20"
+            className="mb-12 mt-32"
           >
             <h1 className="text-5xl md:text-7xl font-bold text-[#2C3E50] leading-tight flex flex-col items-center">
               <span className="block">Find student housing</span>
@@ -137,103 +183,67 @@ export default function Hero() {
             </Button>
           </motion.div>
 
-          {/* Feature Cards Row */}
-          <div className="flex flex-col gap-8 justify-center items-center mt-6 w-full max-w-6xl mx-auto">
-            {/* Top Row - 3 Cards */}
-            <div className="flex gap-6 justify-center items-stretch w-full">
-              {featureCards.slice(0, 3).map((card, index) => (
-                <motion.div 
-                  key={index}
-                  className="flex-1 min-w-[220px] max-w-[280px] bg-white rounded-3xl shadow-lg border border-[#F5E6D6] p-0 flex flex-col items-center relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group"
-                  animate={{ 
-                    height: expandedCard === index ? "auto" : "120px",
-                    minHeight: expandedCard === index ? "200px" : "120px"
-                  }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+          {/* Feature Cards */}
+          <div className="w-full max-w-7xl mx-auto mt-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {cards.map((card) => (
+                <div
+                  key={card.id}
+                  className={`relative rounded-2xl p-4 shadow-md transition-all duration-500 ease-in-out ${card.bgColor} ${
+                    expandedCard === card.id ? "col-span-full lg:col-span-2" : "col-span-1"
+                  }`}
                 >
-                  <div className="p-7 flex flex-col items-center w-full relative">
-                    {/* Toggle Button */}
-                    <button
-                      onClick={() => handleCardToggle(index)}
-                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[#2C3E50]/20 text-[#2C3E50] flex items-center justify-center hover:bg-[#2C3E50]/30 transition-all duration-200 z-10 backdrop-blur-sm"
+                  {/* Plus/Close button */}
+                  <button
+                    onClick={() => toggleCard(card.id)}
+                    className={`absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center border border-blue-500 bg-white text-blue-500 transition-colors duration-200 ease-in-out hover:bg-blue-50`}
+                    aria-expanded={expandedCard === card.id}
+                    aria-controls={`card-content-${card.id}`}
+                  >
+                    {expandedCard === card.id ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                  </button>
+
+                  {/* Card Content */}
+                  <div
+                    className={`flex ${
+                      expandedCard === card.id ? "flex-col sm:flex-row items-start" : "flex-col items-center text-center"
+                    } gap-3`}
+                  >
+                    {/* Icon */}
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center ${card.iconBgColor} ${card.iconColor} flex-shrink-0`}
                     >
-                      {expandedCard === index ? (
-                        <X className="w-4 h-4" />
-                      ) : (
-                        <Plus className="w-4 h-4" />
-                      )}
-                    </button>
-                    
-                    {/* Title */}
-                    <h4 className="font-bold text-lg text-[#2C3E50] mb-2 mt-2 text-center">
-                      {card.title}
-                    </h4>
-                    
-                    {/* Description - Animated */}
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ 
-                        opacity: expandedCard === index ? 1 : 0,
-                        height: expandedCard === index ? "auto" : 0
-                      }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <p className="text-sm text-[#34495E] text-center">
-                        {card.description}
-                      </p>
-                    </motion.div>
+                      {card.icon}
+                    </div>
+
+                    <div className="flex flex-col">
+                      {/* Title */}
+                      <h3
+                        className={`font-semibold ${card.textColor} ${
+                          expandedCard === card.id ? "text-lg text-left" : "text-base text-center"
+                        }`}
+                      >
+                        {card.title}
+                      </h3>
+
+                      {/* Expandable content with symmetrical sideways animation */}
+                      <div
+                        id={`card-content-${card.id}`}
+                        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                          expandedCard === card.id ? "max-h-96 mt-2" : "max-h-0"
+                        }`}
+                      >
+                        <p
+                          className={`leading-relaxed text-sm ${card.textColor} text-left transition-transform duration-500 ease-in-out ${
+                            expandedCard === card.id ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
+                          }`}
+                        >
+                          {card.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-            
-            {/* Bottom Row - 2 Cards Centered */}
-            <div className="flex gap-6 justify-center items-stretch w-full">
-              {featureCards.slice(3, 5).map((card, index) => (
-                <motion.div 
-                  key={index + 3}
-                  className="flex-1 min-w-[220px] max-w-[280px] bg-white rounded-3xl shadow-lg border border-[#F5E6D6] p-0 flex flex-col items-center relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group"
-                  animate={{ 
-                    height: expandedCard === (index + 3) ? "auto" : "120px",
-                    minHeight: expandedCard === (index + 3) ? "200px" : "120px"
-                  }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                >
-                  <div className="p-7 flex flex-col items-center w-full relative">
-                    {/* Toggle Button */}
-                    <button
-                      onClick={() => handleCardToggle(index + 3)}
-                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[#2C3E50]/20 text-[#2C3E50] flex items-center justify-center hover:bg-[#2C3E50]/30 transition-all duration-200 z-10 backdrop-blur-sm"
-                    >
-                      {expandedCard === (index + 3) ? (
-                        <X className="w-4 h-4" />
-                      ) : (
-                        <Plus className="w-4 h-4" />
-                      )}
-                    </button>
-                    
-                    {/* Title */}
-                    <h4 className="font-bold text-lg text-[#2C3E50] mb-2 mt-2 text-center">
-                      {card.title}
-                    </h4>
-                    
-                    {/* Description - Animated */}
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ 
-                        opacity: expandedCard === (index + 3) ? 1 : 0,
-                        height: expandedCard === (index + 3) ? "auto" : 0
-                      }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <p className="text-sm text-[#34495E] text-center">
-                        {card.description}
-                      </p>
-                    </motion.div>
-                  </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
