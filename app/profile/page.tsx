@@ -24,12 +24,14 @@ import {
   DollarSign,
   Plus,
   Eye,
-  Trash2
+  Trash2,
+  X
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import UniversitySearch from '@/components/UniversitySearch'
 import LocationSearchInput from '@/components/LocationSearchInput'
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog'
+import ImageCropper from '@/components/ImageCropper'
 
 export default function ProfilePage() {
   const { user, loading } = useAuth()
@@ -44,6 +46,10 @@ export default function ProfilePage() {
   const [deletingListing, setDeletingListing] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [listingToDelete, setListingToDelete] = useState<any>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [showCropper, setShowCropper] = useState(false)
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -89,6 +95,84 @@ export default function ProfilePage() {
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setEditData((prev: any) => ({ ...prev, [name]: value }))
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setEditError('Please select a valid image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setEditError('Image size must be less than 5MB')
+      return
+    }
+
+    setEditError(null)
+    setSelectedImageFile(file)
+    
+    // Create preview for cropping
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setImagePreview(e.target?.result as string)
+      setShowCropper(true)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const removeImage = () => {
+    setEditData((prev: any) => ({ ...prev, avatar_url: '' }))
+    setImagePreview(null)
+    setSelectedImageFile(null)
+  }
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    if (!user) return
+
+    setUploadingImage(true)
+    setShowCropper(false)
+    setEditError(null)
+
+    try {
+      // Convert blob to file
+      const file = new File([croppedBlob], 'cropped-image.jpg', { type: 'image/jpeg' })
+
+      // Upload to Supabase Storage
+      const fileName = `${user.id}-${Date.now()}.jpg`
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (error) throw error
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName)
+
+      // Update edit data
+      setEditData((prev: any) => ({ ...prev, avatar_url: publicUrl }))
+      setImagePreview(URL.createObjectURL(croppedBlob))
+    } catch (err: any) {
+      setEditError('Error uploading image: ' + (err.message || 'Please try again.'))
+      setImagePreview(null)
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleCropCancel = () => {
+    setShowCropper(false)
+    setImagePreview(null)
+    setSelectedImageFile(null)
   }
 
   const isEditValid = editData && editData.full_name && editData.university && editData.university_area && editData.year
@@ -245,16 +329,45 @@ export default function ProfilePage() {
             <div className="bg-[#2C3E50]/90 rounded-3xl shadow-lg border border-[#F5E6D6] p-8 text-center flex flex-col items-center">
               {/* Avatar */}
               <div className="relative inline-block mb-6">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-[#34495E]/30 to-[#2C3E50]/30 flex items-center justify-center">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-[#34495E]/30 to-[#2C3E50]/30 flex items-center justify-center relative">
                   {editMode ? (
-                    <Input
-                      id="avatar_url"
-                      name="avatar_url"
-                      value={editData?.avatar_url || ''}
-                      onChange={handleEditChange}
-                      placeholder="Avatar URL"
-                      className="w-full h-full text-center"
-                    />
+                    <div className="w-full h-full flex flex-col items-center justify-center">
+                      {imagePreview || editData?.avatar_url ? (
+                        <img 
+                          src={imagePreview || editData.avatar_url} 
+                          alt="Avatar Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-16 h-16 text-[#34495E]" />
+                      )}
+                      {uploadingImage && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <label className="cursor-pointer bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors">
+                          <Camera className="w-4 h-4" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                            disabled={uploadingImage}
+                          />
+                        </label>
+                      </div>
+                      {(imagePreview || editData?.avatar_url) && (
+                        <button
+                          onClick={removeImage}
+                          className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                          disabled={uploadingImage}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
                   ) : profile?.avatar_url ? (
                     <img 
                       src={profile.avatar_url} 
@@ -265,6 +378,13 @@ export default function ProfilePage() {
                     <User className="w-16 h-16 text-[#34495E]" />
                   )}
                 </div>
+                {editMode && (
+                  <div className="mt-2 text-center">
+                    <label className="text-xs text-[#FDF6ED] cursor-pointer hover:text-white transition-colors">
+                      Click to upload image
+                    </label>
+                  </div>
+                )}
               </div>
               <h2 className="text-2xl font-bold text-white mb-1">{profile?.full_name}</h2>
               <p className="text-[#FDF6ED] mb-2">{profile?.email}</p>
@@ -576,6 +696,15 @@ export default function ProfilePage() {
         listingTitle={listingToDelete?.title || 'this listing'}
         isLoading={deletingListing === listingToDelete?.id}
       />
+
+      {/* Image Cropper */}
+      {showCropper && imagePreview && (
+        <ImageCropper
+          imageSrc={imagePreview}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+        />
+      )}
     </div>
   )
 } 

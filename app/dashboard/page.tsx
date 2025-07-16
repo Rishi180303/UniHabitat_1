@@ -419,38 +419,115 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Listings Grid */}
         <Dialog open={!!selectedListing} onOpenChange={open => !open && setSelectedListing(null)}>
-          <DialogContent className="max-w-2xl w-full">
+          <DialogContent className="max-w-3xl w-full p-0">
             {selectedListing && (
               <div className="flex flex-col">
-                {/* Image(s) */}
-                <div className="w-full h-72 bg-gray-100 rounded-lg flex flex-col items-center justify-center overflow-hidden mb-4">
+                {/* Image Section */}
+                <div className="w-full h-80 bg-gray-100 rounded-t-lg flex flex-col items-center justify-center overflow-hidden">
                   {selectedListing.images && selectedListing.images.length > 0 ? (
                     <img src={selectedListing.images[0]} alt={selectedListing.title} className="w-full h-full object-cover" />
                   ) : (
                     <>
-                      <span className="text-7xl select-none">🏠</span>
-                      <span className="mt-2 text-sm text-gray-500 text-center">(No images available for this listing)</span>
+                      <span className="text-8xl select-none">🏠</span>
+                      <span className="mt-4 text-sm text-gray-500 text-center px-4">(No images available for this listing)</span>
                     </>
                   )}
                 </div>
-                <DialogHeader>
-                  <DialogTitle className="text-2xl mb-2">{selectedListing.title}</DialogTitle>
-                  <DialogDescription className="mb-2">
-                    {selectedListing.address}
-                    {selectedListing.unit_number && `, Unit ${selectedListing.unit_number}`}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#34495E] mb-2">
-                  <div><span className="font-semibold">Type:</span> {selectedListing.sublease_type}</div>
-                  <div><span className="font-semibold">Furnishing:</span> {selectedListing.furnishing}</div>
-                  <div><span className="font-semibold">Lease Type:</span> {selectedListing.lease_type}</div>
-                  <div><span className="font-semibold">Bedrooms:</span> {selectedListing.total_bedrooms} total, {selectedListing.available_bedrooms} available</div>
-                  <div><span className="font-semibold">Bathrooms:</span> {selectedListing.total_bathrooms}</div>
-                  <div><span className="font-semibold">Move-in:</span> {selectedListing.move_in_date}</div>
-                  <div><span className="font-semibold">Move-out:</span> {selectedListing.move_out_date}</div>
-                  <div><span className="font-semibold">Monthly Rent:</span> ${selectedListing.price}</div>
+
+                {/* Content Section */}
+                <div className="p-8">
+                  {/* Header */}
+                  <div className="mb-8">
+                    <DialogTitle className="text-3xl font-bold text-[#2C3E50] mb-3">
+                      {selectedListing.title}
+                    </DialogTitle>
+                    <DialogDescription className="text-lg text-[#34495E]">
+                      {selectedListing.address}
+                      {selectedListing.unit_number && `, Unit ${selectedListing.unit_number}`}
+                    </DialogDescription>
+                  </div>
+
+                  {/* Price Highlight */}
+                  <div className="bg-gradient-to-r from-[#FDF6ED] to-[#F5E6D6] rounded-2xl p-6 mb-8">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-[#34495E] mb-1">Monthly Rent</p>
+                        <p className="text-3xl font-bold text-[#2C3E50]">${selectedListing.price}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-[#34495E] mb-1">Available</p>
+                        <p className="text-lg font-semibold text-green-600">
+                          {selectedListing.available_bedrooms} of {selectedListing.total_bedrooms} bedrooms
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Property Details */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    {/* Left Column */}
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold text-[#2C3E50] mb-4 flex items-center">
+                          <Home className="w-5 h-5 mr-2 text-[#34495E]" />
+                          Property Details
+                        </h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span className="font-medium text-[#34495E]">Type</span>
+                            <span className="text-[#2C3E50] capitalize">{selectedListing.sublease_type?.replace('-', ' ')}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span className="font-medium text-[#34495E]">Furnishing</span>
+                            <span className="text-[#2C3E50] capitalize">{selectedListing.furnishing?.replace('-', ' ')}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span className="font-medium text-[#34495E]">Lease Type</span>
+                            <span className="text-[#2C3E50] capitalize">{selectedListing.lease_type?.replace('-', ' ')}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span className="font-medium text-[#34495E]">Bathrooms</span>
+                            <span className="text-[#2C3E50]">{selectedListing.total_bathrooms}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold text-[#2C3E50] mb-4 flex items-center">
+                          <Calendar className="w-5 h-5 mr-2 text-[#34495E]" />
+                          Availability
+                        </h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span className="font-medium text-[#34495E]">Move-in Date</span>
+                            <span className="text-[#2C3E50]">{selectedListing.move_in_date}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span className="font-medium text-[#34495E]">Move-out Date</span>
+                            <span className="text-[#2C3E50]">{selectedListing.move_out_date}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span className="font-medium text-[#34495E]">Available Bedrooms</span>
+                            <span className="text-[#2C3E50]">{selectedListing.available_bedrooms} of {selectedListing.total_bedrooms}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
+                    <button className="flex-1 bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#34495E] transition-colors duration-200">
+                      Contact Lister
+                    </button>
+                    <button className="flex-1 border border-[#2C3E50] text-[#2C3E50] py-3 px-6 rounded-xl font-semibold hover:bg-[#FDF6ED] transition-colors duration-200">
+                      Save to Favorites
+                    </button>
+                  </div>
                 </div>
-                {/* Add more fields if available */}
               </div>
             )}
           </DialogContent>
