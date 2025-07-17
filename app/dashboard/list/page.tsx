@@ -66,6 +66,7 @@ export default function ListUnit() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [uploadingImages, setUploadingImages] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
 
   // Prefill form in edit mode
   useEffect(() => {
@@ -120,7 +121,65 @@ export default function ListUnit() {
     setExistingImages(prev => prev.filter((_, i) => i !== index))
   }
 
+  // Validation functions for each step
+  const validateStep = (step: number): { isValid: boolean; message: string } => {
+    switch (step) {
+      case 1:
+        if (!formData.subleaseType) {
+          return { isValid: false, message: "Please select what you're subleasing" }
+        }
+        break
+      case 2:
+        if (!formData.furnishing) {
+          return { isValid: false, message: "Please select the furnishing type" }
+        }
+        break
+      case 3:
+        if (!formData.leaseType) {
+          return { isValid: false, message: "Please select the lease type" }
+        }
+        break
+      case 4:
+        if (!formData.totalBedrooms || !formData.availableBedrooms || !formData.totalBathrooms) {
+          return { isValid: false, message: "Please fill in all property details" }
+        }
+        break
+      case 5:
+        if (!formData.moveInDate || !formData.moveOutDate) {
+          return { isValid: false, message: "Please select both move-in and move-out dates" }
+        }
+        break
+      case 6:
+        if (!formData.address) {
+          return { isValid: false, message: "Please enter the property address" }
+        }
+        break
+      case 7:
+        if (!formData.monthlyRent || Number(formData.monthlyRent) <= 0) {
+          return { isValid: false, message: "Please enter a valid monthly rent amount" }
+        }
+        break
+      case 8:
+        if (formData.photos.length === 0 && existingImages.length === 0) {
+          return { isValid: false, message: "Please add at least one photo" }
+        }
+        break
+      case 9:
+        // Final step - all validations should be complete
+        return { isValid: true, message: "" }
+    }
+    return { isValid: true, message: "" }
+  }
+
   const nextStep = () => {
+    const validation = validateStep(currentStep)
+    if (!validation.isValid) {
+      setValidationError(validation.message)
+      // Clear error after 3 seconds
+      setTimeout(() => setValidationError(null), 3000)
+      return
+    }
+    setValidationError(null)
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
     }
@@ -567,8 +626,8 @@ export default function ListUnit() {
             className="space-y-6"
           >
             <div>
-              <h3 className="text-2xl font-bold text-[#2C3E50] mb-2">What's your address?</h3>
-              <p className="text-[#34495E] mb-6">Your address is private until you approve a request to chat</p>
+              <h3 className="text-2xl font-bold text-[#2C3E50] mb-2">Whats your address?</h3>
+              <p className="text-[#34495E] mb-6">Renters will see your address. You can provide your exact address or the nearest landmark for privacy.</p>
             </div>
             
             <div className="space-y-4">
@@ -585,12 +644,12 @@ export default function ListUnit() {
               </div>
 
               <div>
-                <label className="block text-lg font-semibold text-[#2C3E50] mb-3">Unit # (optional)</label>
+                <label className="block text-lg font-semibold text-[#2C3E50] mb-3">Apartment Name (optional)</label>
                 <input 
                   type="text"
                   value={formData.unitNumber}
                   onChange={(e) => handleInputChange('unitNumber', e.target.value)}
-                  placeholder="Unit, apartment, or suite number"
+                  placeholder="e.g., The Grand, Sunset View, or leave blank"
                   className="w-full p-4 rounded-2xl border-2 border-[#F5E6D6] bg-[#FDF6ED] text-[#2C3E50] font-medium focus:outline-none focus:border-[#2C3E50] transition-all duration-200"
                 />
               </div>
@@ -774,7 +833,7 @@ export default function ListUnit() {
                   <h4 className="font-semibold text-[#2C3E50] mb-3">Location & Pricing</h4>
                   <div className="space-y-2 text-[#34495E]">
                     <p><span className="font-medium">Address:</span> {formData.address}</p>
-                    {formData.unitNumber && <p><span className="font-medium">Unit:</span> {formData.unitNumber}</p>}
+                    {formData.unitNumber && <p><span className="font-medium">Apartment Name:</span> {formData.unitNumber}</p>}
                     <p><span className="font-medium">Monthly Rent:</span> ${formData.monthlyRent}</p>
                     <p><span className="font-medium">Available:</span> {formData.moveInDate} to {formData.moveOutDate}</p>
                     <p><span className="font-medium">Photos:</span> {formData.photos.length} uploaded</p>
@@ -904,6 +963,13 @@ export default function ListUnit() {
           {/* Right Side - Form Content */}
           <div className="lg:col-span-2">
             <div className="bg-[#FDF6ED]/90 backdrop-blur-sm rounded-3xl shadow-xl border border-[#F5E6D6] p-8">
+              {/* Validation Error Display */}
+              {validationError && (
+                <div className="mb-6 border border-yellow-200 rounded-xl text-yellow-800 font-medium text-center animate-pulse">
+                  ⚠️ {validationError}
+                </div>
+              )}
+              
               <AnimatePresence mode="wait">
                 {renderStepContent()}
               </AnimatePresence>

@@ -238,7 +238,10 @@ export default function Dashboard() {
 
             {/* Navigation & Profile */}
             <div className="flex items-center gap-4">
-              <button className="text-base font-medium text-[#2C3E50] hover:text-[#34495E] transition-colors">
+              <button 
+                onClick={() => router.push('/dashboard/list')}
+                className="text-base font-medium text-[#2C3E50] hover:text-[#34495E] transition-colors"
+              >
                 List your place
               </button>
               <button
