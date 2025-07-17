@@ -9,6 +9,7 @@ import { createListing, getListingById, updateListing } from '@/lib/listings'
 import { useAuth } from '@/components/auth-provider'
 import LocationSearchInput from '@/components/LocationSearchInput'
 import DatePicker from '@/components/ui/date-picker'
+import { supabase } from '@/lib/supabase'
 
 const steps = [
   { id: 1, title: "What you're subleasing", icon: Home, description: "Choose what you're offering" },
@@ -59,9 +60,12 @@ export default function ListUnit() {
     photos: [] as File[],
     video: null as File | null,
   })
+  const [existingImages, setExistingImages] = useState<string[]>([])
+  const [existingVideo, setExistingVideo] = useState<string>('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [uploadingImages, setUploadingImages] = useState(false)
 
   // Prefill form in edit mode
   useEffect(() => {
@@ -80,9 +84,12 @@ export default function ListUnit() {
             address: listing.address || '',
             unitNumber: listing.unit_number || '',
             monthlyRent: listing.price?.toString() || '',
-            photos: [], // You may want to handle existing images differently
-            video: null, // You may want to handle existing video differently
+            photos: [],
+            video: null,
           })
+          // Load existing images and video
+          setExistingImages(listing.images || [])
+          setExistingVideo(listing.video_url || '')
         }
       })
     }
@@ -109,6 +116,10 @@ export default function ListUnit() {
     setFormData(prev => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }))
   }
 
+  const removeExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index))
+  }
+
   const nextStep = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
@@ -125,7 +136,58 @@ export default function ListUnit() {
     if (!user) return
     setSubmitting(true)
     setSubmitError(null)
+    
     try {
+      // Upload images to Supabase storage
+      let imageUrls: string[] = []
+      if (formData.photos.length > 0) {
+        setUploadingImages(true)
+        const uploadPromises = formData.photos.map(async (photo, index) => {
+          const fileExt = photo.name.split('.').pop()
+          const fileName = `${user.id}-${Date.now()}-${index}.${fileExt}`
+          
+          const { data, error } = await supabase.storage
+            .from('listings')
+            .upload(fileName, photo, {
+              cacheControl: '3600',
+              upsert: false
+            })
+
+          if (error) throw error
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('listings')
+            .getPublicUrl(fileName)
+
+          return publicUrl
+        })
+
+        imageUrls = await Promise.all(uploadPromises)
+        setUploadingImages(false)
+      }
+
+      // Upload video if present
+      let videoUrl = ''
+      if (formData.video) {
+        const fileExt = formData.video.name.split('.').pop()
+        const fileName = `${user.id}-${Date.now()}-video.${fileExt}`
+        
+        const { data, error } = await supabase.storage
+          .from('listings')
+          .upload(fileName, formData.video, {
+            cacheControl: '3600',
+            upsert: false
+          })
+
+        if (error) throw error
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('listings')
+          .getPublicUrl(fileName)
+
+        videoUrl = publicUrl
+      }
+
       const listing = {
         user_id: user.id,
         title: `${formData.subleaseType === 'private-bedroom' ? 'Private Bedroom' : 'Entire Place'} near campus`,
@@ -143,10 +205,11 @@ export default function ListUnit() {
         move_in_date: formData.moveInDate,
         move_out_date: formData.moveOutDate,
         amenities: [],
-        images: [],
-        video_url: '',
+        images: editMode ? [...existingImages, ...imageUrls] : imageUrls,
+        video_url: editMode ? (videoUrl || existingVideo) : videoUrl,
         created_at: new Date().toISOString(),
       }
+      
       if (editMode && listingId) {
         // Update existing listing
         await updateListing({ ...listing, id: listingId })
@@ -161,6 +224,7 @@ export default function ListUnit() {
       console.error('DEBUG: Supabase insert/update error', err)
     } finally {
       setSubmitting(false)
+      setUploadingImages(false)
     }
   }
 
@@ -595,24 +659,63 @@ export default function ListUnit() {
                 </div>
               </div>
 
-              {formData.photos.length > 0 && (
+              {(formData.photos.length > 0 || existingImages.length > 0) && (
                 <div>
-                  <h4 className="text-lg font-semibold text-[#2C3E50] mb-3">Uploaded photos ({formData.photos.length})</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {formData.photos.map((photo, index) => (
-                      <div key={index} className="relative group">
-                        <div className="aspect-square bg-[#F5E6D6] rounded-xl flex items-center justify-center overflow-hidden">
-                          <span className="text-sm text-[#34495E] text-center px-2">{photo.name}</span>
-                        </div>
-                        <button
-                          onClick={() => removePhoto(index)}
-                          className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                        >
-                          ×
-                        </button>
+                  <h4 className="text-lg font-semibold text-[#2C3E50] mb-3">
+                    Photos ({existingImages.length + formData.photos.length})
+                  </h4>
+                  
+                  {/* Existing Images */}
+                  {existingImages.length > 0 && (
+                    <div className="mb-4">
+                      <h5 className="text-md font-medium text-[#34495E] mb-2">Existing photos</h5>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {existingImages.map((imageUrl, index) => (
+                          <div key={`existing-${index}`} className="relative group">
+                            <div className="aspect-square bg-[#F5E6D6] rounded-xl flex items-center justify-center overflow-hidden">
+                              <img 
+                                src={imageUrl} 
+                                alt={`Existing photo ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <button
+                              onClick={() => removeExistingImage(index)}
+                              className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
+
+                  {/* New Photos */}
+                  {formData.photos.length > 0 && (
+                    <div>
+                      <h5 className="text-md font-medium text-[#34495E] mb-2">New photos</h5>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {formData.photos.map((photo, index) => (
+                          <div key={`new-${index}`} className="relative group">
+                            <div className="aspect-square bg-[#F5E6D6] rounded-xl flex items-center justify-center overflow-hidden">
+                              <img 
+                                src={URL.createObjectURL(photo)} 
+                                alt={`New photo ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <button
+                              onClick={() => removePhoto(index)}
+                              className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -689,7 +792,9 @@ export default function ListUnit() {
               onClick={handlePublishListing}
               disabled={submitting}
             >
-              {submitting ? (editMode ? 'Saving...' : 'Publishing...') : (editMode ? 'Confirm Changes' : 'Publish Listing')}
+              {uploadingImages ? 'Uploading Images...' : 
+               submitting ? (editMode ? 'Saving...' : 'Publishing...') : 
+               (editMode ? 'Confirm Changes' : 'Publish Listing')}
             </Button>
           </motion.div>
         )

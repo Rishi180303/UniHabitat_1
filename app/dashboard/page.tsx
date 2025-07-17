@@ -6,7 +6,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { checkUserProfile, hasCompleteProfile } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar } from "lucide-react"
+import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import LocationSearchInput from '@/components/LocationSearchInput'
 import DatePicker from '@/components/ui/date-picker'
@@ -50,7 +50,13 @@ export default function Dashboard() {
   const [areaMatches, setAreaMatches] = useState<any[]>([])
   const [loadingListings, setLoadingListings] = useState(false)
   const [selectedListing, setSelectedListing] = useState<any | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const defaultLocationSet = useRef(false)
+
+  // Reset image index when a new listing is selected
+  useEffect(() => {
+    setCurrentImageIndex(0)
+  }, [selectedListing])
 
   useEffect(() => {
     if (!loading && !user) {
@@ -417,20 +423,51 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        
         {/* Listings Grid */}
         <Dialog open={!!selectedListing} onOpenChange={open => !open && setSelectedListing(null)}>
           <DialogContent className="max-w-3xl w-full p-0">
             {selectedListing && (
               <div className="flex flex-col">
                 {/* Image Section */}
-                <div className="w-full h-80 bg-gray-100 rounded-t-lg flex flex-col items-center justify-center overflow-hidden">
+                <div className="w-full h-80 bg-gray-100 rounded-t-lg overflow-hidden relative flex items-center justify-center">
                   {selectedListing.images && selectedListing.images.length > 0 ? (
-                    <img src={selectedListing.images[0]} alt={selectedListing.title} className="w-full h-full object-cover" />
-                  ) : (
                     <>
+                      <img
+                        src={selectedListing.images[currentImageIndex]}
+                        alt={selectedListing.title}
+                        className="w-full h-full object-contain"
+                      />
+                      {/* Left arrow */}
+                      {selectedListing.images.length > 1 && currentImageIndex > 0 && (
+                        <button
+                          onClick={() => setCurrentImageIndex(currentImageIndex - 1)}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                      )}
+                      {/* Right arrow */}
+                      {selectedListing.images.length > 1 && currentImageIndex < selectedListing.images.length - 1 && (
+                        <button
+                          onClick={() => setCurrentImageIndex(currentImageIndex + 1)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+                      )}
+                      {/* Image count badge */}
+                      {selectedListing.images.length > 1 && (
+                        <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
+                          {currentImageIndex + 1} / {selectedListing.images.length}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center">
                       <span className="text-8xl select-none">🏠</span>
                       <span className="mt-4 text-sm text-gray-500 text-center px-4">(No images available for this listing)</span>
-                    </>
+                    </div>
                   )}
                 </div>
 
