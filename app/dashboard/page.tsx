@@ -24,6 +24,7 @@ import {
   DialogClose
 } from '@/components/ui/dialog'
 import { useRef } from "react"
+import { createClient } from "@supabase/supabase-js"
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -52,6 +53,33 @@ export default function Dashboard() {
   const [selectedListing, setSelectedListing] = useState<any | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const defaultLocationSet = useRef(false)
+  const [listerEmail, setListerEmail] = useState<string | null>(null)
+
+  // Add Supabase client (client-side)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+
+  // Fetch lister email when selectedListing changes
+  useEffect(() => {
+    async function fetchListerEmail() {
+      if (selectedListing && selectedListing.user_id) {
+        const { data, error } = await supabaseClient
+          .from("profiles")
+          .select("email")
+          .eq("id", selectedListing.user_id)
+          .single()
+        if (!error && data?.email) {
+          setListerEmail(data.email)
+        } else {
+          setListerEmail(null)
+        }
+      } else {
+        setListerEmail(null)
+      }
+    }
+    fetchListerEmail()
+  }, [selectedListing])
 
   // Reset image index when a new listing is selected
   useEffect(() => {
@@ -560,12 +588,27 @@ export default function Dashboard() {
 
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
-                    <button className="flex-1 bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#34495E] transition-colors duration-200">
-                      Contact Lister
-                    </button>
-                    <button className="flex-1 border border-[#2C3E50] text-[#2C3E50] py-3 px-6 rounded-xl font-semibold hover:bg-[#FDF6ED] transition-colors duration-200">
-                      Save to Favorites
-                    </button>
+                    {listerEmail ? (
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${listerEmail}&su=${encodeURIComponent('Inquiry about your UniHabitat listing')}`}
+                        className="flex-1 bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#34495E] transition-colors duration-200 text-center"
+                        style={{ display: 'inline-block' }}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Contact Lister
+                      </a>
+                    ) : (
+                      <button
+                        className="flex-1 bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold opacity-50 cursor-not-allowed"
+                        disabled
+                      >
+                        Contact Lister
+                      </button>
+                    )}
+                    {!listerEmail && (
+                      <span className="text-xs text-red-500 mt-2">Lister email could not be fetched.</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -582,6 +625,7 @@ export default function Dashboard() {
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
                   {strictMatches.map(listing => (
                     <DialogTrigger asChild key={listing.id}>
+                      {/* Pass full listing to setSelectedListing so user_id is available */}
                       <div onClick={() => setSelectedListing(listing)}>
                         <ListingCard listing={{
                           id: listing.id,
@@ -613,6 +657,7 @@ export default function Dashboard() {
                     <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
                       {areaMatches.map(listing => (
                         <DialogTrigger asChild key={listing.id}>
+                          {/* Pass full listing to setSelectedListing so user_id is available */}
                           <div onClick={() => setSelectedListing(listing)}>
                             <ListingCard listing={{
                               id: listing.id,
