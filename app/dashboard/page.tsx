@@ -6,7 +6,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { checkUserProfile, hasCompleteProfile } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
+import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar, ChevronLeft, ChevronRight, Users } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import LocationSearchInput from '@/components/LocationSearchInput'
 import DatePicker from '@/components/ui/date-picker'
@@ -54,31 +54,35 @@ export default function Dashboard() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const defaultLocationSet = useRef(false)
   const [listerEmail, setListerEmail] = useState<string | null>(null)
+  const [listerName, setListerName] = useState<string | null>(null)
 
   // Add Supabase client (client-side)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
   const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
 
-  // Fetch lister email when selectedListing changes
+  // Fetch lister email and name when selectedListing changes
   useEffect(() => {
-    async function fetchListerEmail() {
+    async function fetchListerInfo() {
       if (selectedListing && selectedListing.user_id) {
-        const { data, error } = await supabaseClient
+        const { data, error } = await supabase
           .from("profiles")
-          .select("email")
+          .select("email, full_name")
           .eq("id", selectedListing.user_id)
           .single()
-        if (!error && data?.email) {
-          setListerEmail(data.email)
+        if (!error && data) {
+          setListerEmail(data.email || null)
+          setListerName(data.full_name || null)
         } else {
           setListerEmail(null)
+          setListerName(null)
         }
       } else {
         setListerEmail(null)
+        setListerName(null)
       }
     }
-    fetchListerEmail()
+    fetchListerInfo()
   }, [selectedListing])
 
   // Reset image index when a new listing is selected
@@ -230,6 +234,13 @@ export default function Dashboard() {
     minPrice: '',
     maxPrice: '',
   })
+
+  // Add a date formatting helper
+  const formatDatePretty = (dateString: string) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+  }
 
   // Show loading while checking profile
   if (loading || checkingProfile) {
@@ -507,7 +518,11 @@ export default function Dashboard() {
                   {/* Header */}
                   <div className="mb-8">
                     <DialogTitle className="text-3xl font-bold text-[#2C3E50] mb-3">
-                      {selectedListing.title}
+                      {listerName && selectedListing?.sublease_type ? (
+                        `${listerName}'s ${selectedListing.sublease_type === 'private-bedroom' ? 'Private Bedroom' : selectedListing.sublease_type === 'entire-place' ? 'Entire Place' : 'Unit'}`
+                      ) : (
+                        selectedListing?.title
+                      )}
                     </DialogTitle>
                     <DialogDescription className="text-lg text-[#34495E]">
                       {selectedListing.address}
@@ -542,19 +557,19 @@ export default function Dashboard() {
                         </h3>
                         <div className="space-y-3">
                           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="font-medium text-[#34495E]">Type</span>
-                            <span className="text-[#2C3E50] capitalize">{selectedListing.sublease_type?.replace('-', ' ')}</span>
+                            <span className="font-medium text-[#34495E] flex items-center"><Home className="w-4 h-4 mr-1 text-[#BFAE9B]" />Type</span>
+                            <span className="text-[#2C3E50] capitalize">{selectedListing.sublease_type === 'private-bedroom' ? 'Private Bedroom' : selectedListing.sublease_type === 'entire-place' ? 'Entire Place' : selectedListing.sublease_type}</span>
                           </div>
                           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="font-medium text-[#34495E]">Furnishing</span>
+                            <span className="font-medium text-[#34495E] flex items-center"><Bed className="w-4 h-4 mr-1 text-[#BFAE9B]" />Furnishing</span>
                             <span className="text-[#2C3E50] capitalize">{selectedListing.furnishing?.replace('-', ' ')}</span>
                           </div>
                           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="font-medium text-[#34495E]">Lease Type</span>
+                            <span className="font-medium text-[#34495E] flex items-center"><Calendar className="w-4 h-4 mr-1 text-[#BFAE9B]" />Lease Type</span>
                             <span className="text-[#2C3E50] capitalize">{selectedListing.lease_type?.replace('-', ' ')}</span>
                           </div>
                           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="font-medium text-[#34495E]">Bathrooms</span>
+                            <span className="font-medium text-[#34495E] flex items-center"><Bath className="w-4 h-4 mr-1 text-[#BFAE9B]" />Bathrooms</span>
                             <span className="text-[#2C3E50]">{selectedListing.total_bathrooms}</span>
                           </div>
                         </div>
@@ -570,15 +585,15 @@ export default function Dashboard() {
                         </h3>
                         <div className="space-y-3">
                           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="font-medium text-[#34495E]">Move-in Date</span>
-                            <span className="text-[#2C3E50]">{selectedListing.move_in_date}</span>
+                            <span className="font-medium text-[#34495E] flex items-center"><Calendar className="w-4 h-4 mr-1 text-[#BFAE9B]" />Move-in Date</span>
+                            <span className="text-[#2C3E50]">{formatDatePretty(selectedListing.move_in_date)}</span>
                           </div>
                           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="font-medium text-[#34495E]">Move-out Date</span>
-                            <span className="text-[#2C3E50]">{selectedListing.move_out_date}</span>
+                            <span className="font-medium text-[#34495E] flex items-center"><Calendar className="w-4 h-4 mr-1 text-[#BFAE9B]" />Move-out Date</span>
+                            <span className="text-[#2C3E50]">{formatDatePretty(selectedListing.move_out_date)}</span>
                           </div>
                           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="font-medium text-[#34495E]">Available Bedrooms</span>
+                            <span className="font-medium text-[#34495E] flex items-center"><Users className="w-4 h-4 mr-1 text-[#BFAE9B]" />Available Bedrooms</span>
                             <span className="text-[#2C3E50]">{selectedListing.available_bedrooms} of {selectedListing.total_bedrooms}</span>
                           </div>
                         </div>
@@ -587,20 +602,20 @@ export default function Dashboard() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
+                  <div className="flex flex-col items-center gap-4 pt-6 border-t border-gray-100">
                     {listerEmail ? (
                       <a
                         href={`https://mail.google.com/mail/?view=cm&fs=1&to=${listerEmail}&su=${encodeURIComponent('Inquiry about your UniHabitat listing')}`}
-                        className="flex-1 bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#34495E] transition-colors duration-200 text-center"
+                        className="bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#34495E] transition-colors duration-200 text-center w-60 text-lg"
                         style={{ display: 'inline-block' }}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        Contact Lister
+                        {`Contact${listerName ? ` ${listerName}` : ' Lister'}`}
                       </a>
                     ) : (
                       <button
-                        className="flex-1 bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold opacity-50 cursor-not-allowed"
+                        className="bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold opacity-50 cursor-not-allowed w-60 text-lg"
                         disabled
                       >
                         Contact Lister
