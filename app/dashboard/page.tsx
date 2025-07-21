@@ -55,6 +55,7 @@ export default function Dashboard() {
   const defaultLocationSet = useRef(false)
   const [listerEmail, setListerEmail] = useState<string | null>(null)
   const [listerName, setListerName] = useState<string | null>(null)
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null)
 
   // Add Supabase client (client-side)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
@@ -89,6 +90,25 @@ export default function Dashboard() {
   useEffect(() => {
     setCurrentImageIndex(0)
   }, [selectedListing])
+
+  // Fetch current user's name on mount
+  useEffect(() => {
+    async function fetchCurrentUserName() {
+      if (user?.id) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single()
+        if (!error && data?.full_name) {
+          setCurrentUserName(data.full_name)
+        } else {
+          setCurrentUserName(null)
+        }
+      }
+    }
+    fetchCurrentUserName()
+  }, [user])
 
   useEffect(() => {
     if (!loading && !user) {
@@ -241,6 +261,14 @@ export default function Dashboard() {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
   }
+
+  // Generate the email body template
+  const emailBody = encodeURIComponent(
+    `Hi${listerName ? ` ${listerName}` : ''},\n\n` +
+    `My name is ${currentUserName || 'a UniHabitat user'} and I found your listing on UniHabitat. I’m interested in your ${selectedListing?.sublease_type === 'private-bedroom' ? 'Private Bedroom' : selectedListing?.sublease_type === 'entire-place' ? 'Entire Place' : 'unit'} available from ${formatDatePretty(selectedListing?.move_in_date)} to ${formatDatePretty(selectedListing?.move_out_date)}.\n\n` +
+    `Could you please share more details or let me know if it’s still available?\n\n` +
+    `Thank you!\n${currentUserName || ''}`
+  )
 
   // Show loading while checking profile
   if (loading || checkingProfile) {
@@ -605,7 +633,7 @@ export default function Dashboard() {
                   <div className="flex flex-col items-center gap-4 pt-6 border-t border-gray-100">
                     {listerEmail ? (
                       <a
-                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${listerEmail}&su=${encodeURIComponent('Inquiry about your UniHabitat listing')}`}
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${listerEmail}&su=${encodeURIComponent('Inquiry about your UniHabitat listing')}&body=${emailBody}`}
                         className="bg-[#2C3E50] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#34495E] transition-colors duration-200 text-center w-60 text-lg"
                         style={{ display: 'inline-block' }}
                         target="_blank"
