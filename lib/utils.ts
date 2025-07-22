@@ -6,6 +6,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Admin configuration
+const ADMIN_EMAIL = 'unihabitat1@gmail.com'
+
+export function isAdminUser(email: string | undefined | null): boolean {
+  return email === ADMIN_EMAIL
+}
+
 export async function checkUserProfile(userId: string) {
   try {
     const { data, error } = await supabase

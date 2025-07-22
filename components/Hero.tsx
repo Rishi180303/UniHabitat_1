@@ -8,6 +8,7 @@ import { useState, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { useAuth } from "./auth-provider"
 import { supabase } from "@/lib/supabase"
+import { isAdminUser } from "@/lib/utils"
 import Image from "next/image"
 
 export default function Hero() {
@@ -24,8 +25,12 @@ export default function Hero() {
   const handleOpenAuthModal = async () => {
     // Check if user is already logged in
     if (user) {
-      // If logged in, redirect to dashboard
-      window.location.href = '/dashboard'
+      // If logged in, redirect to appropriate dashboard
+      if (isAdminUser(user.email)) {
+        window.location.href = '/admin'
+      } else {
+        window.location.href = '/dashboard'
+      }
       return
     }
 
@@ -97,7 +102,11 @@ export default function Hero() {
               className="bg-white text-[#2C3E50] border-[#2C3E50]/20 hover:bg-[#FDF6ED] hover:text-[#34495E] transition-all duration-300 text-lg px-8 py-4"
               onClick={() => {
                 if (user) {
-                  window.location.href = '/dashboard/list'
+                  if (isAdminUser(user.email)) {
+                    window.location.href = '/admin'
+                  } else {
+                    window.location.href = '/dashboard/list'
+                  }
                 } else {
                   setAuthMode('signup')
                   setIsAuthModalOpen(true)

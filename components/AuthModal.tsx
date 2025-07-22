@@ -8,6 +8,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "./auth-provider"
 import { useRouter } from "next/navigation"
+import { isAdminUser } from "@/lib/utils"
 
 interface AuthModalProps {
   isOpen: boolean
@@ -156,7 +157,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         })
         setTimeout(() => {
           onClose()
-          router.push('/dashboard')
+          // Check if admin user and redirect accordingly
+          if (isAdminUser(email)) {
+            router.push('/admin')
+          } else {
+            router.push('/dashboard')
+          }
         }, 1500)
       }
     } catch (error: any) {
@@ -254,6 +260,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         setTimeout(() => {
           // Check if user has completed profile setup
           const checkProfile = async () => {
+            // Check if admin user and redirect accordingly
+            if (isAdminUser(email)) {
+              router.push('/admin')
+              onClose()
+              return
+            }
+
             const { data: profile } = await supabase
               .from('profiles')
               .select('*')

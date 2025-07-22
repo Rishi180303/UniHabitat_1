@@ -266,6 +266,7 @@ export default function ListUnit() {
         amenities: [],
         images: editMode ? [...existingImages, ...imageUrls] : imageUrls,
         video_url: editMode ? (videoUrl || existingVideo) : videoUrl,
+        status: editMode ? undefined : 'pending', // New listings start as pending, edits keep existing status
         created_at: new Date().toISOString(),
       }
       
@@ -844,7 +845,7 @@ export default function ListUnit() {
             </div>
 
             {submitError && <div className="text-red-600 font-medium text-center">{submitError}</div>}
-            {submitSuccess && <div className="text-green-600 font-medium text-center">Listing published! Redirecting...</div>}
+            {submitSuccess && <div className="text-green-600 font-medium text-center">{editMode ? 'Listing updated! Redirecting...' : 'Listing submitted for review! Redirecting...'}</div>}
 
             <Button 
               className="w-full bg-[#2C3E50] text-white py-4 text-lg font-semibold hover:bg-[#34495E] transition-all duration-300 shadow-lg"
@@ -852,8 +853,8 @@ export default function ListUnit() {
               disabled={submitting}
             >
               {uploadingImages ? 'Uploading Images...' : 
-               submitting ? (editMode ? 'Saving...' : 'Publishing...') : 
-               (editMode ? 'Confirm Changes' : 'Publish Listing')}
+               submitting ? (editMode ? 'Saving...' : 'Submitting...') : 
+               (editMode ? 'Confirm Changes' : 'Submit for Review')}
             </Button>
           </motion.div>
         )

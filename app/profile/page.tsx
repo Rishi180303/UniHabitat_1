@@ -63,6 +63,7 @@ export default function ProfilePage() {
 
         // Load listings
         const userListings = await getUserListings(user.id)
+        console.log('DEBUG: User listings with status:', userListings.map(l => ({ id: l.id, title: l.title, status: l.status })))
         setListings(userListings)
         setListingsLoading(false)
       }
@@ -622,6 +623,20 @@ export default function ProfilePage() {
                       >
                         <div className="flex flex-col gap-4 mb-6">
                           <h4 className="text-2xl font-bold text-[#2C3E50] mb-1">{listing.title}</h4>
+                          
+                                                     {/* Status Badge */}
+                           <span className={`inline-block mb-2 px-4 py-1 rounded-full text-base font-semibold ${
+                             listing.status === 'approved' ? 'bg-green-100 text-green-700' :
+                             listing.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                             listing.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                             'bg-blue-100 text-blue-700' // For legacy listings (null status)
+                           }`}>
+                             {listing.status === 'approved' ? '✓ Approved' :
+                              listing.status === 'pending' ? '⏳ Pending Review' :
+                              listing.status === 'rejected' ? '✗ Rejected' :
+                              '📋 Legacy (Needs Review)'}
+                           </span>
+
                           <span className={`inline-block mb-2 px-4 py-1 rounded-full text-base font-semibold ${
                             listing.sublease_type === 'private-bedroom' 
                               ? 'bg-blue-100 text-blue-700' 

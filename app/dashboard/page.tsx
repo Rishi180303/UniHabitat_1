@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
-import { checkUserProfile, hasCompleteProfile } from "@/lib/utils"
+import { checkUserProfile, hasCompleteProfile, isAdminUser } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar, ChevronLeft, ChevronRight, Users, Car, Footprints } from "lucide-react"
 import { supabase } from "@/lib/supabase"
@@ -136,6 +136,12 @@ export default function Dashboard() {
       return
     }
 
+    // Check if user is admin and redirect to admin dashboard
+    if (user && isAdminUser(user.email)) {
+      router.push('/admin')
+      return
+    }
+
     if (user && checkingProfile) {
       checkUserProfile(user.id).then((userProfile) => {
         setProfile(userProfile)
@@ -166,7 +172,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchListings = async () => {
       setLoadingListings(true)
-      let query = supabase.from('listings').select('*')
+      let query = supabase.from('listings').select('*').or('status.eq.approved,status.is.null') // Show approved and legacy listings
       let city = ''
       let state = ''
       if (location) {
