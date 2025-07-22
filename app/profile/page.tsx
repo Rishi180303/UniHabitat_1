@@ -279,7 +279,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
       {/* Header */}
-      <div className="bg-[#FDF6ED]/90 backdrop-blur-xl border-b border-[#F5E6D6] sticky top-0 z-50">
+      <div className="bg-[#FDF6ED] sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
@@ -414,7 +414,7 @@ export default function ProfilePage() {
             className="lg:w-2/3 w-full flex flex-col gap-8"
           >
             {/* Personal Information */}
-            <div className="bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] rounded-3xl shadow-xl p-8 mb-4">
+            <div className="bg-white rounded-3xl shadow-lg p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <User className="w-5 h-5 mr-2 text-blue-600" />
                 Personal Information
@@ -448,7 +448,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Academic Information */}
-            <div className="bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] rounded-3xl shadow-xl p-8 mb-4">
+            <div className="bg-white rounded-3xl shadow-lg p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <GraduationCap className="w-5 h-5 mr-2 text-emerald-600" />
                 Academic Information
@@ -523,7 +523,7 @@ export default function ProfilePage() {
             </div>
 
             {/* About Me */}
-            <div className="bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] rounded-3xl shadow-xl p-8 mb-4">
+            <div className="bg-white rounded-3xl shadow-lg p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
                 About Me
@@ -578,7 +578,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Your Listings - Full Width Section */}
-      <div className="w-full bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] py-12">
+      <div className="w-full py-12">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
             <div>
@@ -616,13 +616,18 @@ export default function ProfilePage() {
                   </div>
                 ) :
                   <div className="w-full">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-5 gap-6">
+                    <div className="grid gap-6" style={{ 
+                      gridTemplateColumns: listings.length >= 3 
+                        ? `repeat(${Math.min(listings.length, 5)}, 1fr)` 
+                        : 'repeat(auto-fit, minmax(320px, 320px))',
+                      justifyContent: listings.length < 3 ? 'flex-start' : 'stretch'
+                    }}>
                     {listings.map((listing) => (
                       <motion.div
                         key={listing.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-xl p-5 border border-[#E8D5C4] shadow-md hover:shadow-lg transition-all duration-200"
+                        className="bg-white rounded-xl p-6 border border-[#E8D5C4] shadow-md hover:shadow-lg transition-all duration-200 min-h-[320px]"
                         whileHover={{ scale: 1.03 }}
                       >
                         <div className="flex flex-col h-full">
