@@ -82,24 +82,51 @@ export default function AdminDashboard() {
   const handleApprove = async (listingId: string) => {
     setProcessingListing(listingId)
     try {
-      console.log('DEBUG: Approving listing:', listingId)
+      console.log('🔍 DEBUG: About to approve listing:', listingId)
+      
+      // First, check if the listing exists
+      const { data: existingListing, error: selectError } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('id', listingId)
+        .single()
+      
+      console.log('🔍 DEBUG: Listing exists check:', { existingListing, selectError })
+      
       const { data, error } = await supabase
         .from('listings')
         .update({ status: 'approved' })
         .eq('id', listingId)
         .select()
 
-      console.log('DEBUG: Approve update result:', { data, error })
+      console.log('🔍 DEBUG: Full update result:', { 
+        data, 
+        error, 
+        listingId,
+        dataLength: data?.length,
+        errorMessage: error?.message,
+        errorCode: error?.code
+      })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Database error:', error)
+        alert(`Database error: ${error.message}`)
+        return // Don't update local state if DB failed
+      }
 
-      // Remove from pending list
+      if (!data || data.length === 0) {
+        console.error('❌ No rows updated')
+        alert('No rows were updated - check listing ID and permissions')
+        return
+      }
+
+      // Only update local state if DB update succeeded
       setPendingListings(prev => prev.filter(listing => listing.id !== listingId))
       setSelectedListing(null)
       
       alert('Listing approved successfully!')
     } catch (error) {
-      console.error('Error approving listing:', error)
+      console.error('❌ Catch block error:', error)
       alert('Error approving listing. Please try again.')
     } finally {
       setProcessingListing(null)
@@ -109,24 +136,42 @@ export default function AdminDashboard() {
   const handleReject = async (listingId: string) => {
     setProcessingListing(listingId)
     try {
-      console.log('DEBUG: Rejecting listing:', listingId)
+      console.log('🔍 DEBUG: About to reject listing:', listingId)
+      
       const { data, error } = await supabase
         .from('listings')
         .update({ status: 'rejected' })
         .eq('id', listingId)
         .select()
 
-      console.log('DEBUG: Reject update result:', { data, error })
+      console.log('🔍 DEBUG: Full reject result:', { 
+        data, 
+        error, 
+        listingId,
+        dataLength: data?.length,
+        errorMessage: error?.message,
+        errorCode: error?.code
+      })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Database error:', error)
+        alert(`Database error: ${error.message}`)
+        return // Don't update local state if DB failed
+      }
 
-      // Remove from pending list
+      if (!data || data.length === 0) {
+        console.error('❌ No rows updated')
+        alert('No rows were updated - check listing ID and permissions')
+        return
+      }
+
+      // Only update local state if DB update succeeded
       setPendingListings(prev => prev.filter(listing => listing.id !== listingId))
       setSelectedListing(null)
       
       alert('Listing rejected successfully!')
     } catch (error) {
-      console.error('Error rejecting listing:', error)
+      console.error('❌ Catch block error:', error)
       alert('Error rejecting listing. Please try again.')
     } finally {
       setProcessingListing(null)
