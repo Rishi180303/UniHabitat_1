@@ -6,7 +6,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { checkUserProfile, hasCompleteProfile } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar, ChevronLeft, ChevronRight, Users } from "lucide-react"
+import { User, Search, Filter, Heart, MapPin, Bed, Bath, Square, Menu, Home, LogOut, X, Calendar, ChevronLeft, ChevronRight, Users, Car, Footprints } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import LocationSearchInput from '@/components/LocationSearchInput'
 import DatePicker from '@/components/ui/date-picker'
@@ -56,7 +56,8 @@ export default function Dashboard() {
   const [listerEmail, setListerEmail] = useState<string | null>(null)
   const [listerName, setListerName] = useState<string | null>(null)
   const [currentUserName, setCurrentUserName] = useState<string | null>(null)
-  const [listingDistance, setListingDistance] = useState<string | null>(null)
+  const [walkingDistance, setWalkingDistance] = useState<string | null>(null)
+  const [drivingDistance, setDrivingDistance] = useState<string | null>(null)
   const [calculatingDistance, setCalculatingDistance] = useState(false)
   const [customDistanceLocation, setCustomDistanceLocation] = useState('')
 
@@ -98,9 +99,13 @@ export default function Dashboard() {
   useEffect(() => {
     if (selectedListing && profile?.university_area) {
       setCustomDistanceLocation(profile.university_area)
+      // Clear previous results when switching listings
+      setWalkingDistance(null)
+      setDrivingDistance(null)
       calculateDistance(selectedListing.address, profile.university_area)
     } else {
-      setListingDistance(null)
+      setWalkingDistance(null)
+      setDrivingDistance(null)
       setCalculatingDistance(false)
       setCustomDistanceLocation('')
     }
@@ -270,13 +275,17 @@ export default function Dashboard() {
     maxPrice: '',
   })
 
-  // Calculate distance from listing to user's location
+  // Calculate distance from listing to user's location (both walking and driving)
   const calculateDistance = async (listingAddress: string, fromLocation: string) => {
     if (!listingAddress || !fromLocation || !window.google) return
     
     setCalculatingDistance(true)
+    // Don't clear existing results to prevent layout jump
+    
     try {
       const service = new window.google.maps.DistanceMatrixService()
+      
+      // Calculate driving distance
       service.getDistanceMatrix({
         origins: [listingAddress],
         destinations: [fromLocation],
@@ -289,18 +298,40 @@ export default function Dashboard() {
           const distance = response.rows[0].elements[0].distance?.text
           const duration = response.rows[0].elements[0].duration?.text
           if (distance && duration) {
-            setListingDistance(`${distance} (${duration} drive)`)
+            setDrivingDistance(`${distance} • ${duration}`)
           } else {
-            setListingDistance('Distance unavailable')
+            setDrivingDistance('Unavailable')
           }
         } else {
-          setListingDistance('Distance unavailable')
+          setDrivingDistance('Unavailable')
+        }
+      })
+      
+      // Calculate walking distance
+      service.getDistanceMatrix({
+        origins: [listingAddress],
+        destinations: [fromLocation],
+        travelMode: window.google.maps.TravelMode.WALKING,
+        unitSystem: window.google.maps.UnitSystem.IMPERIAL,
+      }, (response, status) => {
+        if (status === 'OK' && response?.rows?.[0]?.elements?.[0]?.status === 'OK') {
+          const distance = response.rows[0].elements[0].distance?.text
+          const duration = response.rows[0].elements[0].duration?.text
+          if (distance && duration) {
+            setWalkingDistance(`${distance} • ${duration}`)
+          } else {
+            setWalkingDistance('Unavailable')
+          }
+        } else {
+          setWalkingDistance('Unavailable')
         }
         setCalculatingDistance(false)
       })
+      
     } catch (error) {
       console.error('Distance calculation error:', error)
-      setListingDistance('Distance unavailable')
+      setWalkingDistance('Unavailable')
+      setDrivingDistance('Unavailable')
       setCalculatingDistance(false)
     }
   }
@@ -727,7 +758,7 @@ export default function Dashboard() {
                             ) : (
                               <>
                                 <MapPin className="w-4 h-4" />
-                                {listingDistance ? 'Recalculate' : 'Calculate'}
+                                {(walkingDistance || drivingDistance) ? 'Recalculate' : 'Calculate'}
                               </>
                             )}
                           </button>
@@ -735,18 +766,38 @@ export default function Dashboard() {
                       </div>
                       
                       {/* Distance Result */}
-                      {listingDistance && (
+                      {(walkingDistance || drivingDistance || calculatingDistance) && (
                         <div className="bg-white rounded-xl p-4 border border-[#E8D5C4] shadow-sm">
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <p className="text-2xl font-bold text-[#2C3E50] mb-1">{listingDistance}</p>
-                              <p className="text-sm text-[#34495E]">
+                              {calculatingDistance ? (
+                                <div className="flex items-center gap-3">
+                                  <div className="w-4 h-4 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
+                                  <span className="text-base font-medium text-[#34495E]">Calculating distance...</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-8">
+                                  {walkingDistance && (
+                                    <div className="flex items-center gap-2">
+                                      <Footprints className="w-4 h-4 text-[#34495E]" />
+                                      <span className="text-base font-medium text-[#2C3E50]">{walkingDistance}</span>
+                                    </div>
+                                  )}
+                                  {drivingDistance && (
+                                    <div className="flex items-center gap-2">
+                                      <Car className="w-4 h-4 text-[#34495E]" />
+                                      <span className="text-base font-medium text-[#2C3E50]">{drivingDistance}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              <p className="text-sm text-[#34495E] mt-1">
                                 From {customDistanceLocation.split(',')[0] || 'your location'}
                               </p>
                             </div>
                             <div className="flex-shrink-0 ml-4">
-                              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                <MapPin className="w-6 h-6 text-green-600" />
+                              <div className="w-12 h-12 bg-[#FDF6ED] rounded-xl border border-[#E8D5C4] flex items-center justify-center shadow-sm">
+                                <MapPin className="w-6 h-6 text-[#2C3E50]" />
                               </div>
                             </div>
                           </div>
