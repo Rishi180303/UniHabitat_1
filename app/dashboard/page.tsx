@@ -56,6 +56,9 @@ export default function Dashboard() {
   const [listerEmail, setListerEmail] = useState<string | null>(null)
   const [listerName, setListerName] = useState<string | null>(null)
   const [currentUserName, setCurrentUserName] = useState<string | null>(null)
+  const [listingDistance, setListingDistance] = useState<string | null>(null)
+  const [calculatingDistance, setCalculatingDistance] = useState(false)
+  const [customDistanceLocation, setCustomDistanceLocation] = useState('')
 
   // Add Supabase client (client-side)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
@@ -90,6 +93,18 @@ export default function Dashboard() {
   useEffect(() => {
     setCurrentImageIndex(0)
   }, [selectedListing])
+
+  // Set default location when listing is selected
+  useEffect(() => {
+    if (selectedListing && profile?.university_area) {
+      setCustomDistanceLocation(profile.university_area)
+      calculateDistance(selectedListing.address, profile.university_area)
+    } else {
+      setListingDistance(null)
+      setCalculatingDistance(false)
+      setCustomDistanceLocation('')
+    }
+  }, [selectedListing, profile?.university_area])
 
   // Fetch current user's name on mount
   useEffect(() => {
@@ -254,6 +269,48 @@ export default function Dashboard() {
     minPrice: '',
     maxPrice: '',
   })
+
+  // Calculate distance from listing to user's location
+  const calculateDistance = async (listingAddress: string, fromLocation: string) => {
+    if (!listingAddress || !fromLocation || !window.google) return
+    
+    setCalculatingDistance(true)
+    try {
+      const service = new window.google.maps.DistanceMatrixService()
+      service.getDistanceMatrix({
+        origins: [listingAddress],
+        destinations: [fromLocation],
+        travelMode: window.google.maps.TravelMode.DRIVING,
+        unitSystem: window.google.maps.UnitSystem.IMPERIAL,
+        avoidHighways: false,
+        avoidTolls: false,
+      }, (response, status) => {
+        if (status === 'OK' && response?.rows?.[0]?.elements?.[0]?.status === 'OK') {
+          const distance = response.rows[0].elements[0].distance?.text
+          const duration = response.rows[0].elements[0].duration?.text
+          if (distance && duration) {
+            setListingDistance(`${distance} (${duration} drive)`)
+          } else {
+            setListingDistance('Distance unavailable')
+          }
+        } else {
+          setListingDistance('Distance unavailable')
+        }
+        setCalculatingDistance(false)
+      })
+    } catch (error) {
+      console.error('Distance calculation error:', error)
+      setListingDistance('Distance unavailable')
+      setCalculatingDistance(false)
+    }
+  }
+
+  // Handle manual distance calculation
+  const handleCalculateDistance = () => {
+    if (selectedListing && customDistanceLocation.trim()) {
+      calculateDistance(selectedListing.address, customDistanceLocation.trim())
+    }
+  }
 
   // Add a date formatting helper
   const formatDatePretty = (dateString: string) => {
@@ -626,6 +683,75 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Distance Calculator Section */}
+                  <div className="bg-gradient-to-r from-[#FDF6ED] to-[#F5E6D6] rounded-2xl p-6 mb-8 border border-[#E8D5C4]">
+                    <h3 className="text-lg font-semibold text-[#2C3E50] mb-4 flex items-center">
+                      <MapPin className="w-5 h-5 mr-2 text-[#34495E]" />
+                      Calculate Distance
+                    </h3>
+                    
+                    {/* Distance Input and Calculate Button */}
+                    <div className="space-y-4">
+                      <div className="flex gap-3">
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-[#34495E] mb-2">
+                            From location (e.g., your dorm, library, workplace)
+                          </label>
+                          <LocationSearchInput
+                            value={customDistanceLocation}
+                            onSelect={(address, latLng) => {
+                              setCustomDistanceLocation(address)
+                              // Auto-calculate distance when location is selected from dropdown
+                              if (selectedListing && address.trim()) {
+                                setTimeout(() => calculateDistance(selectedListing.address, address), 100)
+                              }
+                            }}
+                            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
+                            className="px-4 py-3 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#2C3E50] focus:border-transparent bg-white text-[#2C3E50] placeholder-[#34495E]/60"
+                          />
+                        </div>
+                        <div className="flex-shrink-0 flex items-end">
+                          <button
+                            onClick={handleCalculateDistance}
+                            disabled={calculatingDistance || !customDistanceLocation.trim()}
+                            className="px-6 py-3 bg-[#2C3E50] text-white rounded-xl font-semibold hover:bg-[#34495E] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          >
+                            {calculatingDistance ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Calculating
+                              </>
+                            ) : (
+                              <>
+                                <MapPin className="w-4 h-4" />
+                                {listingDistance ? 'Recalculate' : 'Calculate'}
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Distance Result */}
+                      {listingDistance && (
+                        <div className="bg-white rounded-xl p-4 border border-[#E8D5C4] shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="text-2xl font-bold text-[#2C3E50] mb-1">{listingDistance}</p>
+                              <p className="text-sm text-[#34495E]">
+                                From {customDistanceLocation.split(',')[0] || 'your location'}
+                              </p>
+                            </div>
+                            <div className="flex-shrink-0 ml-4">
+                              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                <MapPin className="w-6 h-6 text-green-600" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
