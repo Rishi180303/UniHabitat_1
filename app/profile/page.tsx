@@ -573,26 +573,29 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Your Listings */}
-            <div className="w-full">
-              <div className="border-t border-[#E8D5C4] my-12" />
-              <div className="bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] rounded-3xl shadow-xl border border-[#F5E6D6] p-10 mb-8">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-                  <div>
-                    <h3 className="text-2xl font-extrabold text-[#2C3E50] flex items-center mb-2">
-                      <Home className="w-6 h-6 mr-2 text-orange-600" />
-                      Your Listings
-                    </h3>
-                    <p className="text-[#34495E] text-base">All the units you're currently listing for rent or sublease. Click edit to update details or add a new listing below.</p>
-                  </div>
-                  <Button
-                    onClick={() => router.push('/dashboard/list')}
-                    className="bg-[#2C3E50] text-white px-6 py-3 rounded-2xl font-semibold shadow hover:bg-[#34495E] text-lg"
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Add New Listing
-                  </Button>
-                </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Your Listings - Full Width Section */}
+      <div className="w-full bg-gradient-to-br from-[#FDF6ED] to-[#F5E6D6] py-12">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+            <div>
+              <h3 className="text-3xl font-extrabold text-[#2C3E50] flex items-center mb-2">
+                <Home className="w-7 h-7 mr-3 text-orange-600" />
+                Your Listings
+              </h3>
+              <p className="text-[#34495E] text-lg">All the units you're currently listing for rent or sublease. Click edit to update details or add a new listing below.</p>
+            </div>
+            <Button
+              onClick={() => router.push('/dashboard/list')}
+              className="bg-[#2C3E50] text-white px-8 py-4 rounded-2xl font-semibold shadow hover:bg-[#34495E] text-xl"
+            >
+              <Plus className="w-6 h-6 mr-2" />
+              Add New Listing
+            </Button>
+          </div>
                 {listingsLoading ? (
                   <div className="flex items-center justify-center py-16">
                     <div className="w-8 h-8 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
@@ -612,94 +615,82 @@ export default function ProfilePage() {
                     </Button>
                   </div>
                 ) :
-                  <div className="w-full flex flex-wrap justify-center gap-10">
+                  <div className="w-full">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-5 gap-6">
                     {listings.map((listing) => (
                       <motion.div
                         key={listing.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white min-w-[320px] max-w-[400px] w-full rounded-2xl p-8 border border-[#F5E6D6] shadow-lg hover:shadow-2xl transition-all duration-200 flex flex-col justify-between"
-                        whileHover={{ scale: 1.02 }}
+                        className="bg-white rounded-xl p-5 border border-[#E8D5C4] shadow-md hover:shadow-lg transition-all duration-200"
+                        whileHover={{ scale: 1.03 }}
                       >
-                        <div className="flex flex-col gap-4 mb-6">
-                          <h4 className="text-2xl font-bold text-[#2C3E50] mb-1">{listing.title}</h4>
+                        <div className="flex flex-col h-full">
+                          <h4 className="text-sm font-bold text-[#2C3E50] mb-3 line-clamp-2 leading-tight">{listing.title}</h4>
                           
-                                                     {/* Status Badge */}
-                           <span className={`inline-block mb-2 px-4 py-1 rounded-full text-base font-semibold ${
-                             listing.status === 'approved' ? 'bg-green-100 text-green-700' :
-                             listing.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                             'bg-red-100 text-red-700'
-                           }`}>
-                             {listing.status === 'approved' ? '✓ Approved' :
-                              listing.status === 'pending' ? '⏳ Pending Review' :
-                              '✗ Rejected'}
-                           </span>
+                          <div className="flex flex-col gap-2 mb-4">
+                            <span className={`px-3 py-1.5 rounded-lg text-xs font-medium text-center ${
+                              listing.status === 'approved' ? 'bg-green-100 text-green-700' :
+                              listing.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                              'bg-red-100 text-red-700'
+                            }`}>
+                              {listing.status === 'approved' ? 'Approved' :
+                               listing.status === 'pending' ? 'Pending' :
+                               'Rejected'}
+                            </span>
+                            <span className={`px-3 py-1.5 rounded-lg text-xs font-medium text-center ${
+                              listing.sublease_type === 'private-bedroom' 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : 'bg-purple-100 text-purple-700'
+                            }`}>
+                              {listing.sublease_type === 'private-bedroom' ? 'Private Room' : 'Entire Place'}
+                            </span>
+                          </div>
 
-                          <span className={`inline-block mb-2 px-4 py-1 rounded-full text-base font-semibold ${
-                            listing.sublease_type === 'private-bedroom' 
-                              ? 'bg-blue-100 text-blue-700' 
-                              : 'bg-green-100 text-green-700'
-                          }`}>
-                            {listing.sublease_type === 'private-bedroom' ? 'Private Bedroom' : 'Entire Place'}
-                          </span>
-                          <div className="flex items-center gap-2 text-[#34495E] text-lg">
-                            <MapPin className="w-5 h-5" />
-                            <span>{listing.address}</span>
+                          <div className="flex items-center gap-2 mb-3">
+                            <DollarSign className="w-4 h-4 text-green-600" />
+                            <span className="text-base font-bold text-green-700">${listing.price}/month</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[#34495E] text-xl font-bold">
-                            <DollarSign className="w-5 h-5" />
-                            <span>${listing.price}/month</span>
+                          
+                          <div className="flex items-start gap-2 mb-3">
+                            <MapPin className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-xs text-gray-600 line-clamp-2 leading-relaxed">{listing.address}</span>
                           </div>
-                          <div className="flex items-center gap-6 text-[#34495E] text-base mt-2">
-                            <div className="flex items-center gap-2">
-                              <Bed className="w-5 h-5" />
-                              <span>{listing.total_bedrooms} bed</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Bath className="w-5 h-5" />
-                              <span>{listing.total_bathrooms} bath</span>
-                            </div>
+                          
+                          <div className="flex gap-4 text-sm text-gray-600 mb-4">
+                            <span>{listing.total_bedrooms} bed</span>
+                            <span>{listing.total_bathrooms} bath</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[#34495E] text-base mt-2">
-                            <Calendar className="w-5 h-5" />
-                            <span>Available: {listing.move_in_date} - {listing.move_out_date}</span>
+                          
+                          <div className="flex gap-2 mt-auto">
+                            <Button
+                              size="sm"
+                              className="bg-[#2C3E50] text-white text-sm rounded-lg flex-1 py-2 hover:bg-[#34495E]"
+                              onClick={() => router.push(`/dashboard/list?edit=1&listingId=${listing.id}`)}
+                            >
+                              <Edit3 className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-red-200 text-red-600 hover:bg-red-50 text-sm rounded-lg flex-1 py-2"
+                              onClick={() => handleDeleteListing(listing.id)}
+                              disabled={deletingListing === listing.id}
+                            >
+                              {deletingListing === listing.id ? (
+                                <div className="w-4 h-4 border border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                            </Button>
                           </div>
-                          <div className="flex items-center gap-2 text-[#34495E] text-base mt-2">
-                            <Clock className="w-5 h-5" />
-                            <span>Created: {new Date(listing.created_at).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-3 mt-auto w-full">
-                          <Button
-                            size="lg"
-                            className="bg-[#2C3E50] text-white text-lg font-semibold rounded-2xl shadow w-full py-4 hover:bg-[#34495E] flex items-center justify-center"
-                            onClick={() => router.push(`/dashboard/list?edit=1&listingId=${listing.id}`)}
-                          >
-                            <Edit3 className="w-5 h-5 mr-2" />
-                            Edit Listing
-                          </Button>
-                          <Button
-                            size="lg"
-                            variant="outline"
-                            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-2xl font-semibold shadow w-full py-4 flex items-center justify-center"
-                            onClick={() => handleDeleteListing(listing.id)}
-                            disabled={deletingListing === listing.id}
-                          >
-                            {deletingListing === listing.id ? (
-                              <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                            ) : (
-                              <Trash2 className="w-5 h-5 mr-2" />
-                            )}
-                            {deletingListing === listing.id ? 'Deleting...' : 'Delete Listing'}
-                          </Button>
                         </div>
                       </motion.div>
                     ))}
+                    </div>
                   </div>
                 }
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
       <DeleteConfirmationDialog
