@@ -62,7 +62,7 @@ export default function AdminDashboard() {
               university
             )
           `)
-          .or('status.eq.pending,status.is.null') // Include pending and existing listings (null status)
+          .eq('status', 'pending')
           .order('created_at', { ascending: false })
 
         if (error) throw error
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
             Listings Requiring Review ({pendingListings.length})
           </h2>
           <p className="text-[#34495E]">
-            Review new submissions and legacy listings. Legacy listings are pre-existing listings that need approval.
+            Review new listing submissions from students before they go live on the platform.
           </p>
         </div>
 
@@ -226,10 +226,8 @@ export default function AdminDashboard() {
                       <Home className="w-12 h-12 text-gray-400" />
                     </div>
                   )}
-                                     <div className={`absolute top-2 right-2 text-white px-2 py-1 rounded-full text-xs font-semibold ${
-                     listing.status === 'pending' ? 'bg-orange-500' : 'bg-blue-500'
-                   }`}>
-                     {listing.status === 'pending' ? 'PENDING' : 'LEGACY'}
+                                     <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                     PENDING
                    </div>
                 </div>
 

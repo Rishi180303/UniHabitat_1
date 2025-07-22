@@ -172,7 +172,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchListings = async () => {
       setLoadingListings(true)
-      let query = supabase.from('listings').select('*').or('status.eq.approved,status.is.null') // Show approved and legacy listings
+      let query = supabase.from('listings').select('*').eq('status', 'approved') // Show only approved listings
       let city = ''
       let state = ''
       if (location) {

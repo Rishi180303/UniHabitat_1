@@ -628,13 +628,11 @@ export default function ProfilePage() {
                            <span className={`inline-block mb-2 px-4 py-1 rounded-full text-base font-semibold ${
                              listing.status === 'approved' ? 'bg-green-100 text-green-700' :
                              listing.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                             listing.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                             'bg-blue-100 text-blue-700' // For legacy listings (null status)
+                             'bg-red-100 text-red-700'
                            }`}>
                              {listing.status === 'approved' ? '✓ Approved' :
                               listing.status === 'pending' ? '⏳ Pending Review' :
-                              listing.status === 'rejected' ? '✗ Rejected' :
-                              '📋 Legacy (Needs Review)'}
+                              '✗ Rejected'}
                            </span>
 
                           <span className={`inline-block mb-2 px-4 py-1 rounded-full text-base font-semibold ${
