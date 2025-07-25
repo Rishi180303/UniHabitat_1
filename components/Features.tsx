@@ -27,18 +27,18 @@ export default function Features() {
   const listersSteps = [
     {
       title: "Create Your Listing",
-      description: "Post your room or apartment in minutes with our simple form. Include photos, pricing, and availability details to attract tenants.",
+      description: "Post your room or apartment in minutes with our simple form. Include photos, pricing, and availability details. Your listing will be submitted for review to ensure safety.",
       emoji: "📝"
     },
     {
-      title: "Manage Your Listings",
-      description: "Edit, update, or remove your listings anytime from your profile dashboard. Keep your property information current.",
-      emoji: "⚙️"
+      title: "Admin Review & Approval",
+      description: "Our team personally reviews every listing to verify legitimacy and prevent scams. This keeps our platform safe and trustworthy for all students.",
+      emoji: "🛡️"
     },
     {
-      title: "Handle Inquiries",
-      description: "Respond to student inquiries through your provided contact information. Schedule viewings and finalize agreements directly.",
-      emoji: "💬"
+      title: "Go Live & Connect",
+      description: "Once approved, your listing goes live for students to discover. Manage your listings and respond to inquiries directly through provided contact info.",
+      emoji: "✨"
     }
   ]
 
