@@ -63,7 +63,7 @@ export default function ProfilePage() {
 
         // Load listings
         const userListings = await getUserListings(user.id)
-        console.log('DEBUG: User listings with status:', userListings.map(l => ({ id: l.id, title: l.title, status: l.status })))
+    
         setListings(userListings)
         setListingsLoading(false)
       }

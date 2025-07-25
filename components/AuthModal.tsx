@@ -57,15 +57,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
     setIsLoading(true)
     setMessage(null)
 
-    console.log('Auth Debug - Starting authentication:', {
-      mode,
-      email,
-      timestamp: new Date().toISOString(),
-      url: window.location.href,
-      origin: window.location.origin,
-      hostname: window.location.hostname,
-      port: window.location.port
-    })
+
 
     try {
       let result: any = null
@@ -105,15 +97,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
           }
         })
 
-        console.log('Signup OTP result:', {
-          error: result.error ? {
-            message: result.error.message,
-            status: result.error.status,
-            name: result.error.name
-          } : null,
-          success: !result.error,
-          timestamp: new Date().toISOString()
-        })
+
       } else if (mode === 'signin') {
         // For signin, use password authentication
         if (!password) {
@@ -130,15 +114,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         throw new Error('Authentication failed - no response received')
       }
 
-      console.log('Auth Debug - Response:', {
-        error: result.error ? {
-          message: result.error.message,
-          status: result.error.status,
-          name: result.error.name
-        } : null,
-        data: result.data ? 'present' : 'missing',
-        timestamp: new Date().toISOString()
-      })
+
 
       if (result.error) {
         throw result.error
@@ -166,25 +142,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
         }, 1500)
       }
     } catch (error: any) {
-      console.error('Auth Debug - Error details:', {
-        error: {
-          message: error.message,
-          status: error.status,
-          name: error.name,
-          stack: error.stack
-        },
-        timestamp: new Date().toISOString()
-      })
 
-      // Handle specific error cases - log the exact error message
-      console.log('Error message analysis:', {
-        message: error.message,
-        includesAlready: error.message.includes('already'),
-        includesRegistered: error.message.includes('registered'),
-        includesExists: error.message.includes('exists'),
-        includesUser: error.message.includes('user'),
-        fullMessage: error.message
-      })
 
       // Handle specific error cases
       if (error.message.includes('already registered') || 
@@ -239,17 +197,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'signin' }: A
       } else {
         // After successful OTP verification, update the user's password
         if (password) {
-          console.log('Updating user password after OTP verification...')
           const { error: updateError } = await supabase.auth.updateUser({
             password: password
           })
           
           if (updateError) {
-            console.error('Password update error:', updateError)
             // Don't fail the whole process if password update fails
             // The user can still access their account
-          } else {
-            console.log('Password updated successfully')
+            console.error('Password update error:', updateError)
           }
         }
 

@@ -269,7 +269,7 @@ export default function Dashboard() {
   }
 
   const handleFilterChange = (newFilter: FilterState) => setFilterState(newFilter)
-  const handleFilterApply = () => {/* TODO: implement filter logic */}
+  const handleFilterApply = () => {}
   const handleFilterClear = () => setFilterState({
     subleaseType: '',
     furnishing: '',

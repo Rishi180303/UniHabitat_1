@@ -82,40 +82,19 @@ export default function AdminDashboard() {
   const handleApprove = async (listingId: string) => {
     setProcessingListing(listingId)
     try {
-      console.log('🔍 DEBUG: About to approve listing:', listingId)
-      
-      // First, check if the listing exists
-      const { data: existingListing, error: selectError } = await supabase
-        .from('listings')
-        .select('*')
-        .eq('id', listingId)
-        .single()
-      
-      console.log('🔍 DEBUG: Listing exists check:', { existingListing, selectError })
-      
       const { data, error } = await supabase
         .from('listings')
         .update({ status: 'approved' })
         .eq('id', listingId)
         .select()
 
-      console.log('🔍 DEBUG: Full update result:', { 
-        data, 
-        error, 
-        listingId,
-        dataLength: data?.length,
-        errorMessage: error?.message,
-        errorCode: error?.code
-      })
-
       if (error) {
-        console.error('❌ Database error:', error)
+        console.error('Database error:', error)
         alert(`Database error: ${error.message}`)
-        return // Don't update local state if DB failed
+        return
       }
 
       if (!data || data.length === 0) {
-        console.error('❌ No rows updated')
         alert('No rows were updated - check listing ID and permissions')
         return
       }
@@ -126,7 +105,7 @@ export default function AdminDashboard() {
       
       alert('Listing approved successfully!')
     } catch (error) {
-      console.error('❌ Catch block error:', error)
+      console.error('Error approving listing:', error)
       alert('Error approving listing. Please try again.')
     } finally {
       setProcessingListing(null)
@@ -136,31 +115,19 @@ export default function AdminDashboard() {
   const handleReject = async (listingId: string) => {
     setProcessingListing(listingId)
     try {
-      console.log('🔍 DEBUG: About to reject listing:', listingId)
-      
       const { data, error } = await supabase
         .from('listings')
         .update({ status: 'rejected' })
         .eq('id', listingId)
         .select()
 
-      console.log('🔍 DEBUG: Full reject result:', { 
-        data, 
-        error, 
-        listingId,
-        dataLength: data?.length,
-        errorMessage: error?.message,
-        errorCode: error?.code
-      })
-
       if (error) {
-        console.error('❌ Database error:', error)
+        console.error('Database error:', error)
         alert(`Database error: ${error.message}`)
-        return // Don't update local state if DB failed
+        return
       }
 
       if (!data || data.length === 0) {
-        console.error('❌ No rows updated')
         alert('No rows were updated - check listing ID and permissions')
         return
       }
@@ -171,7 +138,7 @@ export default function AdminDashboard() {
       
       alert('Listing rejected successfully!')
     } catch (error) {
-      console.error('❌ Catch block error:', error)
+      console.error('Error rejecting listing:', error)
       alert('Error rejecting listing. Please try again.')
     } finally {
       setProcessingListing(null)

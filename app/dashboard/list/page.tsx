@@ -281,7 +281,7 @@ export default function ListUnit() {
       setTimeout(() => router.push('/dashboard'), 1500)
     } catch (err: any) {
       setSubmitError(err.message || 'Failed to save listing')
-      console.error('DEBUG: Supabase insert/update error', err)
+      console.error('Error saving listing:', err)
     } finally {
       setSubmitting(false)
       setUploadingImages(false)
