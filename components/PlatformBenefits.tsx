@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { MapPin, GraduationCap, Shield, Camera, Search, Eye } from "lucide-react"
+import { MapPin, GraduationCap, Shield, Search, MessageCircle, Users } from "lucide-react"
 import { useAuth } from "./auth-provider"
 import { useState } from "react"
 import AuthModal from "./AuthModal"
@@ -7,57 +7,59 @@ import AuthModal from "./AuthModal"
 const benefits = [
   {
     icon: <GraduationCap className="w-8 h-8" />,
-    title: "Students Only Platform",
-    subtitle: "Verified .edu email required",
-    description: "Only verified university students can join using their .edu email address, ensuring a trusted community of peers.",
+    title: "Students Only",
+    subtitle: "Real students, real trust",
+    description: "You need a .edu email to join, so everyone here is actually a student like you. No sketchy randos or fake accounts.",
     color: "from-blue-50 to-indigo-50",
     iconColor: "text-blue-600",
     bgColor: "bg-blue-50"
   },
   {
     icon: <Shield className="w-8 h-8" />,
-    title: "Admin-Approved Listings",
-    subtitle: "Every listing personally reviewed",
-    description: "Our team manually reviews and approves every listing before it goes live, preventing scams and ensuring quality.",
+    title: "We Review Every Listing",
+    subtitle: "Zero tolerance for scams",
+    description: "We personally check every single listing before it goes live. If something looks off, it doesn't make it to the site.",
     color: "from-green-50 to-emerald-50",
     iconColor: "text-green-600",
     bgColor: "bg-green-50"
   },
   {
     icon: <MapPin className="w-8 h-8" />,
-    title: "Smart Distance Calculator",
-    subtitle: "Google Maps integration",
-    description: "Calculate exact walking and driving distances from any listing to your university, dorm, or any custom location.",
+    title: "Distance Calculator",
+    subtitle: "Know before you go",
+    description: "See exactly how far a place is from campus, your dorm, or anywhere else. Walking time, driving time - we got you covered.",
     color: "from-purple-50 to-violet-50",
     iconColor: "text-purple-600",
     bgColor: "bg-purple-50"
   },
   {
     icon: <Search className="w-8 h-8" />,
-    title: "Intelligent Search",
-    subtitle: "Smart matching algorithm",
-    description: "Advanced filtering with 'strict matches' for your exact criteria and 'area matches' for nearby alternatives.",
+    title: "Smart Search",
+    subtitle: "Find exactly what you need",
+    description: "Get perfect matches for your criteria, plus backup options in your area. No more scrolling through irrelevant listings.",
     color: "from-amber-50 to-orange-50",
     iconColor: "text-amber-600",
     bgColor: "bg-amber-50"
   },
   {
-    icon: <Camera className="w-8 h-8" />,
-    title: "Rich Media Support",
-    subtitle: "Photos & video tours",
-    description: "Upload multiple high-quality photos and video walkthroughs to showcase your space with cloud storage.",
-    color: "from-pink-50 to-rose-50",
-    iconColor: "text-pink-600",
-    bgColor: "bg-pink-50"
+    icon: <MessageCircle className="w-8 h-8" />,
+    title: "Direct Messaging",
+    subtitle: "Coming soon",
+    description: "Chat directly with other students without sharing your personal info until you're ready. Keep conversations organized and safe.",
+    color: "from-emerald-50 to-teal-50",
+    iconColor: "text-emerald-600",
+    bgColor: "bg-emerald-50",
+    comingSoon: true
   },
   {
-    icon: <Eye className="w-8 h-8" />,
-    title: "Privacy Protection",
-    subtitle: "Your listings stay private",
-    description: "Automatically hide your own listings from your search results, ensuring a clean browsing experience.",
-    color: "from-teal-50 to-cyan-50",
-    iconColor: "text-teal-600",
-    bgColor: "bg-teal-50"
+    icon: <Users className="w-8 h-8" />,
+    title: "Roommate Matching",
+    subtitle: "Coming soon", 
+    description: "Find compatible roommates based on your lifestyle, study habits, and living preferences. No more living with strangers.",
+    color: "from-pink-50 to-rose-50",
+    iconColor: "text-pink-600",
+    bgColor: "bg-pink-50",
+    comingSoon: true
   }
 ]
 
@@ -93,10 +95,10 @@ export default function PlatformBenefits() {
           className="text-center mb-20"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-6">
-            Why Students Choose UniHabitat
+            Why You Should Choose UniHabitat
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We've reimagined student housing to be as simple and trustworthy as it should be
+            Student housing made simple, safe, and trustworthy
           </p>
         </motion.div>
 
@@ -132,7 +134,17 @@ export default function PlatformBenefits() {
                     {benefit.subtitle}
                   </p>
                   <p className="text-gray-600 leading-relaxed flex-1">
-                    {benefit.description}
+                    {benefit.comingSoon ? (
+                      <>
+                        <span className="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold mb-2">
+                          🚀 Coming Soon
+                        </span>
+                        <br />
+                        {benefit.description}
+                      </>
+                    ) : (
+                      benefit.description
+                    )}
                   </p>
                 </div>
 
