@@ -412,7 +412,7 @@ export default function Dashboard() {
                 {profile?.avatar_url ? (
                   <Image src={profile.avatar_url} alt="Profile" width={32} height={32} className="rounded-full object-cover" />
                 ) : (
-                  <Menu className="w-6 h-6 text-[#2C3E50]" />
+                  <User className="w-7 h-7 text-[#2C3E50]" />
                 )}
               </button>
             </div>

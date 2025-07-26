@@ -13,7 +13,7 @@ import {
   GraduationCap, 
   Calendar, 
   Edit3, 
-  ArrowLeft, 
+  ArrowLeft,
   Camera,
   MapPin,
   BookOpen,
@@ -31,6 +31,7 @@ import {
   Settings,
   Heart
 } from 'lucide-react'
+import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import UniversitySearch from '@/components/UniversitySearch'
 import LocationSearchInput from '@/components/LocationSearchInput'
@@ -282,10 +283,10 @@ export default function ProfilePage() {
     return null
   }
 
-  return (
+    return (
     <div className="min-h-screen bg-[#FDF6ED]">
-            {/* Header */}
-      <div className="bg-[#FDF6ED] sticky top-0 z-50">
+      {/* Fixed Header with Navigation */}
+      <div className="fixed top-0 left-0 right-0 bg-[#FDF6ED] z-50 border-b border-[#F5E6D6]/30">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <button
@@ -300,11 +301,129 @@ export default function ProfilePage() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow hover:bg-[#F5E6D6] transition-all"
             >
-              <Menu className="w-6 h-6 text-[#2C3E50]" />
+              {profile?.avatar_url ? (
+                <Image src={profile.avatar_url} alt="Profile" width={32} height={32} className="rounded-full object-cover" />
+              ) : (
+                <User className="w-7 h-7 text-[#2C3E50]" />
+              )}
             </button>
           </div>
         </div>
+        
+        {/* Navigation Tabs inside Header */}
+        <div className="flex justify-center pb-6">
+          <div className="bg-white rounded-3xl shadow-lg p-4 w-fit">
+            {/* Desktop Tab Navigation */}
+            <nav className="hidden lg:block">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveSection('profile')}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
+                    activeSection === 'profile'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                  }`}
+                >
+                  <User className="w-5 h-5" />
+                  <span className="font-medium">My Profile</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveSection('preferences')}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
+                    activeSection === 'preferences'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                  }`}
+                >
+                  <Settings className="w-5 h-5" />
+                  <span className="font-medium">Preferences</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveSection('listings')}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
+                    activeSection === 'listings'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                  }`}
+                >
+                  <Home className="w-5 h-5" />
+                  <span className="font-medium">My Listings</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveSection('favourites')}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
+                    activeSection === 'favourites'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                  }`}
+                >
+                  <Heart className="w-5 h-5" />
+                  <span className="font-medium">Favourites</span>
+                </button>
+              </div>
+            </nav>
+
+            {/* Mobile Tab Navigation */}
+            <div className="lg:hidden">
+              <div className="grid grid-cols-2 gap-2 w-80">
+                <button
+                  onClick={() => setActiveSection('profile')}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
+                    activeSection === 'profile'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
+                  }`}
+                >
+                  <User className="w-5 h-5" />
+                  <span className="text-sm font-medium">Profile</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveSection('preferences')}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
+                    activeSection === 'preferences'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
+                  }`}
+                >
+                  <Settings className="w-5 h-5" />
+                  <span className="text-sm font-medium">Preferences</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveSection('listings')}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
+                    activeSection === 'listings'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
+                  }`}
+                >
+                  <Home className="w-5 h-5" />
+                  <span className="text-sm font-medium">Listings</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveSection('favourites')}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
+                    activeSection === 'favourites'
+                      ? 'bg-[#2C3E50] text-white shadow-lg'
+                      : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
+                  }`}
+                >
+                  <Heart className="w-5 h-5" />
+                  <span className="text-sm font-medium">Favourites</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Content with top padding to account for expanded fixed header */}
+      <div className="pt-44">
 
             {/* Hamburger Menu Overlay */}
       {isMenuOpen && (
@@ -371,128 +490,11 @@ export default function ProfilePage() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 lg:px-8 py-6 lg:py-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+                  <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
-          {/* Page Title */}
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-2">My Profile</h1>
-            <p className="text-[#34495E] text-base md:text-lg">Manage your account and personal information</p>
-          </div>
-
-          {/* Navigation Tabs */}
-          <div className="flex justify-center mb-8">
-            <div className="bg-white rounded-3xl shadow-lg p-4 w-fit">
-              {/* Desktop Tab Navigation */}
-              <nav className="hidden lg:block">
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setActiveSection('profile')}
-                    className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
-                      activeSection === 'profile'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
-                    }`}
-                  >
-                    <User className="w-5 h-5" />
-                    <span className="font-medium">My Profile</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('preferences')}
-                    className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
-                      activeSection === 'preferences'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
-                    }`}
-                  >
-                    <Settings className="w-5 h-5" />
-                    <span className="font-medium">Preferences</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('listings')}
-                    className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
-                      activeSection === 'listings'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
-                    }`}
-                  >
-                    <Home className="w-5 h-5" />
-                    <span className="font-medium">My Listings</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('favourites')}
-                    className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-left transition-all duration-300 ${
-                      activeSection === 'favourites'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
-                    }`}
-                  >
-                    <Heart className="w-5 h-5" />
-                    <span className="font-medium">Favourites</span>
-                  </button>
-                </div>
-              </nav>
-
-              {/* Mobile Tab Navigation */}
-              <div className="lg:hidden">
-                <div className="grid grid-cols-2 gap-2 w-80">
-                  <button
-                    onClick={() => setActiveSection('profile')}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
-                      activeSection === 'profile'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
-                    }`}
-                  >
-                    <User className="w-5 h-5" />
-                    <span className="text-sm font-medium">Profile</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('preferences')}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
-                      activeSection === 'preferences'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
-                    }`}
-                  >
-                    <Settings className="w-5 h-5" />
-                    <span className="text-sm font-medium">Preferences</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('listings')}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
-                      activeSection === 'listings'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
-                    }`}
-                  >
-                    <Home className="w-5 h-5" />
-                    <span className="text-sm font-medium">Listings</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('favourites')}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
-                      activeSection === 'favourites'
-                        ? 'bg-[#2C3E50] text-white shadow-lg'
-                        : 'text-[#2C3E50] hover:bg-[#FDF6ED]'
-                    }`}
-                  >
-                    <Heart className="w-5 h-5" />
-                    <span className="text-sm font-medium">Favourites</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Content Area */}
           <div className="w-full min-h-[600px]">
               <motion.div
@@ -932,6 +934,7 @@ export default function ProfilePage() {
           onCancel={handleCropCancel}
         />
       )}
+      </div>
     </div>
   )
 } 
