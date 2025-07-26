@@ -55,76 +55,107 @@ export default function Features() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-6">
             How UniHabitat Works
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12">
             A simple, safe, and modern way to find student housing
           </p>
 
-          {/* Toggle Button */}
+          {/* Modern Toggle Selector */}
           <div className="flex justify-center">
-            <div className="bg-white/50 p-1 rounded-full shadow-sm">
+            <div className="relative bg-white p-2 rounded-2xl shadow-lg border border-gray-100 inline-flex">
+              <motion.div
+                className="absolute top-2 bottom-2 bg-gradient-to-r from-[#2C3E50] to-[#34495E] rounded-xl shadow-md"
+                initial={false}
+                animate={{
+                  left: activeTab === "renters" ? "8px" : "50%",
+                  width: activeTab === "renters" ? "calc(50% - 4px)" : "calc(50% - 4px)"
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
               <button
                 onClick={() => setActiveTab("renters")}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                className={`relative z-10 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
                   activeTab === "renters"
-                    ? "bg-[#2C3E50] text-white shadow-md"
+                    ? "text-white"
                     : "text-[#2C3E50] hover:text-[#34495E]"
                 }`}
               >
-                Renters
+                For Renters
               </button>
               <button
                 onClick={() => setActiveTab("listers")}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                className={`relative z-10 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
                   activeTab === "listers"
-                    ? "bg-[#2C3E50] text-white shadow-md"
+                    ? "text-white"
                     : "text-[#2C3E50] hover:text-[#34495E]"
                 }`}
               >
-                Listers
+                For Listers
               </button>
             </div>
           </div>
         </motion.div>
 
-        <div ref={containerRef} className="max-w-3xl mx-auto flex flex-col gap-24">
-          {currentSteps.map((step, index) => (
-            <motion.div
-              key={`${activeTab}-${index}`}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ 
-                duration: 0.6, 
-                delay: index * 0.2,
-                ease: "easeOut"
-              }}
-              className="flex flex-col md:flex-row items-center md:items-start gap-8 relative"
-            >
-              {/* Step number and vertical line */}
-              <div className="flex flex-col items-center md:items-start min-w-[60px]">
-                <div className="w-12 h-12 rounded-full bg-[#2C3E50] flex items-center justify-center text-white text-2xl font-bold mb-2 shadow-md">
-                  {index + 1}
-                </div>
+        {/* Steps Grid */}
+        <div ref={containerRef} className="max-w-7xl mx-auto">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="grid md:grid-cols-3 gap-8"
+          >
+            {currentSteps.map((step, index) => (
+              <motion.div
+                key={`${activeTab}-${index}`}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: index * 0.15,
+                  ease: "easeOut"
+                }}
+                className="relative group"
+              >
+                {/* Connection Line */}
                 {index < currentSteps.length - 1 && (
-                  <div className="hidden md:block w-1 h-24 bg-[#2C3E50]/10 mx-auto my-2 rounded-full" />
+                  <div className="hidden md:block absolute top-20 left-full w-8 h-0.5 bg-gradient-to-r from-[#2C3E50]/20 to-transparent z-0" />
                 )}
-              </div>
 
-              {/* Content */}
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-lg text-[#34495E] max-w-xl mx-auto md:mx-0">
-                  {step.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+                {/* Card */}
+                <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-50 group-hover:border-[#2C3E50]/10 h-full flex flex-col">
+                  {/* Step Number Badge */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2C3E50] to-[#34495E] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <span className="text-2xl font-bold text-white">{index + 1}</span>
+                    </div>
+                    <div className="text-4xl opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                      {step.emoji}
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-[#2C3E50] mb-4 group-hover:text-[#34495E] transition-colors duration-300">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed text-lg">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  {/* Decorative Element */}
+                  <div className="mt-6 h-1 w-12 bg-gradient-to-r from-[#2C3E50] to-[#34495E] rounded-full opacity-60 group-hover:w-20 transition-all duration-500" />
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+
         </div>
       </div>
     </section>
