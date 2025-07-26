@@ -13,7 +13,7 @@ import {
   GraduationCap, 
   Calendar, 
   Edit3, 
-  ArrowLeft, 
+  ArrowLeft,
   Camera,
   MapPin,
   BookOpen,
@@ -25,7 +25,11 @@ import {
   Plus,
   Eye,
   Trash2,
-  X
+  X,
+  Menu,
+  LogOut,
+  Settings,
+  Heart
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import UniversitySearch from '@/components/UniversitySearch'
@@ -50,6 +54,8 @@ export default function ProfilePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [showCropper, setShowCropper] = useState(false)
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('profile')
   const router = useRouter()
 
   useEffect(() => {
@@ -279,58 +285,190 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
       {/* Header */}
-      <div className="bg-[#FDF6ED] sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 lg:px-8">
+      <div className="bg-[#FDF6ED] sticky top-0 z-50 border-b border-[#F5E6D6]">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={handleBackToDashboard}
-                className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-[#2C3E50]" />
-              </button>
-              <div>
-                <h1 className="text-3xl font-extrabold text-[#2C3E50] tracking-tight">
-                  Profile
-                </h1>
-                <p className="text-[#34495E] mt-1 font-medium">Manage your account</p>
-              </div>
+            <div>
+              <h1 className="text-3xl font-extrabold text-[#2C3E50] tracking-tight">
+                UniHabitat
+              </h1>
             </div>
-            <div className="flex items-center space-x-3">
-              {!editMode && (
-                <Button
-                  onClick={handleEditProfile}
-                  className="bg-[#2C3E50] text-white px-4 py-2 rounded-2xl font-semibold shadow hover:bg-[#34495E]"
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </Button>
-              )}
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-4 py-2 rounded-2xl font-semibold"
-              >
-                Sign Out
-              </Button>
-            </div>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow hover:bg-[#F5E6D6] transition-all"
+            >
+              <Menu className="w-6 h-6 text-[#2C3E50]" />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 lg:px-8 py-10">
-        <div className="flex flex-col lg:flex-row gap-10">
-          {/* Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="lg:w-1/3 w-full flex-shrink-0"
+      {/* Hamburger Menu Overlay */}
+      {isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div
+            className="absolute right-0 top-0 h-full w-80 bg-[#FDF6ED]/95 backdrop-blur-xl border-l border-[#F5E6D6] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-[#2C3E50]/90 rounded-3xl shadow-lg border border-[#F5E6D6] p-8 text-center flex flex-col items-center">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-xl font-bold text-[#2C3E50]">Menu</h2>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors shadow-sm"
+                >
+                  <X className="w-5 h-5 text-[#2C3E50]" />
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {/* Dashboard Option */}
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-[#F5E6D6] transition-all duration-200 group shadow-md hover:shadow-lg"
+                >
+                  <div className="p-2 bg-gradient-to-br from-[#2C3E50] to-[#34495E] rounded-xl shadow-md">
+                    <Home className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-[#2C3E50]">Dashboard</p>
+                    <p className="text-sm text-[#34495E]">Browse housing listings</p>
+                  </div>
+                </button>
+
+                {/* Landing Page Option */}
+                <button
+                  onClick={() => router.push('/')}
+                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-[#F5E6D6] transition-all duration-200 group shadow-md hover:shadow-lg"
+                >
+                  <div className="p-2 bg-gradient-to-br from-[#34495E] to-[#2C3E50] rounded-xl shadow-md">
+                    <ArrowLeft className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-[#2C3E50]">Landing Page</p>
+                    <p className="text-sm text-[#34495E]">Back to homepage</p>
+                  </div>
+                </button>
+
+                {/* Logout Option */}
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-red-50 transition-all duration-200 group shadow-md hover:shadow-lg"
+                >
+                  <div className="p-2 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl shadow-md">
+                    <LogOut className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-[#2C3E50]">Logout</p>
+                    <p className="text-sm text-[#34495E]">Sign out of your account</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* User Info */}
+              {profile && (
+                <div className="mt-8 p-4 bg-[#F5E6D6] rounded-2xl shadow-md">
+                  <p className="text-sm font-medium text-[#34495E] mb-1">Signed in as</p>
+                  <p className="font-semibold text-[#2C3E50]">{profile.full_name}</p>
+                  <p className="text-sm text-[#34495E]">{user.email}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8"
+        >
+          {/* Page Title */}
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-[#2C3E50] mb-2">My Profile</h1>
+            <p className="text-[#34495E] text-lg">Manage your account and personal information</p>
+          </div>
+
+          {/* Layout with Sidebar and Content */}
+          <div className="flex gap-8">
+            {/* Left Sidebar Navigation */}
+            <div className="w-64 flex-shrink-0">
+              <div className="bg-white rounded-3xl shadow-lg p-6 sticky top-28">
+                <nav className="space-y-2">
+                  <button
+                    onClick={() => setActiveSection('profile')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl text-left transition-all duration-300 ${
+                      activeSection === 'profile'
+                        ? 'bg-[#2C3E50] text-white shadow-lg'
+                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                    }`}
+                  >
+                    <User className="w-5 h-5" />
+                    <span className="font-medium">My Profile</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveSection('preferences')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl text-left transition-all duration-300 ${
+                      activeSection === 'preferences'
+                        ? 'bg-[#2C3E50] text-white shadow-lg'
+                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                    }`}
+                  >
+                    <Settings className="w-5 h-5" />
+                    <span className="font-medium">Preferences</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveSection('listings')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl text-left transition-all duration-300 ${
+                      activeSection === 'listings'
+                        ? 'bg-[#2C3E50] text-white shadow-lg'
+                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                    }`}
+                  >
+                    <Home className="w-5 h-5" />
+                    <span className="font-medium">My Listings</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveSection('favourites')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl text-left transition-all duration-300 ${
+                      activeSection === 'favourites'
+                        ? 'bg-[#2C3E50] text-white shadow-lg'
+                        : 'text-[#2C3E50] hover:bg-[#FDF6ED] hover:shadow-md'
+                    }`}
+                  >
+                    <Heart className="w-5 h-5" />
+                    <span className="font-medium">Favourites</span>
+                  </button>
+                </nav>
+              </div>
+            </div>
+
+            {/* Right Content Area */}
+            <div className="flex-1 min-h-[600px]">
+              <motion.div
+                key={activeSection}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="h-full"
+              >
+                {activeSection === 'profile' && (
+                  <div className="space-y-8">
+
+          {/* Profile Header with Avatar - Centered */}
+          <div className="bg-white rounded-3xl shadow-lg p-8 text-center">
+            <div className="flex flex-col items-center">
               {/* Avatar */}
               <div className="relative inline-block mb-6">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-[#34495E]/30 to-[#2C3E50]/30 flex items-center justify-center relative">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-[#F5E6D6] to-[#E8D5C4] flex items-center justify-center relative border-4 border-[#F5E6D6]">
                   {editMode ? (
                     <div className="w-full h-full flex flex-col items-center justify-center">
                       {imagePreview || editData?.avatar_url ? (
@@ -340,7 +478,7 @@ export default function ProfilePage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <User className="w-16 h-16 text-[#34495E]" />
+                        <User className="w-16 h-16 text-[#2C3E50]" />
                       )}
                       {uploadingImage && (
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -376,44 +514,52 @@ export default function ProfilePage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-16 h-16 text-[#34495E]" />
+                    <User className="w-16 h-16 text-[#2C3E50]" />
                   )}
                 </div>
                 {editMode && (
                   <div className="mt-2 text-center">
-                    <label className="text-xs text-[#FDF6ED] cursor-pointer hover:text-white transition-colors">
+                    <label className="text-xs text-[#2C3E50] cursor-pointer hover:text-[#34495E] transition-colors">
                       Click to upload image
                     </label>
                   </div>
                 )}
               </div>
-              <h2 className="text-2xl font-bold text-white mb-1">{profile?.full_name}</h2>
-              <p className="text-[#FDF6ED] mb-2">{profile?.email}</p>
-              <div className="flex flex-col items-center gap-2 text-[#FDF6ED] mt-4">
-                <span className="inline-flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  {profile?.university}
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  {profile?.university_area}
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4" />
-                  Class of {profile?.year}
-                </span>
-              </div>
-            </div>
-          </motion.div>
 
-          {/* Info + Listings Column */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="lg:w-2/3 w-full flex flex-col gap-8"
-          >
-            {/* Personal Information */}
+              {/* Basic Info */}
+              <h1 className="text-4xl font-bold text-[#2C3E50] mb-2">{profile?.full_name || 'Your Name'}</h1>
+              <p className="text-[#34495E] text-lg mb-4">{profile?.email}</p>
+              
+              {/* Quick Info Cards */}
+              <div className="flex flex-wrap justify-center gap-4 mb-6">
+                <div className="bg-[#FDF6ED] px-4 py-2 rounded-2xl border border-[#F5E6D6]">
+                  <span className="inline-flex items-center gap-2 text-[#2C3E50] font-medium">
+                    <MapPin className="w-4 h-4" />
+                    {profile?.university || 'University'}
+                  </span>
+                </div>
+                <div className="bg-[#FDF6ED] px-4 py-2 rounded-2xl border border-[#F5E6D6]">
+                  <span className="inline-flex items-center gap-2 text-[#2C3E50] font-medium">
+                    <GraduationCap className="w-4 h-4" />
+                    Class of {profile?.year || 'Year'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Edit Button */}
+              {!editMode && (
+                <Button
+                  onClick={handleEditProfile}
+                  className="bg-[#2C3E50] text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:bg-[#34495E] transition-all"
+                >
+                  <Edit3 className="w-5 h-5 mr-2" />
+                  Edit Profile
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Personal Information */}
             <div className="bg-white rounded-3xl shadow-lg p-8 mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <User className="w-5 h-5 mr-2 text-blue-600" />
@@ -572,132 +718,169 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
-
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Your Listings - Full Width Section */}
-      <div className="w-full py-12">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-            <div>
-              <h3 className="text-3xl font-extrabold text-[#2C3E50] flex items-center mb-2">
-                <Home className="w-7 h-7 mr-3 text-orange-600" />
-                Your Listings
-              </h3>
-              <p className="text-[#34495E] text-lg">All the units you're currently listing for rent or sublease. Click edit to update details or add a new listing below.</p>
-            </div>
-            <Button
-              onClick={() => router.push('/dashboard/list')}
-              className="bg-[#2C3E50] text-white px-8 py-4 rounded-2xl font-semibold shadow hover:bg-[#34495E] text-xl"
-            >
-              <Plus className="w-6 h-6 mr-2" />
-              Add New Listing
-            </Button>
-          </div>
-                {listingsLoading ? (
-                  <div className="flex items-center justify-center py-16">
-                    <div className="w-8 h-8 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
-                    <span className="ml-4 text-[#34495E] text-lg">Loading your listings...</span>
                   </div>
-                ) : listings.length === 0 ? (
-                  <div className="text-center py-16">
-                    <Home className="w-14 h-14 text-[#BFAE9B] mx-auto mb-4" />
-                    <h4 className="text-2xl font-bold text-[#2C3E50] mb-2">No listings yet</h4>
-                    <p className="text-[#34495E] mb-6 text-lg">Start by creating your first listing to rent out your space.</p>
-                    <Button
-                      onClick={() => router.push('/dashboard/list')}
-                      className="bg-[#2C3E50] text-white px-8 py-4 rounded-2xl font-semibold shadow hover:bg-[#34495E] text-lg"
-                    >
-                      <Plus className="w-5 h-5 mr-2" />
-                      Create Your First Listing
-                    </Button>
-                  </div>
-                ) :
-                  <div className="w-full">
-                    <div className="grid gap-6" style={{ 
-                      gridTemplateColumns: listings.length >= 3 
-                        ? `repeat(${Math.min(listings.length, 5)}, 1fr)` 
-                        : 'repeat(auto-fit, minmax(320px, 320px))',
-                      justifyContent: listings.length < 3 ? 'flex-start' : 'stretch'
-                    }}>
-                    {listings.map((listing) => (
-                      <motion.div
-                        key={listing.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-xl p-6 border border-[#E8D5C4] shadow-md hover:shadow-lg transition-all duration-200 min-h-[320px]"
-                        whileHover={{ scale: 1.03 }}
-                      >
-                        <div className="flex flex-col h-full">
-                          <h4 className="text-sm font-bold text-[#2C3E50] mb-3 line-clamp-2 leading-tight">{listing.title}</h4>
-                          
-                          <div className="flex flex-col gap-2 mb-4">
-                            <span className={`px-3 py-1.5 rounded-lg text-xs font-medium text-center ${
-                              listing.status === 'approved' ? 'bg-green-100 text-green-700' :
-                              listing.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                              'bg-red-100 text-red-700'
-                            }`}>
-                              {listing.status === 'approved' ? 'Approved' :
-                               listing.status === 'pending' ? 'Pending' :
-                               'Rejected'}
-                            </span>
-                            <span className={`px-3 py-1.5 rounded-lg text-xs font-medium text-center ${
-                              listing.sublease_type === 'private-bedroom' 
-                                ? 'bg-blue-100 text-blue-700' 
-                                : 'bg-purple-100 text-purple-700'
-                            }`}>
-                              {listing.sublease_type === 'private-bedroom' ? 'Private Room' : 'Entire Place'}
-                            </span>
-                          </div>
+                )}
 
-                          <div className="flex items-center gap-2 mb-3">
-                            <DollarSign className="w-4 h-4 text-green-600" />
-                            <span className="text-base font-bold text-green-700">${listing.price}/month</span>
-                          </div>
-                          
-                          <div className="flex items-start gap-2 mb-3">
-                            <MapPin className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                            <span className="text-xs text-gray-600 line-clamp-2 leading-relaxed">{listing.address}</span>
-                          </div>
-                          
-                          <div className="flex gap-4 text-sm text-gray-600 mb-4">
-                            <span>{listing.total_bedrooms} bed</span>
-                            <span>{listing.total_bathrooms} bath</span>
-                          </div>
-                          
-                          <div className="flex gap-2 mt-auto">
-                            <Button
-                              size="sm"
-                              className="bg-[#2C3E50] text-white text-sm rounded-lg flex-1 py-2 hover:bg-[#34495E]"
-                              onClick={() => router.push(`/dashboard/list?edit=1&listingId=${listing.id}`)}
-                            >
-                              <Edit3 className="w-4 h-4 mr-1" />
-                              Edit
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-red-200 text-red-600 hover:bg-red-50 text-sm rounded-lg flex-1 py-2"
-                              onClick={() => handleDeleteListing(listing.id)}
-                              disabled={deletingListing === listing.id}
-                            >
-                              {deletingListing === listing.id ? (
-                                <div className="w-4 h-4 border border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                              ) : (
-                                <Trash2 className="w-4 h-4" />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                {activeSection === 'preferences' && (
+                  <div className="space-y-8">
+                    <div className="bg-white rounded-3xl shadow-lg p-8">
+                      <h2 className="text-2xl font-bold text-[#2C3E50] mb-6 flex items-center">
+                        <Settings className="w-6 h-6 mr-3" />
+                        Preferences
+                      </h2>
+                      <div className="text-center py-12">
+                        <Settings className="w-16 h-16 text-[#BFAE9B] mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Coming Soon</h3>
+                        <p className="text-[#34495E]">Preference settings will be available in a future update.</p>
+                      </div>
                     </div>
                   </div>
-                }
-        </div>
+                )}
+
+                {activeSection === 'listings' && (
+                  <div className="space-y-8">
+                    <div className="bg-white rounded-3xl shadow-lg p-8">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+                        <div>
+                          <h2 className="text-2xl font-bold text-[#2C3E50] flex items-center mb-2">
+                            <Home className="w-6 h-6 mr-3" />
+                            My Listings
+                          </h2>
+                          <p className="text-[#34495E]">All the units you're currently listing for rent or sublease.</p>
+                        </div>
+                        <Button
+                          onClick={() => router.push('/dashboard/list')}
+                          className="bg-[#2C3E50] text-white px-6 py-3 rounded-2xl font-semibold shadow hover:bg-[#34495E]"
+                        >
+                          <Plus className="w-5 h-5 mr-2" />
+                          Add New Listing
+                        </Button>
+                      </div>
+
+                      {listingsLoading ? (
+                        <div className="flex items-center justify-center py-16">
+                          <div className="w-8 h-8 border-2 border-[#2C3E50] border-t-transparent rounded-full animate-spin"></div>
+                          <span className="ml-4 text-[#34495E] text-lg">Loading your listings...</span>
+                        </div>
+                      ) : listings.length === 0 ? (
+                        <div className="text-center py-16">
+                          <Home className="w-14 h-14 text-[#BFAE9B] mx-auto mb-4" />
+                          <h4 className="text-2xl font-bold text-[#2C3E50] mb-2">No listings yet</h4>
+                          <p className="text-[#34495E] mb-6 text-lg">Start by creating your first listing to rent out your space.</p>
+                          <Button
+                            onClick={() => router.push('/dashboard/list')}
+                            className="bg-[#2C3E50] text-white px-8 py-4 rounded-2xl font-semibold shadow hover:bg-[#34495E] text-lg"
+                          >
+                            <Plus className="w-5 h-5 mr-2" />
+                            Create Your First Listing
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="grid gap-6" style={{ 
+                          gridTemplateColumns: listings.length >= 3 
+                            ? `repeat(${Math.min(listings.length, 3)}, 1fr)` 
+                            : 'repeat(auto-fit, minmax(320px, 320px))',
+                          justifyContent: listings.length < 3 ? 'flex-start' : 'stretch'
+                        }}>
+                          {listings.map((listing) => (
+                            <motion.div
+                              key={listing.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="bg-[#FDF6ED] rounded-xl p-6 border border-[#E8D5C4] shadow-md hover:shadow-lg transition-all duration-200 min-h-[320px]"
+                              whileHover={{ scale: 1.03 }}
+                            >
+                              <div className="flex flex-col h-full">
+                                <h4 className="text-sm font-bold text-[#2C3E50] mb-3 line-clamp-2 leading-tight">{listing.title}</h4>
+                                
+                                <div className="flex flex-col gap-2 mb-4">
+                                  <span className={`px-3 py-1.5 rounded-lg text-xs font-medium text-center ${
+                                    listing.status === 'approved' ? 'bg-green-100 text-green-700' :
+                                    listing.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                    'bg-red-100 text-red-700'
+                                  }`}>
+                                    {listing.status === 'approved' ? 'Approved' :
+                                     listing.status === 'pending' ? 'Pending' :
+                                     'Rejected'}
+                                  </span>
+                                  <span className={`px-3 py-1.5 rounded-lg text-xs font-medium text-center ${
+                                    listing.sublease_type === 'private-bedroom' 
+                                      ? 'bg-blue-100 text-blue-700' 
+                                      : 'bg-purple-100 text-purple-700'
+                                  }`}>
+                                    {listing.sublease_type === 'private-bedroom' ? 'Private Room' : 'Entire Place'}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2 mb-3">
+                                  <DollarSign className="w-4 h-4 text-green-600" />
+                                  <span className="text-base font-bold text-green-700">${listing.price}/month</span>
+                                </div>
+                                
+                                <div className="flex items-start gap-2 mb-3">
+                                  <MapPin className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-xs text-gray-600 line-clamp-2 leading-relaxed">{listing.address}</span>
+                                </div>
+                                
+                                <div className="flex gap-4 text-sm text-gray-600 mb-4">
+                                  <span>{listing.total_bedrooms} bed</span>
+                                  <span>{listing.total_bathrooms} bath</span>
+                                </div>
+                                
+                                <div className="flex gap-2 mt-auto">
+                                  <Button
+                                    size="sm"
+                                    className="bg-[#2C3E50] text-white text-sm rounded-lg flex-1 py-2 hover:bg-[#34495E]"
+                                    onClick={() => router.push(`/dashboard/list?edit=1&listingId=${listing.id}`)}
+                                  >
+                                    <Edit3 className="w-4 h-4 mr-1" />
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-red-200 text-red-600 hover:bg-red-50 text-sm rounded-lg flex-1 py-2"
+                                    onClick={() => handleDeleteListing(listing.id)}
+                                    disabled={deletingListing === listing.id}
+                                  >
+                                    {deletingListing === listing.id ? (
+                                      <div className="w-4 h-4 border border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                      <Trash2 className="w-4 h-4" />
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {activeSection === 'favourites' && (
+                  <div className="space-y-8">
+                    <div className="bg-white rounded-3xl shadow-lg p-8">
+                      <h2 className="text-2xl font-bold text-[#2C3E50] mb-6 flex items-center">
+                        <Heart className="w-6 h-6 mr-3" />
+                        Favourites
+                      </h2>
+                      <div className="text-center py-12">
+                        <Heart className="w-16 h-16 text-[#BFAE9B] mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-[#2C3E50] mb-2">Coming Soon</h3>
+                        <p className="text-[#34495E]">Save your favorite listings and they'll appear here.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
       </div>
+
+
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}
         onClose={cancelDelete}
