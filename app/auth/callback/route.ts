@@ -32,17 +32,7 @@ export async function GET(request: Request) {
         // First, try to exchange the code for a session
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
         
-        console.log('Code exchange result:', {
-          success: !exchangeError,
-          hasData: !!data,
-          hasUser: !!data?.user,
-          error: exchangeError ? {
-            message: exchangeError.message,
-            status: exchangeError.status,
-            name: exchangeError.name
-          } : null,
-          timestamp: new Date().toISOString()
-        })
+
         
         if (exchangeError) {
           console.error('Code exchange error:', exchangeError)

@@ -345,7 +345,7 @@ export default function ProfileSetup() {
                     name="avatar_url"
                     value={formData.avatar_url}
                     onChange={handleInputChange}
-                    placeholder="https://example.com/avatar.png"
+                    placeholder="https://yourimage.com/avatar.png"
                     className="pl-10 focus:ring-2 focus:ring-[#2C3E50] focus:border-transparent"
                   />
                 </div>
