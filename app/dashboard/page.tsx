@@ -511,73 +511,58 @@ export default function Dashboard() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute right-0 top-0 h-full w-80 bg-[#FDF6ED]/95 backdrop-blur-xl border-l border-[#F5E6D6] shadow-2xl"
+            className="absolute right-4 top-4 w-64 bg-white/95 backdrop-blur-xl rounded-2xl border border-[#F5E6D6] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-xl font-bold text-[#2C3E50]">Menu</h2>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-[#2C3E50]">Menu</h2>
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-2 rounded-full hover:bg-[#F5E6D6] transition-colors shadow-sm"
+                  className="p-1.5 rounded-lg hover:bg-[#F5E6D6] transition-colors"
                 >
-                  <X className="w-5 h-5 text-[#2C3E50]" />
+                  <X className="w-4 h-4 text-[#2C3E50]" />
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {/* Profile Option */}
                 <button
                   onClick={() => handleMenuAction('profile')}
-                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-[#F5E6D6] transition-all duration-200 group shadow-md hover:shadow-lg"
+                  className="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-[#F5E6D6] transition-all duration-200 text-left"
                 >
-                  <div className="p-2 bg-gradient-to-br from-[#2C3E50] to-[#34495E] rounded-xl shadow-md">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-semibold text-[#2C3E50]">Profile</p>
-                    <p className="text-sm text-[#34495E]">Manage your account</p>
-                  </div>
+                  <User className="w-4 h-4 text-[#2C3E50]" />
+                  <span className="font-medium text-[#2C3E50]">Profile</span>
                 </button>
 
                 {/* Homepage Option */}
                 <button
                   onClick={() => handleMenuAction('homepage')}
-                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-[#F5E6D6] transition-all duration-200 group shadow-md hover:shadow-lg"
+                  className="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-[#F5E6D6] transition-all duration-200 text-left"
                 >
-                  <div className="p-2 bg-gradient-to-br from-[#34495E] to-[#2C3E50] rounded-xl shadow-md">
-                    <Home className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-semibold text-[#2C3E50]">Homepage</p>
-                    <p className="text-sm text-[#34495E]">Back to landing page</p>
-                  </div>
+                  <Home className="w-4 h-4 text-[#2C3E50]" />
+                  <span className="font-medium text-[#2C3E50]">Homepage</span>
                 </button>
 
                 {/* Logout Option */}
                 <button
                   onClick={() => handleMenuAction('logout')}
                   disabled={isLoggingOut}
-                  className="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-red-50 transition-all duration-200 group shadow-md hover:shadow-lg"
+                  className="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-red-50 transition-all duration-200 text-left"
                 >
-                  <div className="p-2 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl shadow-md">
-                    <LogOut className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-semibold text-[#2C3E50]">
-                      {isLoggingOut ? 'Logging out...' : 'Logout'}
-                    </p>
-                    <p className="text-sm text-[#34495E]">Sign out of your account</p>
-                  </div>
+                  <LogOut className="w-4 h-4 text-red-600" />
+                  <span className="font-medium text-red-600">
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
+                  </span>
                 </button>
               </div>
 
               {/* User Info */}
               {profile && (
-                <div className="mt-8 p-4 bg-[#F5E6D6] rounded-2xl shadow-md">
-                  <p className="text-sm font-medium text-[#34495E] mb-1">Signed in as</p>
-                  <p className="font-semibold text-[#2C3E50]">{profile.full_name}</p>
-                  <p className="text-sm text-[#34495E]">{user.email}</p>
+                <div className="mt-4 pt-3 border-t border-[#F5E6D6]">
+                  <p className="text-xs text-[#34495E] mb-1">Signed in as</p>
+                  <p className="font-semibold text-[#2C3E50] text-sm">{profile.full_name}</p>
+                  <p className="text-xs text-[#34495E] truncate">{user.email}</p>
                 </div>
               )}
             </div>
