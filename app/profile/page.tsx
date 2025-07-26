@@ -284,15 +284,18 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#FDF6ED]">
-      {/* Header */}
-      <div className="bg-[#FDF6ED] sticky top-0 z-50 border-b border-[#F5E6D6]">
+            {/* Header */}
+      <div className="bg-[#FDF6ED] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="flex justify-between items-center py-6">
-              <div>
-                <h1 className="text-3xl font-extrabold text-[#2C3E50] tracking-tight">
+            <button
+              onClick={() => router.push('/')}
+              className="hover:opacity-80 transition-opacity"
+            >
+              <h1 className="text-3xl font-extrabold text-[#2C3E50] tracking-tight">
                 UniHabitat
-                </h1>
-            </div>
+              </h1>
+            </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow hover:bg-[#F5E6D6] transition-all"
